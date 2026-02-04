@@ -1,0 +1,279 @@
+.auth {
+  margin: 0 auto;
+  max-width: 1440px;
+  display: grid;
+  place-items: center;
+  padding: 90px 16px 40px;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 410px;
+  border-radius: 16px;
+  background: var(--card);
+  padding: 40px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .auth__card {
+    max-width: 540px;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 28px 32px;
+    gap: 24px;
+  }
+}
+
+.auth__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth__tabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth__tabBig,
+.auth__tabSmall {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .auth__tabBig,
+  .auth__tabSmall {
+    font-size: 32px;
+  }
+}
+
+.auth__tab--active {
+  color: var(--text);
+}
+.auth__tab--inactive {
+  color: var(--text-muted);
+}
+
+.auth__desc {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+@media (min-width: 768px) {
+  .auth__desc {
+    font-size: 16px;
+  }
+}
+
+.auth__section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.auth__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth__link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--text-muted);
+  text-align: left;
+  text-decoration: underline;
+}
+.auth__link:hover {
+  color: var(--text);
+}
+
+.auth__footer {
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .auth__footer {
+    font-size: 16px;
+  }
+}
+
+.auth__footerBtn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+.auth__footerBtn:hover {
+  color: var(--text);
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+.iconBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.roleCard {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 120ms ease;
+}
+.roleCard:hover {
+  border-color: color-mix(in srgb, var(--brand) 60%, var(--border));
+}
+
+.roleCard--selected {
+  border-color: var(--brand);
+}
+
+.roleCard__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: var(--card);
+}
+
+@media (min-width: 768px) {
+  .roleCard__content {
+    padding: 24px;
+  }
+}
+
+.roleCard__title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #000;
+}
+
+@media (min-width: 768px) {
+  .roleCard__title {
+    font-size: 20px;
+    font-weight: 400;
+  }
+}
+
+.roleCard__desc {
+  font-size: 12px;
+  line-height: 1.2;
+  color: #878787;
+  white-space: pre-line;
+}
+
+@media (min-width: 768px) {
+  .roleCard__desc {
+    font-size: 14px;
+  }
+}
+
+.roleCard__right {
+  position: relative;
+  width: 120px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .roleCard__right {
+    width: 180px;
+    min-height: 140px;
+  }
+}
+
+.roleCard__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.roleCard__radio {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .roleCard__radio {
+    width: 24px;
+    height: 24px;
+    top: 16px;
+    right: 16px;
+  }
+}
+
+.roleCard--selected .roleCard__radio {
+  border-color: var(--brand);
+}
+
+.roleCard__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+@media (min-width: 768px) {
+  .roleCard__dot {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.auth__checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+

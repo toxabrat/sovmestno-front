@@ -1,0 +1,14 @@
+:root {
+  --bg: #f4f4f4;
+  --text: #313235;
+  --text-muted: #98989a;
+  --card: #ffffff;
+  --border: #d4d8f3;
+  --brand: #6c7efe;
+  --lime: #d8f772;
+  --shadow-card: 0px 0px 10px 0px rgba(196, 196, 196, 0.25);
+  --radius-card: 24px;
+
+  font-family: 'Golos Text', system-ui, -apple-system, sans-serif;
+}
+

@@ -1,0 +1,116 @@
+
+.notFound {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .notFound {
+    padding: 24px 20px;
+  }
+}
+
+.notFound__card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 0 40px 60px;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .notFound__card {
+    padding: 0 24px 40px;
+    border-radius: 12px;
+  }
+}
+
+.notFound__image {
+  display: block;
+  max-width: 450px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 600px) {
+  .notFound__image {
+    max-width: 280px;
+    margin-bottom: 24px;
+  }
+}
+
+.notFound__title {
+  font-family: 'Golos Text', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.1;
+  color: #000;
+  margin: 0 0 16px;
+}
+
+@media (max-width: 600px) {
+  .notFound__title {
+    font-size: 32px;
+  }
+}
+
+.notFound__subtitle {
+  font-family: 'Golos Text', sans-serif;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #313235;
+  margin: 0 0 32px;
+}
+
+@media (max-width: 600px) {
+  .notFound__subtitle {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .notFound__subtitle br {
+    display: none;
+  }
+}
+
+.notFound__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 36px;
+  background: #6C7EFE;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Golos Text', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+  cursor: pointer;
+  transition: filter 150ms ease;
+}
+
+.notFound__btn:hover {
+  filter: brightness(0.95);
+}
+
+@media (max-width: 600px) {
+  .notFound__btn {
+    height: 48px;
+    padding: 0 28px;
+    font-size: 13px;
+  }
+}
+
