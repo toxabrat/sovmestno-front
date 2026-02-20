@@ -1,0 +1,311 @@
+.venueProfile {
+  width: 100%;
+  background: #f4f4f6;
+  min-height: calc(100vh - 64px);
+}
+
+.venueProfile__content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+@media (max-width: 768px) {
+  .venueProfile__content {
+    padding: 20px 16px 60px;
+  }
+}
+
+/* ── State ── */
+.venueProfile__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  font-size: 16px;
+  color: #888;
+}
+.venueProfile__state--error { color: #c0392b; }
+
+/* ── Layout ── */
+.venueProfile__layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .venueProfile__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Main card ── */
+.venueProfile__card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+/* Cover */
+.venueProfile__cover {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+}
+
+.venueProfile__coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.venueProfile__coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e0ddf8 0%, #c8c0f0 100%);
+}
+
+/* Card body — padding around logo+name+buttons */
+.venueProfile__cardBody {
+  padding: 0 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Identity row */
+.venueProfile__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: -52px; /* logo overlaps cover */
+}
+
+.venueProfile__logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 4px solid #fff;
+  background: #f0ecff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+}
+
+.venueProfile__logoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.venueProfile__logoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #c8963e 0%, #9a6820 100%);
+}
+
+.venueProfile__nameBlock {
+  padding-top: 60px; /* push down so it starts below the logo overlap */
+  flex: 1;
+  min-width: 0;
+}
+
+.venueProfile__name {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.venueProfile__desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Actions — right-aligned */
+.venueProfile__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.venueProfile__saveBtn {
+  height: 46px;
+  padding: 0 32px;
+  border-radius: 100px;
+  border: 1.5px solid #1a1a1a;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+
+.venueProfile__saveBtn:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.venueProfile__proposeBtn {
+  height: 46px;
+  padding: 0 28px;
+  border-radius: 100px;
+  border: none;
+  background: #5B6BF5;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 150ms;
+}
+
+.venueProfile__proposeBtn:hover {
+  opacity: 0.88;
+}
+
+/* ── Sidebar ── */
+.venueProfile__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.venueProfile__sideCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.venueProfile__sideHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.venueProfile__sideIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.venueProfile__sideTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.venueProfile__address {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Social badges ── */
+.venueProfile__socialList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.venueProfile__socialBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 7px 7px;
+  border-radius: 12px;
+  background: #f0f1ff;
+  text-decoration: none;
+  transition: opacity 150ms;
+}
+
+.venueProfile__socialBadge:hover {
+  opacity: 0.82;
+}
+
+.venueProfile__socialBadgeImg {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.venueProfile__socialBadgeLabel {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Photos section ── */
+.venueProfile__photos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.venueProfile__photosTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.venueProfile__photosGrid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.venueProfile__photoThumb {
+  width: 190px;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.venueProfile__photoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.venueProfile__photoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e0ddf5 0%, #ccc8e8 100%);
+}
+
+@media (max-width: 600px) {
+  .venueProfile__photoThumb {
+    width: calc(50% - 6px);
+    height: 110px;
+  }
+
+  .venueProfile__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .venueProfile__saveBtn,
+  .venueProfile__proposeBtn {
+    width: 100%;
+  }
+}

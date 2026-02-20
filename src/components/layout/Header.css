@@ -112,14 +112,29 @@
   gap: 16px;
 }
 
-.header__userEvents {
+.header__createBtn {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
   font-size: 14px;
+  font-weight: 400;
   color: var(--text);
+  background: transparent;
+  border: 1.5px solid var(--text);
+  border-radius: 100px;
+  cursor: pointer;
   white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.header__createBtn:hover {
+  background: var(--text);
+  color: var(--card);
 }
 
 @media (max-width: 900px) {
-  .header__userEvents {
+  .header__createBtn {
     display: none;
   }
 }

@@ -1,4 +1,7 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
+import { useAuth } from '../../context/AuthContext'
 import './SpaceSuccessPage.css'
 
 import starBig from '../../assets/icons/space_gratitude/Star 42.png'
@@ -8,6 +11,21 @@ import underlineLine from '../../assets/icons/space_gratitude/Vector 2370.png'
 
 export function SpaceSuccessPage() {
   const navigate = useNavigate()
+  const { data, resetData } = useSpaceRegistration()
+  const { login, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (data.token && data.userId && !isAuthenticated) {
+      login(data.token, {
+        id: data.userId,
+        email: data.email,
+        role: 'venue',
+        name: data.name,
+        avatarId: data.logoId ?? undefined,
+      })
+      resetData()
+    }
+  }, [data, login, isAuthenticated, resetData])
 
   const handleViewEvents = () => {
     navigate('/events')

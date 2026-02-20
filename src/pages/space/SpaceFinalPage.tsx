@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
+import { updateVenueProfile, uploadImage } from '../../api/auth'
 import './SpaceFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -23,16 +25,21 @@ const EVENT_FORMATS = [
 
 export function SpaceFinalPage() {
   const navigate = useNavigate()
+  const { data, updateData } = useSpaceRegistration()
 
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  const [photos, setPhotos] = useState<Array<{ preview: string; uploading: boolean }>>([])
   const [selectedFormats, setSelectedFormats] = useState<string[]>([])
-  const [telegram, setTelegram] = useState('')
-  const [vk, setVk] = useState('')
-  const [tiktok, setTiktok] = useState('')
-  const [youtube, setYoutube] = useState('')
-  const [dzen, setDzen] = useState('')
+  const [telegram, setTelegram] = useState(data.telegramChannel)
+  const [vk, setVk] = useState(data.vkLink)
+  const [tiktok, setTiktok] = useState(data.tiktokLink)
+  const [youtube, setYoutube] = useState(data.youtubeLink)
+  const [dzen, setDzen] = useState(data.dzenLink)
+  const [isLoading, setIsLoading] = useState(false)
 
   const allSelected = selectedFormats.length === EVENT_FORMATS.length
-  
+
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedFormats([])
@@ -53,20 +60,78 @@ export function SpaceFinalPage() {
     navigate('/space/create')
   }
 
+  const handlePhotoClick = () => {
+    photoInputRef.current?.click()
+  }
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+
+    for (const file of files) {
+      const preview = URL.createObjectURL(file)
+      const idx = photos.length
+      setPhotos(prev => [...prev, { preview, uploading: true }])
+
+      if (data.token) {
+        try {
+          await uploadImage(file, 'venue-photo', data.token)
+        } catch (err) {
+          console.error('Error uploading venue photo:', err)
+        }
+      }
+
+      setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, uploading: false } : p))
+    }
+
+    e.target.value = ''
+  }
+
   const handleSkip = () => {
     navigate('/space/success')
   }
 
+  const submitData = async () => {
+    if (!data.token || !data.userId) {
+      console.error('No token or userId, navigating to success anyway')
+      navigate('/space/success')
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const streetAddress = [data.city, data.street].filter(Boolean).join(', ')
+      await updateVenueProfile(data.userId, {
+        name: data.name,
+        description: data.description || undefined,
+        street_address: streetAddress || undefined,
+        tg_channel_link: telegram || undefined,
+        vk_link: vk || undefined,
+        tiktok_link: tiktok || undefined,
+        youtube_link: youtube || undefined,
+        dzen_link: dzen || undefined,
+      }, data.token)
+
+      updateData({
+        telegramChannel: telegram,
+        vkLink: vk,
+        tiktokLink: tiktok,
+        youtubeLink: youtube,
+        dzenLink: dzen,
+      })
+
+      navigate('/space/success')
+    } catch (err) {
+      console.error('Error updating venue social links:', err)
+      navigate('/space/success')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSave = () => {
-    console.log({
-      selectedFormats,
-      telegram,
-      vk,
-      tiktok,
-      youtube,
-      dzen,
-    })
-    navigate('/space/success')
+    submitData()
   }
 
   return (
@@ -89,11 +154,29 @@ export function SpaceFinalPage() {
         </div>
       </header>
 
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handlePhotoChange}
+        style={{ display: 'none' }}
+      />
+
       <div className="spaceFinal__photoUpload">
-        <button type="button" className="spaceFinal__photoBtn">
-          <img src={plusIcon} alt="" className="spaceFinal__photoIcon" />
-          <span className="spaceFinal__photoText">Загрузить фото</span>
-        </button>
+        <div className="spaceFinal__photoGallery">
+          <button type="button" className="spaceFinal__photoBtn" onClick={handlePhotoClick}>
+            <img src={plusIcon} alt="" className="spaceFinal__photoIcon" />
+            <span className="spaceFinal__photoText">Загрузить фото</span>
+          </button>
+
+          {photos.map((photo, i) => (
+            <div key={i} className="spaceFinal__photoThumb">
+              <img src={photo.preview} alt="" className="spaceFinal__photoThumbImg" />
+              {photo.uploading && <div className="spaceFinal__photoThumbOverlay" />}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="spaceFinal__formatsCard">
@@ -210,19 +293,21 @@ export function SpaceFinalPage() {
       </div>
 
       <div className="spaceFinal__footer">
-        <button 
-          type="button" 
+        <button
+          type="button"
           className="spaceFinal__skipBtn"
           onClick={handleSkip}
+          disabled={isLoading}
         >
-          Пропустить
+          {isLoading ? 'Загрузка...' : 'Пропустить'}
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className="spaceFinal__saveBtn"
           onClick={handleSave}
+          disabled={isLoading}
         >
-          Сохранить
+          {isLoading ? 'Загрузка...' : 'Сохранить'}
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { TextField } from '../../components/ui/TextField'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
+import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { registerCreator, login as apiLogin } from '../../api/auth'
 import './AuthPage.css'
@@ -100,6 +101,7 @@ function isValidPassword(password: string): boolean {
 export function AuthPage() {
   const navigate = useNavigate()
   const { updateData } = useCreatorRegistration()
+  const { updateData: updateSpaceData } = useSpaceRegistration()
   const { login } = useAuth()
   
   const [tab, setTab] = useState<Tab>('signup')
@@ -121,6 +123,11 @@ export function AuthPage() {
     if (!isFormValid || isLoading) return
     
     if (role === 'space') {
+      updateSpaceData({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      })
       navigate('/space/create')
     } else if (role === 'creator') {
       setIsLoading(true)

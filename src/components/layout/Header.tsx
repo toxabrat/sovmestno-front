@@ -24,10 +24,10 @@ export function Header() {
     navigate('/landing/space')
   }
 
-  const avatarId = 1
+  const avatarId = user?.avatarId
 
   useEffect(() => {
-    if (!token || !isAuthenticated) {
+    if (!token || !isAuthenticated || !avatarId) {
       setAvatarUrl(null)
       if (avatarUrlRef.current) {
         URL.revokeObjectURL(avatarUrlRef.current)
@@ -36,7 +36,7 @@ export function Header() {
       return
     }
     let cancelled = false
-    fetchImageUrl(avatarId, token)
+    fetchImageUrl(avatarId!, token)
       .then((url) => {
         if (cancelled) {
           URL.revokeObjectURL(url)
@@ -58,7 +58,7 @@ export function Header() {
       }
       setAvatarUrl(null)
     }
-  }, [token, isAuthenticated])
+  }, [token, isAuthenticated, avatarId])
 
   const nav = useMemo(
     () => [
@@ -107,7 +107,11 @@ export function Header() {
         <div className="header__right">
           {isAuthenticated ? (
             <div className="header__user">
-              <span className="header__userEvents">Мои мероприятия</span>
+              {user?.role === 'creator' && (
+                <button type="button" className="header__createBtn">
+                  создать мероприятие
+                </button>
+              )}
               <button type="button" className="header__iconBtn">
                 <img src={iconBookmark} alt="Закладки" className="header__icon" />
               </button>
@@ -115,13 +119,22 @@ export function Header() {
                 <img src={iconBell} alt="Уведомления" className="header__icon" />
                 <span className="header__bellDot" />
               </button>
-              <div className="header__avatar">
+              <button
+                type="button"
+                className="header__avatar"
+                onClick={() => {
+                  if (user?.role === 'venue') navigate('/venue/profile')
+                  else if (user?.role === 'creator') navigate('/creator/profile')
+                }}
+                style={{ cursor: (user?.role === 'venue' || user?.role === 'creator') ? 'pointer' : 'default' }}
+                aria-label="Профиль"
+              >
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Аватар" className="header__avatarImg" />
                 ) : (
                   <span className="header__avatarPlaceholder" />
                 )}
-              </div>
+              </button>
               <button type="button" className="header__logout" onClick={handleLogout}>
                 Выйти
               </button>
