@@ -1,0 +1,80 @@
+name: Deploy Frontend to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Staging Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create .env.staging from secrets
+        run: |
+          cat > .env.staging << 'EOF'
+          VITE_API_URL=https://${{ secrets.STAGING_API_DOMAIN }}
+          EOF
+
+      - name: Build frontend (staging)
+        run: npm run build -- --mode staging
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.STAGING_SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Prepare deployment directory
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.STAGING_DEPLOY_PATH }}
+        run: |
+          echo "Creating deployment directory on server..."
+          ssh ${STAGING_USER}@${STAGING_HOST} "mkdir -p ${DEPLOY_PATH}"
+
+      - name: Upload built files
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.STAGING_DEPLOY_PATH }}
+        run: |
+          echo "Uploading files to server..."
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./dist/ ${STAGING_USER}@${STAGING_HOST}:${DEPLOY_PATH}/
+
+      - name: Verify deployment
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.STAGING_DEPLOY_PATH }}
+        run: |
+          echo "Verifying deployment..."
+
+          ssh ${STAGING_USER}@${STAGING_HOST} "ls -la ${DEPLOY_PATH}"
+
+          echo "✓ Frontend deployed successfully!"
+          echo "Frontend URL: https://${{ secrets.STAGING_DOMAIN }}"
+          echo "API URL: https://${{ secrets.STAGING_API_DOMAIN }}"
+
+      - name: Send notification on failure
+        if: failure()
+        run: |
+          echo "Frontend deployment to staging failed!"
+          # Add notification logic here (Telegram, Slack, etc.)
