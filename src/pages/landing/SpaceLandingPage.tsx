@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom'
 import { Header } from '../../components/layout/Header'
 import './SpaceLandingPage.css'
 
+import heroStar from '../../assets/icons/hero-star.svg'
+import benefit1 from '../../assets/icons/space_landing/Frame 2131327892.png'
+import benefit2 from '../../assets/icons/space_landing/Frame 2131327893.png'
+import benefit3 from '../../assets/icons/space_landing/Frame 2131328051.png'
+import benefit4 from '../../assets/icons/space_landing/Frame 2131327894.png'
+
 export function SpaceLandingPage() {
   const [activeTab, setActiveTab] = useState<'space' | 'creator'>('space')
 
@@ -48,7 +54,7 @@ export function SpaceLandingPage() {
           </Link>
 
           <img 
-            src="/src/assets/icons/hero-star.svg" 
+            src={heroStar} 
             alt="" 
             className="landing__heroStar" 
           />
@@ -58,22 +64,22 @@ export function SpaceLandingPage() {
       <section className="landing__section">
         <div className="landing__benefits">
           <img 
-            src="/src/assets/icons/space_landing/Frame 2131327892.png" 
+            src={benefit1} 
             alt="Экономия времени" 
             className="landing__benefitImg"
           />
           <img 
-            src="/src/assets/icons/space_landing/Frame 2131327893.png" 
+            src={benefit2} 
             alt="Готовые идеи мероприятий" 
             className="landing__benefitImg"
           />
           <img 
-            src="/src/assets/icons/space_landing/Frame 2131328051.png" 
+            src={benefit3} 
             alt="Привлечение аудитории" 
             className="landing__benefitImg"
           />
           <img 
-            src="/src/assets/icons/space_landing/Frame 2131327894.png" 
+            src={benefit4} 
             alt="Позиционирование на рынке" 
             className="landing__benefitImg"
           />
