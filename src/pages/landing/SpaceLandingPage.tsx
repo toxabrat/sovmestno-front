@@ -85,13 +85,3 @@ export function SpaceLandingPage() {
   )
 }
 
-function StepCard({ number, title }: { number: number; title: string }) {
-  return (
-    <div className="landing__step">
-      <div className="landing__stepNumber">{number}</div>
-      <h3 className="landing__stepTitle">{title}</h3>
-      <div className="landing__stepDecor" />
-    </div>
-  )
-}
-
