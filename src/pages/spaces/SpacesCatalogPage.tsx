@@ -23,7 +23,7 @@ function VenueCard({ venue: initialVenue, token }: { venue: VenueListItem; token
   useEffect(() => {
     if (!token || (initialVenue.description && (initialVenue.street_address || initialVenue.address))) return
     let cancelled = false
-    fetch(`/api/user/users/venues/${initialVenue.user_id}`, {
+    fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/venues/${initialVenue.user_id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : null)

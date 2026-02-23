@@ -1,4 +1,4 @@
-const EVENT_API_BASE = '/api/event'
+const EVENT_API_BASE = `${import.meta.env.VITE_API_URL ?? ''}/api/event`
 
 export interface Category {
   id: number

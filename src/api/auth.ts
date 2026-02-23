@@ -1,4 +1,4 @@
-export const API_BASE_URL = '/api'
+export const API_BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api`
 
 export async function fetchImageUrl(imageId: number, token: string): Promise<string> {
   const url = `${API_BASE_URL}/user/users/images/${imageId}`

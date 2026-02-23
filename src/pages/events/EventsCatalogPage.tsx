@@ -17,7 +17,7 @@ async function getCreatorInfo(
 ): Promise<{ name: string; avatarId?: number }> {
   if (creatorCache[creatorId]) return creatorCache[creatorId]
   try {
-    const res = await fetch(`/api/user/users/creators/${creatorId}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/creators/${creatorId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) throw new Error()
