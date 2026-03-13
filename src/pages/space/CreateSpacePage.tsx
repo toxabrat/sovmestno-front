@@ -103,6 +103,7 @@ export function CreateSpacePage() {
       })
 
       const token = response.access_token
+      const refreshToken = response.refresh_token
       const userId = response.user.id
       const venueId = response.user.venue?.id ?? null
 
@@ -134,6 +135,7 @@ export function CreateSpacePage() {
 
       updateData({
         token,
+        refreshToken,
         userId,
         venueId,
         description: about.trim(),

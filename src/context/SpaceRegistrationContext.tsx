@@ -2,6 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 
 interface SpaceRegistrationData {
   token: string | null
+  refreshToken: string | null
   userId: number | null
   venueId: number | null
   name: string
@@ -34,6 +35,7 @@ interface SpaceRegistrationContextType {
 
 const initialData: SpaceRegistrationData = {
   token: null,
+  refreshToken: null,
   userId: null,
   venueId: null,
   name: '',

@@ -21,7 +21,7 @@ export function initApiClient(
 let refreshPromise: Promise<string> | null = null
 
 async function getValidToken(): Promise<string | null> {
-  const { token, refreshToken } = getAuth()
+  const { token } = getAuth()
   if (!token) return null
 
   return token

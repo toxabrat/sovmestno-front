@@ -143,6 +143,7 @@ export function AuthPage() {
 
         updateData({ 
           token: response.access_token,
+          refreshToken: response.refresh_token,
           userId: response.user.id,
           name: name.trim(), 
           email: email.trim(), 

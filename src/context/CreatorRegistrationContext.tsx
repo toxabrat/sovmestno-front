@@ -2,6 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 
 interface CreatorRegistrationData {
   token: string | null
+  refreshToken: string | null
   userId: number | null
   name: string
   email: string
@@ -29,6 +30,7 @@ interface CreatorRegistrationContextType {
 
 const initialData: CreatorRegistrationData = {
   token: null,
+  refreshToken: null,
   userId: null,
   name: '',
   email: '',

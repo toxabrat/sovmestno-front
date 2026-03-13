@@ -15,8 +15,8 @@ export function SpaceSuccessPage() {
   const { login, isAuthenticated } = useAuth()
 
   useEffect(() => {
-    if (data.token && data.userId && !isAuthenticated) {
-      login(data.token, {
+    if (data.token && data.refreshToken && data.userId && !isAuthenticated) {
+      login(data.token, data.refreshToken, {
         id: data.userId,
         email: data.email,
         role: 'venue',
