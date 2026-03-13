@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { AuthPage } from './pages/auth/AuthPage'
 import { SpaceLandingPage } from './pages/landing/SpaceLandingPage'
+import { CreatorLandingPage } from './pages/landing/CreatorLandingPage'
 import { CreateSpacePage } from './pages/space/CreateSpacePage'
 import { SpaceFinalPage } from './pages/space/SpaceFinalPage'
 import { SpaceSuccessPage } from './pages/space/SpaceSuccessPage'
@@ -10,6 +11,7 @@ import { CreatorFinalPage } from './pages/creator/CreatorFinalPage'
 import { CreatorSuccessPage } from './pages/creator/CreatorSuccessPage'
 import { SpacesCatalogPage } from './pages/spaces/SpacesCatalogPage'
 import { EventsCatalogPage } from './pages/events/EventsCatalogPage'
+import { EventDetailsPage } from './pages/events/EventDetailsPage'
 import { VenueProfilePage } from './pages/venue/VenueProfilePage'
 import { CreatorProfilePage } from './pages/creator/CreatorProfilePage'
 import { NotFoundPage } from './pages/errors/NotFoundPage'
@@ -24,6 +26,7 @@ export default function App() {
     <SpaceRegistrationProvider>
     <Routes>
       <Route path="/landing/space" element={<SpaceLandingPage />} />
+      <Route path="/landing/creator" element={<CreatorLandingPage />} />
 
       <Route element={<AppShell />}>
         <Route path="/" element={<Navigate to="/landing/space" replace />} />
@@ -35,8 +38,10 @@ export default function App() {
 
         <Route path="/spaces" element={<SpacesCatalogPage />} />
         <Route path="/events" element={<EventsCatalogPage />} />
+        <Route path="/events/:eventId" element={<EventDetailsPage />} />
         <Route path="/venue/profile" element={<VenueProfilePage />} />
         <Route path="/creator/profile" element={<CreatorProfilePage />} />
+        <Route path="/creator/profile/:userId" element={<CreatorProfilePage />} />
 
         <Route path="/creator/create" element={<CreateCreatorPage />} />
         <Route path="/creator/final" element={<CreatorFinalPage />} />

@@ -1,34 +1,151 @@
 .spacesCatalog {
   width: 100%;
+  background: #f7f7f9;
+  min-height: 100vh;
 }
 
 .spacesCatalog__content {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 80px 80px;
+  padding: 24px 40px 80px;
 }
 
 @media (max-width: 768px) {
   .spacesCatalog__content {
-    padding: 16px 20px 60px;
+    padding: 16px 16px 60px;
   }
 }
 
-/* ── Hero Banner ── */
-.spacesCatalog__heroBanner {
-  width: 100%;
+.heroBanner {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
   border-radius: 20px;
+  overflow: hidden;
+  height: 360px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 900px) {
+  .heroBanner {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.heroBanner__left {
+  position: relative;
+  overflow: hidden;
+  background: #313235;
+}
+
+.heroBanner__bgImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
   display: block;
 }
 
-/* ── Title ── */
-.spacesCatalog__title {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 32px 0 24px;
+.heroBanner__right {
+  position: relative;
+  overflow: hidden;
 }
 
+.heroBanner__coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.heroBanner__coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #c4c9e4 0%, #a8aed4 100%);
+  min-height: 360px;
+}
+
+.heroBanner__overlay {
+  position: absolute;
+  inset: 0;
+  padding: 20px 20px 20px 24px;
+  background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.heroBanner__venueIcon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 2px;
+}
+
+.heroBanner__tagIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.heroBanner__bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heroBanner__textBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.heroBanner__tag {
+  display: none;
+}
+
+.heroBanner__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .heroBanner__title { font-size: 18px; }
+}
+
+.heroBanner__desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.82);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.heroBanner__btn {
+  height: 40px;
+  padding: 0 20px;
+  background: #6C6CE5;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: filter 150ms ease;
+}
+
+.heroBanner__btn:hover {
+  filter: brightness(0.88);
+}
 
 .spacesCatalog__loading,
 .spacesCatalog__empty {
@@ -38,40 +155,40 @@
   text-align: center;
 }
 
-/* ── Grid ── */
 .spacesCatalog__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px;
 }
 
-@media (max-width: 1024px) {
+.spacesCatalog__grid--after {
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
   .spacesCatalog__grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 560px) {
   .spacesCatalog__grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ── Venue Card ── */
 .venueCard {
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
-/* ── Cover ── */
 .venueCard__cover {
-  position: relative;
   width: 100%;
-  height: 160px;
+  height: 190px;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -80,6 +197,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .venueCard__coverPlaceholder {
@@ -88,25 +206,23 @@
   background: linear-gradient(135deg, #d6daf0 0%, #c4c9e4 100%);
 }
 
-
-/* ── Card Body ── */
 .venueCard__body {
-  padding: 14px 16px 16px;
+  padding: 14px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
   flex: 1;
 }
 
 .venueCard__nameRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
 }
 
 .venueCard__logo {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -126,20 +242,19 @@
 }
 
 .venueCard__name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
   line-height: 1.3;
 }
 
-/* Описание — ровно 2 строки */
 .venueCard__desc {
   font-size: 13px;
   color: #555;
-  line-height: 1.55;
+  line-height: 1.5;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -147,38 +262,88 @@
 .venueCard__address {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
+  gap: 4px;
+  font-size: 11px;
   color: #888;
-  margin-top: 2px;
+}
+
+.venueCard__actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.venueCard__saveBtn {
+  flex: 1;
+  height: 38px;
+  background: transparent;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.venueCard__saveBtn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
 }
 
 .venueCard__proposeBtn {
-  margin-top: auto;
-  padding-top: 8px;
-  width: 100%;
-  height: 46px;
-  background: #E0E447;
-  color: #1a1a1a;
+  flex: 2;
+  height: 38px;
+  background: #6C6CE5;
+  color: #fff;
   border: none;
   border-radius: 100px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
   transition: filter 150ms ease;
 }
 
 .venueCard__proposeBtn:hover {
-  filter: brightness(0.95);
+  filter: brightness(0.88);
 }
 
-/* ── Pagination ── */
+.spacesCatalog__categoryRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .spacesCatalog__categoryRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spacesCatalog__categoryBanner {
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.spacesCatalog__categoryBannerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 20px;
+}
+
 .spacesCatalog__pagination {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-top: 48px;
+  margin-top: 40px;
 }
 
 .spacesCatalog__pageBtn {

@@ -24,36 +24,43 @@ export interface LoginRequest {
   password: string
 }
 
-export interface LoginResponse {
-  token: string
-  user: {
+export interface AuthUser {
+  id: number
+  email: string
+  role: string
+  avatar_id?: number
+  avatar?: { id: number; file_path: string }
+  created_at: string
+  updated_at: string
+  creator?: {
     id: number
-    email: string
-    role: string
-    avatar?: string
-    avatar_id?: number
-    created_at: string
-    updated_at: string
-    creator?: {
-      id: number
-      name: string
-      description: string
-      phone: string
-      work_email: string
-      photo_id?: number
-      photo?: {
-        id: number
-        file_path: string
-      }
-    }
-    venue?: {
-      id: number
-      name: string
-    }
+    name: string
+    description: string
+    phone: string
+    work_email: string
+    photo_id?: number
+    photo?: { id: number; file_path: string }
+  }
+  venue?: {
+    id: number
+    name: string
+    logo?: { id: number; file_path: string }
+    logo_id?: number
   }
 }
 
-export async function login(data: LoginRequest): Promise<LoginResponse> {
+export interface AuthResponse {
+  access_token: string
+  refresh_token: string
+  expires_in: number
+  token_type: string
+  user: AuthUser
+}
+
+
+export type LoginResponse = AuthResponse
+
+export async function login(data: LoginRequest): Promise<AuthResponse> {
   console.log('=== Login Request ===')
   console.log('URL:', `${API_BASE_URL}/user/auth/login`)
   console.log('Email:', data.email)
@@ -86,16 +93,7 @@ export interface RegisterCreatorRequest {
   password: string
 }
 
-export interface RegisterCreatorResponse {
-  token: string
-  user: {
-    id: number
-    email: string
-    role: string
-    created_at: string
-    updated_at: string
-  }
-}
+export interface RegisterCreatorResponse extends AuthResponse {}
 
 export async function registerCreator(data: RegisterCreatorRequest): Promise<RegisterCreatorResponse> {
   console.log('=== Register Creator Request ===')
@@ -252,22 +250,7 @@ export interface RegisterVenueRequest {
   category_ids?: number[]
 }
 
-export interface RegisterVenueResponse {
-  token: string
-  user: {
-    id: number
-    email: string
-    role: string
-    created_at: string
-    updated_at: string
-    venue?: {
-      id: number
-      name: string
-      logo?: { id: number; file_path: string }
-      logo_id?: number
-    }
-  }
-}
+export interface RegisterVenueResponse extends AuthResponse {}
 
 export async function registerVenue(data: RegisterVenueRequest): Promise<RegisterVenueResponse> {
   console.log('=== Register Venue Request ===')
@@ -470,6 +453,7 @@ export async function fetchVenueProfile(userId: number, token: string): Promise<
     },
   })
   const data = await response.json().catch(() => ({}))
+  console.log('fetchVenueProfile raw:', JSON.stringify(data))
   if (!response.ok) throw new Error(JSON.stringify(data))
   return data
 }
@@ -504,4 +488,35 @@ export async function updateVenueProfile(
   }
 
   return responseData
+}
+
+export interface RefreshTokenResponse {
+  access_token: string
+  expires_in: number
+  token_type: string
+}
+
+export async function refreshAccessToken(refreshToken: string): Promise<RefreshTokenResponse> {
+  const response = await fetch(`${API_BASE_URL}/user/auth/refresh`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+export async function apiLogout(refreshToken: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/user/auth/logout`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  }).catch(() => {})
 }

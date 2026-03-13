@@ -102,7 +102,7 @@ export function CreateSpacePage() {
         tg_personal_link: telegram.trim(),
       })
 
-      const token = response.token
+      const token = response.access_token
       const userId = response.user.id
       const venueId = response.user.venue?.id ?? null
 

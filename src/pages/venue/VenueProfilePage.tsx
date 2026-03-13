@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { fetchVenueProfile, fetchImageUrl } from '../../api/auth'
-import type { VenueProfile } from '../../api/auth'
+import { fetchVenueProfile, fetchImageUrl, fetchVenues } from '../../api/auth'
+import type { VenueProfile, VenueListItem } from '../../api/auth'
+import { Footer } from '../../components/layout/Footer'
 import './VenueProfilePage.css'
 
 import iconPin from '../../assets/playground_profile/Group 1067450.png'
@@ -28,6 +29,49 @@ function PhotoThumb({ imageId, token }: { imageId: number; token: string }) {
       {url
         ? <img src={url} alt="" className="venueProfile__photoImg" />
         : <div className="venueProfile__photoPlaceholder" />}
+    </div>
+  )
+}
+
+
+function RecommendedCard({ venue, token }: { venue: VenueListItem; token: string | null }) {
+  const [coverUrl, setCoverUrl] = useState<string | null>(null)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!token) return
+    const coverId = venue.cover_photo?.id ?? venue.cover_photo_id
+    const logoId  = venue.logo?.id ?? venue.logo_id
+    if (coverId) fetchImageUrl(coverId, token).then(setCoverUrl).catch(() => {})
+    if (logoId)  fetchImageUrl(logoId,  token).then(setLogoUrl).catch(() => {})
+  }, [venue, token])
+
+  return (
+    <div className="recCard">
+      <div className="recCard__cover">
+        {coverUrl
+          ? <img src={coverUrl} alt="" className="recCard__coverImg" />
+          : <div className="recCard__coverPlaceholder" />}
+      </div>
+      <div className="recCard__body">
+        <div className="recCard__nameRow">
+          <div className="recCard__logo">
+            {logoUrl
+              ? <img src={logoUrl} alt="" className="recCard__logoImg" />
+              : <div className="recCard__logoPlaceholder" />}
+          </div>
+          <span className="recCard__name">{venue.name}</span>
+        </div>
+        {venue.description && (
+          <p className="recCard__desc">{venue.description}</p>
+        )}
+        {(venue.street_address || venue.address) && (
+          <p className="recCard__address">
+            <span className="recCard__pin">📍</span>
+            {venue.street_address ?? venue.address}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
@@ -69,16 +113,18 @@ export function VenueProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const [recommended, setRecommended] = useState<VenueListItem[]>([])
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const loadProfile = () => {
     if (!user?.id || !token) return
     setIsLoading(true)
     fetchVenueProfile(user.id, token)
       .then(data => {
         setProfile(data)
-
         const coverId = data.cover_photo?.id ?? data.cover_photo_id
         const logoId  = data.logo?.id ?? data.logo_id
-
         if (coverId) fetchImageUrl(coverId, token).then(setCoverUrl).catch(() => {})
         if (logoId)  fetchImageUrl(logoId,  token).then(setLogoUrl).catch(() => {})
       })
@@ -87,7 +133,18 @@ export function VenueProfilePage() {
         setError('Не удалось загрузить профиль')
       })
       .finally(() => setIsLoading(false))
-  }, [user?.id, token])
+  }
+
+  useEffect(() => { loadProfile() }, [user?.id, token])
+
+  useEffect(() => {
+    fetchVenues(token, 6, 0)
+      .then(res => setRecommended(res.data.slice(0, 3)))
+      .catch(() => {})
+  }, [token])
+
+  const scrollLeft  = () => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })
+  const scrollRight = () => scrollRef.current?.scrollBy({ left:  300, behavior: 'smooth' })
 
   const address = profile?.street_address || profile?.address || ''
 
@@ -178,8 +235,15 @@ export function VenueProfilePage() {
 
         {photoItems.length > 0 && (
           <section className="venueProfile__photos">
-            <h2 className="venueProfile__photosTitle">Фотографии пространства</h2>
-            <div className="venueProfile__photosGrid">
+            <div className="venueProfile__photosHeader">
+              <h2 className="venueProfile__photosTitle">Фотографии пространства</h2>
+              <div className="venueProfile__photosNav">
+                <button type="button" className="venueProfile__arrowBtn" onClick={scrollLeft}>‹</button>
+                <button type="button" className="venueProfile__arrowBtn" onClick={scrollRight}>›</button>
+              </div>
+            </div>
+
+            <div className="venueProfile__photosScroll" ref={scrollRef}>
               {photoItems.map(p => (
                 <PhotoThumb key={p.id} imageId={p.image.id} token={token!} />
               ))}
@@ -188,6 +252,21 @@ export function VenueProfilePage() {
         )}
 
       </div>
+
+      {recommended.length > 0 && (
+        <section className="venueProfile__recommended">
+          <div className="venueProfile__recommendedInner">
+            <h2 className="venueProfile__recommendedTitle">Вам моугут понравится эти пространства</h2>
+            <div className="venueProfile__recommendedGrid">
+              {recommended.map(v => (
+                <RecommendedCard key={v.id} venue={v} token={token} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <Footer />
     </div>
   )
 }

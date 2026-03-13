@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Button } from '../ui/Button'
 import { useAuth } from '../../context/AuthContext'
-import { fetchImageUrl } from '../../api/auth'
+import { fetchImageUrl, apiLogout } from '../../api/auth'
 import './Header.css'
 
 import iconBookmark from '../../assets/icons/auth_success/Vector(7).png'
@@ -17,9 +17,10 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const avatarUrlRef = useRef<string | null>(null)
-  const { isAuthenticated, user, token, logout } = useAuth()
+  const { isAuthenticated, user, token, refreshToken, logout } = useAuth()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (refreshToken) await apiLogout(refreshToken)
     logout()
     navigate('/landing/space')
   }

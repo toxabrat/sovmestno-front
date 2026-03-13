@@ -142,7 +142,7 @@ export function AuthPage() {
         console.log('Registration successful:', response)
 
         updateData({ 
-          token: response.token,
+          token: response.access_token,
           userId: response.user.id,
           name: name.trim(), 
           email: email.trim(), 
@@ -173,7 +173,7 @@ export function AuthPage() {
 
       const avatarId = response.user.creator?.photo?.id ?? (response.user.venue as { logo?: { id: number } })?.logo?.id ?? undefined
 
-      login(response.token, {
+      login(response.access_token, response.refresh_token, {
         id: response.user.id,
         email: response.user.email,
         role: response.user.role,

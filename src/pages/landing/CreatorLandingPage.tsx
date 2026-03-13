@@ -2,67 +2,67 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
-import './SpaceLandingPage.css'
+import './CreatorLandingPage.css'
 
-import landingImg from '../../assets/icons/landing_space/lending page пространство(1).png'
+import landingImg from '../../assets/icons/landing_creator/lending page креатор(2).png'
 
-export function SpaceLandingPage() {
-  const [activeTab, setActiveTab] = useState<'space' | 'creator'>('space')
+export function CreatorLandingPage() {
+  const [activeTab, setActiveTab] = useState<'space' | 'creator'>('creator')
   const navigate = useNavigate()
 
   const handleTabChange = (tab: 'space' | 'creator') => {
     setActiveTab(tab)
-    if (tab === 'creator') navigate('/landing/creator')
+    if (tab === 'space') navigate('/landing/space')
   }
 
   return (
-    <div className="landing">
+    <div className="landingCreator">
       <Header />
 
-      <div className="landing__imageWrap">
-        <div className="landing__canvas">
+      <div className="landingCreator__imageWrap">
+        <div className="landingCreator__canvas">
           <img
             src={landingImg}
-            alt="Совместно — лендинг"
-            className="landing__bgImage"
+            alt="Совместно — для креаторов"
+            className="landingCreator__bgImage"
           />
 
-          <div className="landing__topOverlay">
-            <div className="landing__heroToggle">
+          <div className="landingCreator__topOverlay">
+            <div className="landingCreator__heroToggle">
               <button
                 type="button"
-                className={`landing__heroToggleBtn ${activeTab === 'space' ? 'landing__heroToggleBtn--active' : ''}`}
+                className={`landingCreator__heroToggleBtn ${activeTab === 'space' ? 'landingCreator__heroToggleBtn--active' : ''}`}
                 onClick={() => handleTabChange('space')}
               >
                 Площадкам
               </button>
               <button
                 type="button"
-                className={`landing__heroToggleBtn ${activeTab === 'creator' ? 'landing__heroToggleBtn--active' : ''}`}
+                className={`landingCreator__heroToggleBtn ${activeTab === 'creator' ? 'landingCreator__heroToggleBtn--active' : ''}`}
                 onClick={() => handleTabChange('creator')}
               >
                 Креаторам
               </button>
             </div>
 
-            <Link to="/events" className="landing__heroBtn">
+            <Link to="/events" className="landingCreator__heroBtn">
               Искать мероприятие →
             </Link>
           </div>
 
-          <div className="landing__tgOverlay">
+          <div className="landingCreator__tgOverlay">
             <a
               href="https://t.me/sovmestno"
               target="_blank"
               rel="noopener noreferrer"
-              className="landing__tgBtn"
+              className="landingCreator__tgBtn"
             >
               ПОДПИСАТЬСЯ НА TELEGRAM →
             </a>
           </div>
 
-          <div className="landing__bottomOverlay">
-            <Link to="/events" className="landing__bottomBtn">
+          <div className="landingCreator__bottomOverlay">
+            <Link to="/events" className="landingCreator__bottomBtn">
               ИСКАТЬ МЕРОПРИЯТИЕ →
             </Link>
           </div>

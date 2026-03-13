@@ -19,7 +19,6 @@
   }
 }
 
-/* ── State ── */
 .venueProfile__state {
   display: flex;
   align-items: center;
@@ -30,7 +29,6 @@
 }
 .venueProfile__state--error { color: #c0392b; }
 
-/* ── Layout ── */
 .venueProfile__layout {
   display: grid;
   grid-template-columns: 1fr 280px;
@@ -44,7 +42,6 @@
   }
 }
 
-/* ── Main card ── */
 .venueProfile__card {
   background: #fff;
   border-radius: 20px;
@@ -52,7 +49,6 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.07);
 }
 
-/* Cover */
 .venueProfile__cover {
   width: 100%;
   height: 280px;
@@ -71,7 +67,6 @@
   background: linear-gradient(135deg, #e0ddf8 0%, #c8c0f0 100%);
 }
 
-/* Card body — padding around logo+name+buttons */
 .venueProfile__cardBody {
   padding: 0 32px 28px;
   display: flex;
@@ -79,12 +74,11 @@
   gap: 20px;
 }
 
-/* Identity row */
 .venueProfile__identity {
   display: flex;
   align-items: flex-start;
   gap: 24px;
-  margin-top: -52px; /* logo overlaps cover */
+  margin-top: -52px;
 }
 
 .venueProfile__logo {
@@ -111,7 +105,7 @@
 }
 
 .venueProfile__nameBlock {
-  padding-top: 60px; /* push down so it starts below the logo overlap */
+  padding-top: 60px;
   flex: 1;
   min-width: 0;
 }
@@ -131,7 +125,6 @@
   margin: 0;
 }
 
-/* Actions — right-aligned */
 .venueProfile__actions {
   display: flex;
   align-items: center;
@@ -174,7 +167,6 @@
   opacity: 0.88;
 }
 
-/* ── Sidebar ── */
 .venueProfile__sidebar {
   display: flex;
   flex-direction: column;
@@ -214,7 +206,6 @@
   margin: 0;
 }
 
-/* ── Social badges ── */
 .venueProfile__socialList {
   display: flex;
   flex-direction: column;
@@ -253,11 +244,16 @@
   text-overflow: ellipsis;
 }
 
-/* ── Photos section ── */
 .venueProfile__photos {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+}
+
+.venueProfile__photosHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .venueProfile__photosTitle {
@@ -267,18 +263,108 @@
   margin: 0;
 }
 
-.venueProfile__photosGrid {
+.venueProfile__photosNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.venueProfile__fileInput {
+  display: none;
+}
+
+.venueProfile__uploadBtn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 100px;
+  border: 1.5px solid #6c6ce5;
+  background: transparent;
+  color: #6c6ce5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+  white-space: nowrap;
+}
+
+.venueProfile__uploadBtn:hover {
+  background: #6c6ce5;
+  color: #fff;
+}
+
+.venueProfile__uploadBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.venueProfile__arrowBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #ccc;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  transition: border-color 150ms, color 150ms;
+}
+
+.venueProfile__arrowBtn:hover {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+}
+
+.venueProfile__photosScroll {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.venueProfile__photosScroll::-webkit-scrollbar {
+  display: none;
 }
 
 .venueProfile__photoThumb {
-  width: 190px;
-  height: 140px;
-  border-radius: 12px;
+  width: 220px;
+  min-width: 220px;
+  height: 160px;
+  border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
+}
+
+.venueProfile__photoAdd {
+  background: #f5f5f5;
+  border: 2px dashed #d0d0d0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+}
+
+.venueProfile__photoAdd:hover {
+  background: #ece9ff;
+  border-color: #6c6ce5;
+}
+
+.venueProfile__photoAddPlus {
+  font-size: 28px;
+  color: #aaa;
+  line-height: 1;
+}
+
+.venueProfile__photoAddText {
+  font-size: 13px;
+  color: #888;
 }
 
 .venueProfile__photoImg {
@@ -293,10 +379,147 @@
   background: linear-gradient(135deg, #e0ddf5 0%, #ccc8e8 100%);
 }
 
+.venueProfile__recommended {
+  width: 100%;
+  background: #D4D8F3;
+  padding: 48px 0 60px;
+}
+
+.venueProfile__recommendedInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+@media (max-width: 768px) {
+  .venueProfile__recommendedInner {
+    padding: 0 16px;
+  }
+}
+
+.venueProfile__recommendedTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.venueProfile__recommendedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .venueProfile__recommendedGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recCard {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.recCard__cover {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.recCard__coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.recCard__coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #d6daf0 0%, #c4c9e4 100%);
+}
+
+.recCard__body {
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.recCard__nameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recCard__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f0ecff;
+}
+
+.recCard__logoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recCard__logoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #c8963e 0%, #9a6820 100%);
+}
+
+.recCard__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.25;
+}
+
+.recCard__desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.55;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recCard__address {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+  margin-top: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.recCard__pin {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 600px) {
   .venueProfile__photoThumb {
-    width: calc(50% - 6px);
-    height: 110px;
+    width: 170px;
+    min-width: 170px;
+    height: 130px;
   }
 
   .venueProfile__actions {

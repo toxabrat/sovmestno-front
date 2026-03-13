@@ -1,0 +1,172 @@
+.footer {
+  background: #313235;
+  color: #fff;
+  width: 100%;
+}
+
+.footer__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 48px 80px 40px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 80px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .footer__inner {
+    padding: 40px;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer__inner {
+    padding: 32px 20px;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.footer__left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.footer__subscribeTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .footer__subscribeTitle {
+    font-size: 17px;
+  }
+}
+
+.footer__subscribeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer__emailInput {
+  height: 48px;
+  padding: 0 20px;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  outline: none;
+  width: 220px;
+  transition: border-color 150ms ease;
+}
+
+.footer__emailInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.footer__emailInput:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 480px) {
+  .footer__emailInput {
+    width: 160px;
+  }
+}
+
+.footer__subscribeBtn {
+  height: 48px;
+  padding: 0 24px;
+  background: #d8f772;
+  color: #000;
+  border: none;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 150ms ease;
+}
+
+.footer__subscribeBtn:hover {
+  filter: brightness(0.93);
+}
+
+.footer__socialIcons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer__socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 150ms ease;
+}
+
+.footer__socialLink:hover {
+  opacity: 0.8;
+}
+
+.footer__socialIcon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.footer__email {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.footer__navLink {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 150ms ease;
+  white-space: nowrap;
+}
+
+.footer__navLink:hover {
+  color: #fff;
+}
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.footer__logoText {
+  height: 16px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer__star {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}

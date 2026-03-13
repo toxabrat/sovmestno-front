@@ -1,45 +1,45 @@
 .eventsCatalog {
   width: 100%;
+  background: #f7f7f9;
+  min-height: 100vh;
 }
 
 .eventsCatalog__content {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 80px 80px;
+  padding: 24px 40px 80px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
 }
 
 @media (max-width: 768px) {
   .eventsCatalog__content {
-    padding: 16px 20px 60px;
-    gap: 32px;
+    padding: 16px 16px 60px;
+    gap: 16px;
   }
 }
 
-/* ── Hero ── */
 .eventsCatalog__heroBanner {
   width: 100%;
   border-radius: 20px;
   display: block;
 }
 
-/* ── Мои мероприятия ── */
 .eventsCatalog__mySection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .eventsCatalog__myHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .eventsCatalog__myTitle {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
@@ -73,7 +73,7 @@
 
 .eventsCatalog__myScroll {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: none;
@@ -83,43 +83,40 @@
   display: none;
 }
 
-/* ── My Event Card ── */
 .myEventCard {
-  width: 240px;
-  min-width: 240px;
+  width: 200px;
+  min-width: 200px;
   background: #fff;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 
 .myEventCard--create {
   border: none;
-  background: #f5f5f5;
+  background: #f0f0f0;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  min-height: 220px;
+  min-height: 190px;
   transition: background 150ms;
 }
 
-.myEventCard--create:hover {
-  background: #ebebeb;
-}
+.myEventCard--create:hover { background: #e6e6e6; }
 
 .myEventCard__plusIcon {
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1;
   color: #aaa;
   font-weight: 300;
 }
 
 .myEventCard__createText {
-  font-size: 14px;
+  font-size: 13px;
   color: #888;
   text-align: center;
   line-height: 1.4;
@@ -127,7 +124,7 @@
 
 .myEventCard__cover {
   width: 100%;
-  height: 140px;
+  height: 120px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -145,15 +142,15 @@
 }
 
 .myEventCard__body {
-  padding: 12px 14px 14px;
+  padding: 10px 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
 }
 
 .myEventCard__title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
@@ -164,9 +161,13 @@
   overflow: hidden;
 }
 
+.myEventCard__titleLink {
+  text-decoration: none;
+}
+
 .myEventCard__tag {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 2px 8px;
   background: #f0ecff;
   color: #6b5ce7;
   border-radius: 100px;
@@ -178,24 +179,21 @@
 .myEventCard__creator {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   margin-top: auto;
   padding-top: 4px;
+  text-decoration: none;
 }
 
 .myEventCard__creatorAvatar {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
 }
 
-.myEventCard__creatorImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.myEventCard__creatorImg { width: 100%; height: 100%; object-fit: cover; }
 
 .myEventCard__creatorPlaceholder {
   width: 100%;
@@ -204,59 +202,19 @@
 }
 
 .myEventCard__creatorName {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ── Каталог мероприятий ── */
 .eventsCatalog__catalog {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-.eventsCatalog__catalogTitle {
-  font-size: 22px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-/* ── Filters ── */
-.eventsCatalog__filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.eventsCatalog__filterTag {
-  height: 34px;
-  padding: 0 16px;
-  border-radius: 100px;
-  border: 1.5px solid #e0e0e0;
-  background: #fff;
-  font-size: 14px;
-  color: #555;
-  cursor: pointer;
-  transition: all 150ms ease;
-  white-space: nowrap;
-}
-
-.eventsCatalog__filterTag:hover {
-  border-color: #1a1a1a;
-  color: #1a1a1a;
-}
-
-.eventsCatalog__filterTag--active {
-  border-color: #1a1a1a;
-  background: #1a1a1a;
-  color: #fff;
-}
-
-/* ── States ── */
 .eventsCatalog__loading,
 .eventsCatalog__empty {
   font-size: 15px;
@@ -265,33 +223,30 @@
   text-align: center;
 }
 
-/* ── Catalog Grid ── */
 .eventsCatalog__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 14px;
 }
 
 @media (max-width: 768px) {
-  .eventsCatalog__grid {
-    grid-template-columns: 1fr;
-  }
+  .eventsCatalog__grid { grid-template-columns: 1fr; }
 }
 
-/* ── Catalog Card ── */
 .catalogCard {
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-  min-height: 160px;
+  height: 160px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 .catalogCard__cover {
-  width: 180px;
-  min-width: 180px;
+  width: 160px;
+  min-width: 160px;
+  height: 100%;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -300,6 +255,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .catalogCard__coverPlaceholder {
@@ -308,52 +264,51 @@
   background: linear-gradient(135deg, #e8e4f8 0%, #d5cef0 100%);
 }
 
-@media (max-width: 500px) {
-  .catalogCard {
-    flex-direction: column;
-  }
-  .catalogCard__cover {
-    width: 100%;
-    min-width: unset;
-    height: 180px;
-  }
-}
-
 .catalogCard__body {
-  padding: 18px 20px;
+  padding: 14px 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .catalogCard__title {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.catalogCard__titleLink {
+  text-decoration: none;
 }
 
 .catalogCard__tag {
-  display: inline-block;
-  padding: 3px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
   background: #f0ecff;
   color: #6b5ce7;
   border-radius: 100px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   width: fit-content;
 }
 
 .catalogCard__desc {
-  font-size: 13px;
+  font-size: 12px;
   color: #666;
-  line-height: 1.55;
-  margin: 4px 0 0;
+  line-height: 1.45;
+  margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
@@ -362,24 +317,20 @@
 .catalogCard__creator {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: auto;
-  padding-top: 8px;
+  text-decoration: none;
 }
 
 .catalogCard__creatorAvatar {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
 }
 
-.catalogCard__creatorImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.catalogCard__creatorImg { width: 100%; height: 100%; object-fit: cover; }
 
 .catalogCard__creatorPlaceholder {
   width: 100%;
@@ -388,18 +339,250 @@
 }
 
 .catalogCard__creatorName {
-  font-size: 13px;
+  font-size: 12px;
   color: #555;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ── Load More ── */
+.catalogCard__actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 6px;
+  flex-shrink: 0;
+}
+
+.catalogCard__saveBtn {
+  height: 30px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+  white-space: nowrap;
+}
+
+.catalogCard__saveBtn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
+.catalogCard__proposeBtn {
+  height: 30px;
+  padding: 0 14px;
+  background: #6C6CE5;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 150ms;
+}
+
+.catalogCard__proposeBtn:hover { filter: brightness(0.88); }
+
+.eventsMidBanner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 160px;
+}
+
+@media (max-width: 768px) {
+  .eventsMidBanner { grid-template-columns: 1fr; }
+}
+
+.eventsMidBanner__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  display: block;
+  z-index: 0;
+}
+
+.eventsMidBanner__left {
+  position: relative;
+  z-index: 1;
+  padding: 28px 28px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.eventsMidBanner__text {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4B56D2;
+  line-height: 1.35;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  width: fit-content;
+}
+
+.eventsMidBanner__btn {
+  height: 44px;
+  padding: 0 28px;
+  background: #d8f772;
+  color: #000;
+  border: none;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  margin-left: 16px;
+  transition: filter 150ms;
+}
+
+.eventsMidBanner__btn:hover { filter: brightness(0.93); }
+
+.eventsMidBanner__right {
+  position: relative;
+  z-index: 1;
+  padding: 12px 12px 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.eventsMidBanner__icon {
+  position: absolute;
+  left: -38px;
+  top: 30%;
+  transform: translateY(-50%);
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.eventsMidBanner__card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.featuredCard {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.featuredCard__cover {
+  width: 200px;
+  min-width: 200px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.featuredCard__coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.featuredCard__coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8e4f8 0%, #d5cef0 100%);
+  min-height: 200px;
+}
+
+.featuredCard__body {
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+.featuredCard__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.featuredCard__titleLink {
+  text-decoration: none;
+}
+
+.featuredCard__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  background: #f0ecff;
+  color: #6b5ce7;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.featuredCard__desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.55;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featuredCard__creator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+  text-decoration: none;
+}
+
+.featuredCard__creatorAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.featuredCard__creatorImg { width: 100%; height: 100%; object-fit: cover; }
+
+.featuredCard__creatorPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8b06d 0%, #d4956a 100%);
+}
+
+.featuredCard__creatorName {
+  font-size: 12px;
+  color: #666;
+}
+
 .eventsCatalog__loadMore {
   display: flex;
   justify-content: flex-start;
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 .eventsCatalog__loadMoreBtn {
