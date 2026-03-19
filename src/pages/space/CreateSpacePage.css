@@ -546,3 +546,71 @@
     justify-content: flex-end;
   }
 }
+
+.createSpace__categorySection {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+@media (max-width: 700px) {
+  .createSpace__categorySection { flex-direction: column; gap: 16px; }
+}
+
+.createSpace__categorySectionLeft {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  .createSpace__categorySectionLeft { width: 100%; }
+}
+
+.createSpace__categorySectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.createSpace__categorySectionDesc {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.createSpace__categoryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.createSpace__chip {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 100px;
+  border: 1.5px solid #d8d8e0;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.createSpace__chip:hover { border-color: #aaa; color: #1a1a1a; }
+
+.createSpace__chip--active {
+  background: #6c6ce5;
+  border-color: #6c6ce5;
+  color: #fff;
+}
+.createSpace__chip--active:hover {
+  background: #5b5bd4;
+  border-color: #5b5bd4;
+  color: #fff;
+}

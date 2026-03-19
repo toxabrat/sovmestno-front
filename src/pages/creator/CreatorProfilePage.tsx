@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchCreatorProfile, fetchImageUrl } from '../../api/auth'
-import { fetchEvents, fetchCategories } from '../../api/events'
-import type { CreatorProfile } from '../../api/auth'
+import {
+  fetchCreatorProfile,
+  fetchImageUrl,
+  uploadImage,
+  addCreatorPhoto,
+  deleteCreatorPhoto,
+} from '../../api/auth'
+import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
+import { createApplication } from '../../api/applications'
+import type { CreatorProfile, CreatorPhotoItem } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
 import { Footer } from '../../components/layout/Footer'
 import './CreatorProfilePage.css'
@@ -13,7 +20,7 @@ import iconTelegram from '../../assets/icons/space_sign_up4/Vector(1).png'
 import iconVk       from '../../assets/icons/space_sign_up4/Vector(2).png'
 import iconTiktok   from '../../assets/icons/space_sign_up4/Vector(3).png'
 import iconDzen     from '../../assets/icons/space_sign_up4/Vector(4).png'
-
+import bannerFrame  from '../../assets/icons/creator_profile/Frame 2131328372.png'
 
 const SOCIAL_CONFIG = {
   vk:     { icon: iconVk       },
@@ -24,38 +31,62 @@ const SOCIAL_CONFIG = {
 type SocialType = keyof typeof SOCIAL_CONFIG
 
 function SocialBadge({ href, label, type }: { href: string; label: string; type: SocialType }) {
-  const fullHref = href.startsWith('http') ? href : `https://${href}`
+  const fullHref = href.startsWith('http') ? href : `https://t.me/${label.replace(/^@/, '')}`
   return (
-    <a href={fullHref} target="_blank" rel="noopener noreferrer" className="creatorProfile__socialBadge">
-      <img src={SOCIAL_CONFIG[type].icon} alt="" className="creatorProfile__socialBadgeImg" />
-      <span className="creatorProfile__socialBadgeLabel">{label}</span>
+    <a href={fullHref} target="_blank" rel="noopener noreferrer" className="cp__socialBadge">
+      <img src={SOCIAL_CONFIG[type].icon} alt="" className="cp__socialBadgeImg" />
+      <span className="cp__socialBadgeLabel">{label}</span>
     </a>
   )
 }
 
-function PhotoThumb({ imageId, token }: { imageId: number; token: string }) {
+function PhotoItem({
+  item, token, isOwner, onDelete,
+}: {
+  item: CreatorPhotoItem
+  token: string
+  isOwner: boolean
+  onDelete: (id: number) => void
+}) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
-    let cancelled = false
-    fetchImageUrl(imageId, token).then(u => { if (!cancelled) setUrl(u) }).catch(() => {})
-    return () => { cancelled = true }
-  }, [imageId, token])
+    fetchImageUrl(item.image.id, token).then(setUrl).catch(() => {})
+  }, [item.image.id, token])
+
   return (
-    <div className="creatorProfile__photoThumb">
+    <div className="cp__photoThumb">
       {url
-        ? <img src={url} alt="" className="creatorProfile__photoImg" />
-        : <div className="creatorProfile__photoPlaceholder" />}
+        ? <img src={url} alt="" className="cp__photoImg" />
+        : <div className="cp__photoPlaceholder" />}
+      {isOwner && (
+        <button type="button" className="cp__photoDelete" onClick={() => onDelete(item.id)}>
+          ×
+        </button>
+      )}
     </div>
   )
 }
 
-function EventCard({ event, token, categories, isOwner }: {
+function EventCard({
+  event, token, categories, isOwner, isVenueVisitor, creatorUserId,
+  onDelete, onPublish, onEdit,
+}: {
   event: Event
   token: string | null
   categories: Category[]
   isOwner: boolean
+  isVenueVisitor: boolean
+  creatorUserId?: number
+  onDelete?: (id: number) => void
+  onPublish?: (id: number) => void
+  onEdit?: (id: number) => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
+  const [saved, setSaved] = useState(() => {
+    try { return (JSON.parse(localStorage.getItem('savedEvents') || '[]') as number[]).includes(event.id) } catch { return false }
+  })
+  const [inviteSent, setInviteSent] = useState(false)
+  const [sending, setSending] = useState(false)
   const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
 
   useEffect(() => {
@@ -63,23 +94,71 @@ function EventCard({ event, token, categories, isOwner }: {
     fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
   }, [event.cover_photo_id, token])
 
+  const handleSave = () => {
+    try {
+      const arr: number[] = JSON.parse(localStorage.getItem('savedEvents') || '[]')
+      if (!arr.includes(event.id)) arr.push(event.id)
+      localStorage.setItem('savedEvents', JSON.stringify(arr))
+    } catch { /* */ }
+    setSaved(true)
+  }
+
+  const handleInvite = async () => {
+    if (!token || sending || inviteSent || !creatorUserId) return
+    setSending(true)
+    try {
+      await createApplication({ receiver_id: creatorUserId, receiver_type: 'creator', event_id: event.id }, token)
+      setInviteSent(true)
+    } catch { /* */ }
+    finally { setSending(false) }
+  }
+
   return (
-    <div className="creatorProfile__eventCard">
-      <div className="creatorProfile__eventCover">
+    <div className="cp__eventCard">
+      <div className="cp__eventCover">
         {coverUrl
-          ? <img src={coverUrl} alt="" className="creatorProfile__eventCoverImg" />
-          : <div className="creatorProfile__eventCoverPlaceholder" />}
+          ? <img src={coverUrl} alt="" className="cp__eventCoverImg" />
+          : <div className="cp__eventCoverPlaceholder" />}
       </div>
-      <div className="creatorProfile__eventBody">
-        <Link to={`/events/${event.id}`} className="creatorProfile__eventTitleLink">
-          <h3 className="creatorProfile__eventTitle">{event.title}</h3>
-        </Link>
-        {catName && <span className="creatorProfile__eventTag">💬 {catName}</span>}
-        {event.description && <p className="creatorProfile__eventDesc">{event.description}</p>}
+      <div className="cp__eventBody">
+        <h3 className="cp__eventTitle">{event.title}</h3>
+        {catName && <span className="cp__eventTag">{catName}</span>}
+        {event.description && <p className="cp__eventDesc">{event.description}</p>}
+
         {isOwner && (
-          <div className="creatorProfile__eventActions">
-            <button type="button" className="creatorProfile__eventDeleteBtn">Удалить</button>
-            <button type="button" className="creatorProfile__eventPublishBtn">Опубликовать мероприятие</button>
+          <div className="cp__eventActions">
+            <button type="button" className="cp__eventDeleteBtn" onClick={() => onDelete?.(event.id)}>
+              Удалить
+            </button>
+            {event.is_completed ? (
+              <button type="button" className="cp__eventPublishBtn" onClick={() => onPublish?.(event.id)}>
+                Разместить заново
+              </button>
+            ) : (
+              <button type="button" className="cp__eventPublishBtn" onClick={() => onEdit?.(event.id)}>
+                Редактировать
+              </button>
+            )}
+          </div>
+        )}
+
+        {isVenueVisitor && (
+          <div className="cp__eventActions">
+            <button
+              type="button"
+              className={`cp__eventSaveBtn ${saved ? 'cp__eventSaveBtn--saved' : ''}`}
+              disabled={saved}
+              onClick={handleSave}
+            >
+              {saved ? 'Сохранено' : 'Сохранить'}
+            </button>
+            {inviteSent ? (
+              <span className="cp__eventSentLabel">Заявка отправлена!</span>
+            ) : (
+              <button type="button" className="cp__eventPublishBtn" disabled={sending} onClick={handleInvite}>
+                {sending ? 'Отправка...' : 'Пригласить провести'}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -87,48 +166,68 @@ function EventCard({ event, token, categories, isOwner }: {
   )
 }
 
-function RecommendedEventCard({ event, token, categories }: {
-  event: Event
-  token: string | null
-  categories: Category[]
-}) {
+function EventRecommendCard({ event, token, categories }: { event: Event; token: string | null; categories: Category[] }) {
+  const navigate = useNavigate()
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
+  const [creatorName, setCreatorName] = useState<string>('')
+  const [creatorPhotoUrl, setCreatorPhotoUrl] = useState<string | null>(null)
   const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
-  const [creatorName] = useState('Имя Фамилия')
 
   useEffect(() => {
     if (!token || !event.cover_photo_id) return
     fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
   }, [event.cover_photo_id, token])
 
+  useEffect(() => {
+    if (!token || !event.creator_id) return
+    fetchCreatorProfile(event.creator_id, token)
+      .then(prof => {
+        setCreatorName(prof.name)
+        const photoId = prof.photo?.id ?? prof.photo_id
+        if (photoId) fetchImageUrl(photoId, token).then(setCreatorPhotoUrl).catch(() => {})
+      })
+      .catch(() => {})
+  }, [event.creator_id, token])
+
   return (
-    <div className="creatorProfile__recCard">
-      <div className="creatorProfile__recCover">
+    <div className="cp__recEventCard">
+      <div className="cp__recEventCover">
         {coverUrl
-          ? <img src={coverUrl} alt="" className="creatorProfile__recCoverImg" />
-          : <div className="creatorProfile__recCoverPlaceholder" />}
+          ? <img src={coverUrl} alt="" className="cp__recEventCoverImg" />
+          : <div className="cp__recEventCoverPlaceholder" />}
       </div>
-      <div className="creatorProfile__recBody">
-        <Link to={`/events/${event.id}`} className="creatorProfile__recTitleLink">
-          <h3 className="creatorProfile__recTitle">{event.title}</h3>
-        </Link>
-        {catName && <span className="creatorProfile__recTag">💬 {catName}</span>}
-        {event.description && <p className="creatorProfile__recDesc">{event.description}</p>}
-        <div className="creatorProfile__recAuthor">
-          <div className="creatorProfile__recAvatar" />
-          <span className="creatorProfile__recAuthorName">{creatorName}</span>
-        </div>
+      <div className="cp__recEventBody">
+        <h3 className="cp__recEventTitle">{event.title}</h3>
+        {catName && <span className="cp__recEventTag">◇ {catName}</span>}
+        {event.description && <p className="cp__recEventDesc">{event.description}</p>}
+        {creatorName && (
+          <div
+            className="cp__recEventCreator"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(`/creator/profile/${event.creator_id}`)}
+            onKeyDown={e => e.key === 'Enter' && navigate(`/creator/profile/${event.creator_id}`)}
+          >
+            <div className="cp__recEventCreatorAvatar">
+              {creatorPhotoUrl
+                ? <img src={creatorPhotoUrl} alt="" className="cp__recEventCreatorAvatarImg" />
+                : <div className="cp__recEventCreatorAvatarPlaceholder" />}
+            </div>
+            <span className="cp__recEventCreatorName">{creatorName}</span>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-
 export function CreatorProfilePage() {
   const { user, token } = useAuth()
+  const navigate = useNavigate()
   const { userId } = useParams<{ userId: string }>()
   const targetUserId = userId ? Number(userId) : user?.id
   const isOwner = user?.role === 'creator' && !!targetUserId && user?.id === targetUserId
+  const isVenueVisitor = user?.role === 'venue' && !isOwner
 
   const [profile, setProfile] = useState<CreatorProfile | null>(null)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
@@ -136,177 +235,239 @@ export function CreatorProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   const [categories, setCategories] = useState<Category[]>([])
-  const [myEvents, setMyEvents] = useState<Event[]>([])
-  const [allEvents, setAllEvents] = useState<Event[]>([])
+  const [activeEvents, setActiveEvents] = useState<Event[]>([])
+  const [completedEvents, setCompletedEvents] = useState<Event[]>([])
+  const [recommendedEvents, setRecommendedEvents] = useState<Event[]>([])
 
-  const storageKey = targetUserId ? `creator_photo_ids_${targetUserId}` : null
-  const [photoIds, setPhotoIds] = useState<number[]>([])
-  const photoScrollRef = useRef<HTMLDivElement>(null)
-  const eventsScrollRef = useRef<HTMLDivElement>(null)
+  const photoFileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !storageKey) {
-      setPhotoIds([])
-      return
-    }
-    try {
-      const s = localStorage.getItem(storageKey)
-      setPhotoIds(s ? (JSON.parse(s) as number[]) : [])
-    } catch {
-      setPhotoIds([])
-    }
-  }, [storageKey])
+  const activeScrollRef = useRef<HTMLDivElement>(null)
+  const completedScrollRef = useRef<HTMLDivElement>(null)
+  const photosScrollRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  const loadProfile = () => {
     if (!targetUserId || !token) return
-    setIsLoading(true)
     fetchCreatorProfile(targetUserId, token)
       .then(data => {
+        console.log('CreatorProfile data:', JSON.stringify(data, null, 2))
         setProfile(data)
         const photoId = data.photo?.id ?? data.photo_id
         if (photoId) fetchImageUrl(photoId, token).then(setPhotoUrl).catch(() => {})
       })
       .catch(() => setError('Не удалось загрузить профиль'))
       .finally(() => setIsLoading(false))
+  }
+
+  useEffect(() => {
+    loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUserId, token])
 
   useEffect(() => {
     fetchCategories(token).then(setCategories).catch(() => {})
-    fetchEvents({}, token).then(setAllEvents).catch(() => {})
-  }, [token])
+    fetchEvents({ is_active: true }, token)
+      .then(evts => setRecommendedEvents(evts.filter(e => e.creator_id !== targetUserId).slice(0, 2)))
+      .catch(() => {})
+  }, [token, targetUserId])
 
   useEffect(() => {
     if (!targetUserId || !token) return
-    fetchEvents({ creator_id: targetUserId }, token).then(setMyEvents).catch(() => {})
+    fetchEvents({ creator_id: targetUserId, is_active: true }, token)
+      .then(setActiveEvents).catch(() => {})
+    fetchEvents({ creator_id: targetUserId, is_completed: true }, token)
+      .then(setCompletedEvents).catch(() => {})
   }, [targetUserId, token])
 
-  const clean = (s: string, prefix?: string) =>
-    s.replace(/^https?:\/\//, '').replace(prefix ? new RegExp(`^${prefix}/?@?`) : /x/, '').replace(/\/$/, '')
+  const handleDeleteEvent = async (id: number) => {
+    if (!token) return
+    try {
+      await deleteEvent(id, token)
+      setActiveEvents(prev => prev.filter(e => e.id !== id))
+      setCompletedEvents(prev => prev.filter(e => e.id !== id))
+    } catch { /* */ }
+  }
+
+  const handleEditEvent = (id: number) => {
+    navigate(`/events/create?edit=${id}`)
+  }
+
+  const handlePublishEvent = (id: number) => {
+    navigate(`/events/create?edit=${id}`)
+  }
+
+  const handleAddPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !token) return
+    setUploadingPhoto(true)
+    try {
+      const uploaded = await uploadImage(file, 'venue-photo', token)
+      await addCreatorPhoto(uploaded.id, token)
+      loadProfile()
+    } catch {
+      /* */
+    } finally {
+      setUploadingPhoto(false)
+      if (photoFileInputRef.current) photoFileInputRef.current.value = ''
+    }
+  }
+
+  const handleDeletePhoto = async (photoId: number) => {
+    if (!token) return
+    try {
+      await deleteCreatorPhoto(photoId, token)
+      loadProfile()
+    } catch { /* */ }
+  }
+
+  const clean = (s: string) =>
+    s.replace(/^https?:\/\//, '').replace(/^(t\.me|vk\.com|tiktok\.com)\/?@?/, '').replace(/\/$/, '')
 
   const socials: Array<{ href: string; label: string; type: SocialType }> = []
-  if (profile?.vk_link)          socials.push({ href: profile.vk_link,          label: clean(profile.vk_link, 'vk\\.com'),          type: 'vk' })
-  if (profile?.tg_channel_link)  socials.push({ href: profile.tg_channel_link,  label: clean(profile.tg_channel_link, 't\\.me'),     type: 'tg' })
-  if (profile?.tg_personal_link) socials.push({ href: profile.tg_personal_link, label: clean(profile.tg_personal_link, 't\\.me'),    type: 'tg' })
-  if (profile?.tiktok_link)      socials.push({ href: profile.tiktok_link,      label: clean(profile.tiktok_link),                   type: 'tiktok' })
-  if (profile?.dzen_link)        socials.push({ href: profile.dzen_link,        label: clean(profile.dzen_link),                     type: 'dzen' })
+  if (profile?.vk_link)          socials.push({ href: profile.vk_link,          label: clean(profile.vk_link),          type: 'vk' })
+  if (profile?.tg_channel_link)  socials.push({ href: profile.tg_channel_link,  label: '@' + clean(profile.tg_channel_link),  type: 'tg' })
+  if (profile?.tg_personal_link) socials.push({ href: profile.tg_personal_link, label: '@' + clean(profile.tg_personal_link), type: 'tg' })
+  if (profile?.tiktok_link)      socials.push({ href: profile.tiktok_link,      label: clean(profile.tiktok_link),      type: 'tiktok' })
+  if (profile?.dzen_link)        socials.push({ href: profile.dzen_link,        label: clean(profile.dzen_link),        type: 'dzen' })
 
-  const recEvents = allEvents.filter(e => !myEvents.find(m => m.id === e.id)).slice(0, 3)
+  const photos = profile?.photos ?? []
 
-  if (isLoading) return <div className="creatorProfile__state">Загрузка...</div>
-  if (error || !profile) return <div className="creatorProfile__state creatorProfile__state--error">{error ?? 'Профиль не найден'}</div>
+  if (isLoading) return <div className="cp__state">Загрузка...</div>
+  if (error || !profile) return <div className="cp__state cp__state--error">{error ?? 'Профиль не найден'}</div>
 
   return (
-    <div className="creatorProfile">
-      <div className="creatorProfile__content">
+    <div className="cp">
+      <div className="cp__content">
 
-        <div className="creatorProfile__layout">
-
-          <div className="creatorProfile__card">
-            <div className="creatorProfile__identity">
-              <div className="creatorProfile__avatarWrap">
-                <div className="creatorProfile__avatar">
-                  {photoUrl
-                    ? <img src={photoUrl} alt="" className="creatorProfile__avatarImg" />
-                    : <div className="creatorProfile__avatarPlaceholder" />}
-                </div>
-                <span className="creatorProfile__onlineDot" />
+        <div className="cp__layout">
+          <div className="cp__card">
+            <div className="cp__avatarWrap">
+              <div className="cp__avatar">
+                {photoUrl
+                  ? <img src={photoUrl} alt="" className="cp__avatarImg" />
+                  : <div className="cp__avatarPlaceholder" />}
               </div>
-
-              <div className="creatorProfile__info">
-                <h1 className="creatorProfile__name">{profile.name}</h1>
-                {profile.description && (
-                  <p className="creatorProfile__desc">{profile.description}</p>
-                )}
-              </div>
-
-              <div className="creatorProfile__actions">
-                {isOwner ? (
-                  <>
-                    <button type="button" className="creatorProfile__editBtn">Изменить</button>
-                    <button type="button" className="creatorProfile__proposeBtn">Предложить сотрудничество</button>
-                  </>
-                ) : (
-                  <>
-                    <button type="button" className="creatorProfile__saveBtn">Сохранить</button>
-                    <button type="button" className="creatorProfile__proposeBtn">Предложить сотрудничество</button>
-                  </>
-                )}
-              </div>
+              <span className="cp__onlineDot" />
+            </div>
+            <div className="cp__cardInfo">
+              <h1 className="cp__name">{profile.name}</h1>
+              {(profile.description ?? '').trim() !== '' && (
+                <p className="cp__desc">{profile.description}</p>
+              )}
             </div>
           </div>
 
-          <aside className="creatorProfile__sidebar">
-            {socials.length > 0 && (
-              <div className="creatorProfile__sideCard">
-                <div className="creatorProfile__sideHeader">
-                  <img src={iconSocial} alt="" className="creatorProfile__sideIcon" />
-                  <span className="creatorProfile__sideTitle">Социальные сети</span>
-                </div>
-                <div className="creatorProfile__socialList">
+          <aside className="cp__sidebar">
+            <div className="cp__sideCard">
+              <div className="cp__sideHeader">
+                <img src={iconSocial} alt="" className="cp__sideIcon" />
+                <span className="cp__sideTitle">Социальные сети</span>
+              </div>
+              {socials.length > 0 ? (
+                <div className="cp__socialList">
                   {socials.map((s, i) => <SocialBadge key={i} {...s} />)}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="cp__socialEmpty">Ссылки не указаны</p>
+              )}
+            </div>
           </aside>
-
         </div>
 
-        {myEvents.length > 0 && (
-          <section className="creatorProfile__section">
-            <div className="creatorProfile__sectionHeader">
-              <h2 className="creatorProfile__sectionTitle">Мои актуальные мероприятия</h2>
-              <div className="creatorProfile__arrows">
-                <button type="button" className="creatorProfile__arrowBtn" onClick={() => eventsScrollRef.current?.scrollBy({ left: -280, behavior: 'smooth' })}>‹</button>
-                <button type="button" className="creatorProfile__arrowBtn" onClick={() => eventsScrollRef.current?.scrollBy({ left: 280, behavior: 'smooth' })}>›</button>
-              </div>
+        {activeEvents.length > 0 && (
+          <div className="cp__banner" style={{ backgroundImage: `url(${bannerFrame})` }}>
+            <div className="cp__bannerOverlay">
+              <h2 className="cp__bannerTitle">Это мероприятие ищет пространство</h2>
+              <p className="cp__bannerDesc">
+                Сейчас креатор ищет место, где смог бы реализовать свою идею.
+                Откликнитесь — и креатор получит от вас приглашение
+              </p>
             </div>
-            <div className="creatorProfile__scroll" ref={eventsScrollRef}>
-              {myEvents.map(ev => (
-                <EventCard key={ev.id} event={ev} token={token} categories={categories} isOwner={isOwner} />
-              ))}
+            <div className="cp__bannerArrows">
+              <button type="button" className="cp__arrowBtn" onClick={() => activeScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
+              <button type="button" className="cp__arrowBtn" onClick={() => activeScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
             </div>
-          </section>
+          </div>
         )}
 
-        {photoIds.length > 0 && (
-          <section className="creatorProfile__section">
-            <div className="creatorProfile__sectionHeader">
-              <h2 className="creatorProfile__sectionTitle">Фотографии пространства</h2>
-              <div className="creatorProfile__arrows">
-                <button type="button" className="creatorProfile__arrowBtn" onClick={() => photoScrollRef.current?.scrollBy({ left: -280, behavior: 'smooth' })}>‹</button>
-                <button type="button" className="creatorProfile__arrowBtn" onClick={() => photoScrollRef.current?.scrollBy({ left: 280, behavior: 'smooth' })}>›</button>
-              </div>
-            </div>
-            <div className="creatorProfile__photosScroll" ref={photoScrollRef}>
-              {photoIds.map(id => (
-                <PhotoThumb key={id} imageId={id} token={token!} />
+        {activeEvents.length > 0 && (
+          <div className="cp__eventsRow">
+            <div className="cp__scroll" ref={activeScrollRef}>
+              {activeEvents.map(ev => (
+                <EventCard key={ev.id} event={ev} token={token} categories={categories}
+                  isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
+                  onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {isOwner && myEvents.length > 0 && (
-          <section className="creatorProfile__section">
-            <div className="creatorProfile__sectionHeader">
-              <h2 className="creatorProfile__sectionTitle">Мои мероприятия</h2>
+        <section className="cp__section">
+          <div className="cp__sectionHeader">
+            <h2 className="cp__sectionTitle">Фотографии мероприятий</h2>
+            {(photos.length > 0 || isOwner) && (
+              <div className="cp__arrows">
+                <button type="button" className="cp__arrowBtn" onClick={() => photosScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
+                <button type="button" className="cp__arrowBtn" onClick={() => photosScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
+              </div>
+            )}
+          </div>
+          <div className="cp__scroll" ref={photosScrollRef}>
+            {isOwner && (
+              <>
+                <input ref={photoFileInputRef} type="file" accept="image/*" onChange={handleAddPhoto} style={{ display: 'none' }} />
+                <button
+                  type="button"
+                  className="cp__photoAdd"
+                  onClick={() => photoFileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                >
+                  <span className="cp__photoAddPlus">+</span>
+                  <span className="cp__photoAddText">{uploadingPhoto ? 'Загрузка...' : 'Загрузить фото'}</span>
+                </button>
+              </>
+            )}
+            {photos.length === 0 && !isOwner && (
+              <p className="cp__emptyMsg">Фотографий пока нет</p>
+            )}
+            {photos.map(item => (
+              <PhotoItem key={item.id} item={item} token={token!} isOwner={isOwner} onDelete={handleDeletePhoto} />
+            ))}
+          </div>
+        </section>
+
+        {(completedEvents.length > 0 || isOwner) && (
+          <section className="cp__section">
+            <div className="cp__sectionHeader">
+              <h2 className="cp__sectionTitle">Проведённые мероприятия</h2>
+              <div className="cp__arrows">
+                <button type="button" className="cp__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
+                <button type="button" className="cp__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
+              </div>
             </div>
-            <div className="creatorProfile__eventsGrid">
-              {myEvents.map(ev => (
-                <EventCard key={ev.id} event={ev} token={token} categories={categories} isOwner={true} />
-              ))}
-            </div>
+            {completedEvents.length > 0 ? (
+              <div className="cp__scroll" ref={completedScrollRef}>
+                {completedEvents.map(ev => (
+                  <EventCard key={ev.id} event={ev} token={token} categories={categories}
+                    isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
+                    onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
+                ))}
+              </div>
+            ) : (
+              <p className="cp__emptyMsg">Проведённых мероприятий пока нет</p>
+            )}
           </section>
         )}
 
       </div>
 
-      {recEvents.length > 0 && (
-        <section className="creatorProfile__recommended">
-          <div className="creatorProfile__recommendedInner">
-            <h2 className="creatorProfile__recommendedTitle">Вам моугут понравится эти мероприятия</h2>
-            <div className="creatorProfile__recommendedGrid">
-              {recEvents.map(ev => (
-                <RecommendedEventCard key={ev.id} event={ev} token={token} categories={categories} />
+      {recommendedEvents.length > 0 && (
+        <section className="cp__venuesSection">
+          <div className="cp__venuesInner">
+            <h2 className="cp__venuesTitle">Вам могут понравиться эти мероприятия</h2>
+            <div className="cp__recEventsGrid">
+              {recommendedEvents.map(ev => (
+                <EventRecommendCard key={ev.id} event={ev} token={token} categories={categories} />
               ))}
             </div>
           </div>

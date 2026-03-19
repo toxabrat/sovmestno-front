@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { uploadImage, registerVenue, updateVenueProfile } from '../../api/auth'
+import { fetchCategories } from '../../api/events'
+import type { Category } from '../../api/events'
 import './CreateSpacePage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -29,6 +31,21 @@ export function CreateSpacePage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(data.coverPreview || null)
 
   const [isLoading, setIsLoading] = useState(false)
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+
+  useEffect(() => {
+    fetchCategories()
+      .then(setCategories)
+      .catch(() => {})
+  }, [])
+
+  const toggleCategory = (id: number) => {
+    setSelectedCategories(prev =>
+      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id],
+    )
+  }
 
   const maxAboutLength = 400
 
@@ -100,6 +117,7 @@ export function CreateSpacePage() {
         phone: phone.trim(),
         work_email: email.trim(),
         tg_personal_link: telegram.trim(),
+        category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
       })
 
       const token = response.access_token
@@ -130,6 +148,7 @@ export function CreateSpacePage() {
           tg_personal_link: telegram.trim() || undefined,
           logo_id: logoId ?? undefined,
           cover_photo_id: coverId ?? undefined,
+          category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
         }, token)
       }
 
@@ -277,9 +296,6 @@ export function CreateSpacePage() {
               >
                 <option value="Москва">Москва</option>
                 <option value="Санкт-Петербург">Санкт-Петербург</option>
-                <option value="Казань">Казань</option>
-                <option value="Новосибирск">Новосибирск</option>
-                <option value="Екатеринбург">Екатеринбург</option>
               </select>
               <input
                 type="text"
@@ -292,6 +308,29 @@ export function CreateSpacePage() {
           </div>
         </div>
       </div>
+
+      {categories.length > 0 && (
+        <div className="createSpace__categorySection">
+          <div className="createSpace__categorySectionLeft">
+            <h2 className="createSpace__categorySectionTitle">Интересующие форматы</h2>
+            <p className="createSpace__categorySectionDesc">
+              Выберите форматы мероприятий, которые вам интересны
+            </p>
+          </div>
+          <div className="createSpace__categoryChips">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`createSpace__chip ${selectedCategories.includes(cat.id) ? 'createSpace__chip--active' : ''}`}
+                onClick={() => toggleCategory(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="createSpace__contactsCard">
         <img src={contactsDecor} alt="" className="createSpace__contactsDecor" />

@@ -5,13 +5,14 @@ type Props = InputHTMLAttributes<HTMLInputElement> & {
   label?: string
   hint?: ReactNode
   rightSlot?: ReactNode
+  error?: boolean
 }
 
 function cx(...v: Array<string | false | undefined | null>) {
   return v.filter(Boolean).join(' ')
 }
 
-export function TextField({ label, hint, rightSlot, className, ...props }: Props) {
+export function TextField({ label, hint, rightSlot, error, className, ...props }: Props) {
   return (
     <label className="field">
       {label ? (
@@ -23,6 +24,7 @@ export function TextField({ label, hint, rightSlot, className, ...props }: Props
           className={cx(
             'field__input',
             rightSlot ? 'field__input--withRight' : undefined,
+            error ? 'field__input--error' : undefined,
             className,
           )}
         />

@@ -1,0 +1,190 @@
+.ccPage {
+  width: 100%;
+  background: #f7f7f9;
+  min-height: 100vh;
+  font-family: 'Golos Text', system-ui, -apple-system, sans-serif;
+}
+
+.ccPage__content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .ccPage__content { padding: 16px 16px 60px; gap: 16px; }
+}
+
+/* ─── Banner ─── */
+.ccPage__banner {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.ccPage__bannerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ccPage__bannerOverlay {
+  position: absolute;
+  inset: 0;
+  padding: 36px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  gap: 8px;
+}
+
+.ccPage__bannerTitle {
+  font-size: 36px;
+  font-weight: 800;
+  font-style: italic;
+  color: #D8F772;
+  margin: 0;
+  line-height: 1.1;
+}
+@media (max-width: 768px) {
+  .ccPage__bannerTitle { font-size: 26px; }
+}
+
+.ccPage__bannerDesc {
+  font-size: 14px;
+  color: #E9FF9F;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 400px;
+}
+
+/* ─── Search ─── */
+.ccPage__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 0 18px;
+  height: 48px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.ccPage__searchIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ccPage__searchInput {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  color: #1a1a1a;
+  flex: 1;
+  min-width: 0;
+}
+.ccPage__searchInput::placeholder { color: #aaa; }
+
+/* ─── Grid ─── */
+.ccPage__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .ccPage__grid { grid-template-columns: 1fr; }
+}
+
+.ccCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: box-shadow 150ms;
+}
+.ccCard:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+
+.ccCard__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #e8e8ec;
+}
+.ccCard__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ccCard__avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8b06d 0%, #d4956a 100%);
+}
+
+.ccCard__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ccCard__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* ─── States ─── */
+.ccPage__loading,
+.ccPage__empty {
+  font-size: 15px;
+  color: #888;
+  text-align: center;
+  padding: 48px 0;
+}
+
+/* ─── Pagination ─── */
+.ccPage__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.ccPage__pageBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #1a1a1a;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms, color 150ms;
+}
+.ccPage__pageBtn:disabled { opacity: 0.3; cursor: default; }
+.ccPage__pageBtn:not(:disabled):hover { background: #1a1a1a; color: #fff; }
+
+.ccPage__pageInfo {
+  font-size: 14px;
+  color: #555;
+}

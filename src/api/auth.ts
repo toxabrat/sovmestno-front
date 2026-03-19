@@ -132,7 +132,7 @@ export interface UploadImageResponse {
   image_type: string
 }
 
-export type ImageType = 'avatar' | 'venue-logo' | 'venue-cover' | 'venue-photo' | 'event-cover'
+export type ImageType = 'avatar' | 'venue-logo' | 'venue-cover' | 'venue-photo' | 'creator-photo' | 'event-cover'
 
 export async function uploadImage(file: File, type: ImageType, token: string): Promise<UploadImageResponse> {
   console.log('=== Upload Image Request ===')
@@ -329,6 +329,7 @@ export interface VenueListItem {
   work_email?: string
   logo_id?: number
   cover_photo_id?: number
+  category_ids?: number[]
   logo?: { id: number; file_path: string }
   cover_photo?: { id: number; file_path: string }
   tg_personal_link?: string
@@ -407,11 +408,19 @@ export interface VenueProfile {
   dzen_link?: string
   logo_id?: number
   cover_photo_id?: number
+  category_ids?: number[]
   logo?: { id: number; file_path: string; bucket_name: string }
   cover_photo?: { id: number; file_path: string; bucket_name: string }
   photos?: VenuePhoto[]
   created_at: string
   updated_at: string
+}
+
+export interface CreatorPhotoItem {
+  id: number
+  creator_id: number
+  image_id: number
+  image: { id: number; file_path: string; bucket_name: string }
 }
 
 export interface CreatorProfile {
@@ -423,6 +432,7 @@ export interface CreatorProfile {
   work_email?: string
   photo_id?: number
   photo?: { id: number; file_path: string; bucket_name: string }
+  photos?: CreatorPhotoItem[]
   tg_personal_link?: string
   tg_channel_link?: string
   vk_link?: string
@@ -443,6 +453,41 @@ export async function fetchCreatorProfile(userId: number, token: string): Promis
   const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(JSON.stringify(data))
   return data
+}
+
+export interface CreatorListItem {
+  id: number
+  user_id: number
+  name: string
+  description?: string
+  photo_id?: number
+  photo?: { id: number; file_path: string; bucket_name?: string }
+  created_at: string
+  updated_at: string
+}
+
+export interface CreatorListResponse {
+  data: CreatorListItem[]
+  total: number
+  limit: number
+  offset: number
+}
+
+export async function fetchCreators(
+  token?: string | null,
+  limit = 20,
+  offset = 0,
+): Promise<CreatorListResponse> {
+  const url = `${API_BASE_URL}/user/users/creators?limit=${limit}&offset=${offset}`
+  const headers: Record<string, string> = { Accept: 'application/json' }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  const response = await fetch(url, { headers })
+  const raw = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(raw))
+  const items: CreatorListItem[] =
+    raw.data ?? raw.creators ?? raw.items ?? (Array.isArray(raw) ? raw : [])
+  const total: number = raw.total ?? raw.count ?? items.length
+  return { data: items, total, limit, offset }
 }
 
 export async function fetchVenueProfile(userId: number, token: string): Promise<VenueProfile> {
@@ -508,6 +553,69 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshT
   const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(JSON.stringify(data))
   return data
+}
+
+export async function addVenuePhoto(imageId: number, token: string): Promise<VenuePhoto> {
+  const response = await fetch(`${API_BASE_URL}/user/users/venues/photos`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ image_id: imageId }),
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+export async function addCreatorPhoto(imageId: number, token: string): Promise<CreatorPhotoItem> {
+  const response = await fetch(`${API_BASE_URL}/user/users/creators/photos`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ image_id: imageId }),
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+export async function deleteCreatorPhoto(photoId: number, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/user/users/creators/photos/${photoId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok && response.status !== 204) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error(JSON.stringify(data))
+  }
+}
+
+export async function deleteCreatorProfile(userId: number, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/user/users/creators/${userId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok && response.status !== 204) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error(JSON.stringify(data))
+  }
+}
+
+export async function deleteVenueProfile(userId: number, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/user/users/venues/${userId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok && response.status !== 204) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error(JSON.stringify(data))
+  }
 }
 
 export async function apiLogout(refreshToken: string): Promise<void> {

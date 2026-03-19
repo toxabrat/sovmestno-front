@@ -1,7 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
-import { updateVenueProfile, uploadImage } from '../../api/auth'
+import { useAuth } from '../../context/AuthContext'
+import { updateVenueProfile, uploadImage, addVenuePhoto } from '../../api/auth'
+import { fetchCategories } from '../../api/events'
+import type { Category } from '../../api/events'
 import './SpaceFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -12,25 +15,16 @@ import iconTiktok from '../../assets/icons/space_sign_up4/Vector(3).png'
 import iconYoutube from '../../assets/icons/space_sign_up4/Vector(4).png'
 import iconDzen from '../../assets/icons/space_sign_up4/Vector(5).png'
 
-const EVENT_FORMATS = [
-  'Лекции',
-  'Концерты',
-  'Мастер-классы',
-  'Игры',
-  'Выставки',
-  'Разговорные клубы',
-  'Показы',
-  'Обмен',
-]
-
 export function SpaceFinalPage() {
   const navigate = useNavigate()
   const { data, updateData } = useSpaceRegistration()
+  const { token: authToken } = useAuth()
 
   const photoInputRef = useRef<HTMLInputElement>(null)
 
   const [photos, setPhotos] = useState<Array<{ preview: string; uploading: boolean }>>([])
-  const [selectedFormats, setSelectedFormats] = useState<string[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([])
   const [telegram, setTelegram] = useState(data.telegramChannel)
   const [vk, setVk] = useState(data.vkLink)
   const [tiktok, setTiktok] = useState(data.tiktokLink)
@@ -38,21 +32,27 @@ export function SpaceFinalPage() {
   const [dzen, setDzen] = useState(data.dzenLink)
   const [isLoading, setIsLoading] = useState(false)
 
-  const allSelected = selectedFormats.length === EVENT_FORMATS.length
+  const activeToken = data.token || authToken
+
+  useEffect(() => {
+    fetchCategories(activeToken).then(setCategories).catch(() => {})
+  }, [activeToken])
+
+  const allSelected = categories.length > 0 && selectedCategoryIds.length === categories.length
 
   const handleSelectAll = () => {
     if (allSelected) {
-      setSelectedFormats([])
+      setSelectedCategoryIds([])
     } else {
-      setSelectedFormats([...EVENT_FORMATS])
+      setSelectedCategoryIds(categories.map(c => c.id))
     }
   }
 
-  const toggleFormat = (format: string) => {
-    if (selectedFormats.includes(format)) {
-      setSelectedFormats(selectedFormats.filter(f => f !== format))
+  const toggleFormat = (id: number) => {
+    if (selectedCategoryIds.includes(id)) {
+      setSelectedCategoryIds(selectedCategoryIds.filter(x => x !== id))
     } else {
-      setSelectedFormats([...selectedFormats, format])
+      setSelectedCategoryIds([...selectedCategoryIds, id])
     }
   }
 
@@ -75,7 +75,8 @@ export function SpaceFinalPage() {
 
       if (data.token) {
         try {
-          await uploadImage(file, 'venue-photo', data.token)
+          const uploaded = await uploadImage(file, 'venue-photo', data.token)
+          await addVenuePhoto(uploaded.id, data.token)
         } catch (err) {
           console.error('Error uploading venue photo:', err)
         }
@@ -111,7 +112,8 @@ export function SpaceFinalPage() {
         tiktok_link: tiktok || undefined,
         youtube_link: youtube || undefined,
         dzen_link: dzen || undefined,
-      }, data.token)
+        category_ids: selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
+      }, data.token!)
 
       updateData({
         telegramChannel: telegram,
@@ -187,7 +189,7 @@ export function SpaceFinalPage() {
           </p>
         </div>
         
-        <div className="spaceFinal__formatsContent">
+          <div className="spaceFinal__formatsContent">
           <label className="spaceFinal__selectAll">
             <input
               type="checkbox"
@@ -199,18 +201,20 @@ export function SpaceFinalPage() {
             <span className="spaceFinal__selectAllText">Выбрать всё</span>
           </label>
 
-          <div className="spaceFinal__tags">
-            {EVENT_FORMATS.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={`spaceFinal__tag ${selectedFormats.includes(format) ? 'spaceFinal__tag--selected' : ''}`}
-                onClick={() => toggleFormat(format)}
-              >
-                {format}
-              </button>
-            ))}
-          </div>
+          {categories.length > 0 && (
+            <div className="spaceFinal__tags">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`spaceFinal__tag ${selectedCategoryIds.includes(cat.id) ? 'spaceFinal__tag--selected' : ''}`}
+                  onClick={() => toggleFormat(cat.id)}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

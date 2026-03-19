@@ -174,9 +174,6 @@ export function CreateCreatorPage() {
             >
               <option value="Москва">Москва</option>
               <option value="Санкт-Петербург">Санкт-Петербург</option>
-              <option value="Казань">Казань</option>
-              <option value="Новосибирск">Новосибирск</option>
-              <option value="Екатеринбург">Екатеринбург</option>
             </select>
           </div>
         </div>

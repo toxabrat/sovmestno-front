@@ -49,9 +49,22 @@
   color: var(--text-muted);
 }
 
+.field__input--error {
+  border-color: #e84040;
+  background: color-mix(in srgb, #e84040 6%, var(--bg));
+}
+
+.field__input--error:focus {
+  border-color: #e84040;
+  background: color-mix(in srgb, #e84040 6%, var(--card));
+}
+
 .field__hint {
   margin-top: 4px;
   font-size: 12px;
   color: var(--text-muted);
 }
 
+.field__hint--error {
+  color: #e84040;
+}

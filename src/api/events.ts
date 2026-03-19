@@ -1,3 +1,5 @@
+import { fetchWithAuth } from './apiClient'
+
 const EVENT_API_BASE = `${import.meta.env.VITE_API_URL ?? ''}/api/event`
 
 export interface Category {
@@ -13,7 +15,8 @@ export interface Event {
   description: string
   cover_photo_id?: number
   category_ids?: number[]
-  status: 'published' | 'archived'
+  is_active: boolean
+  is_completed: boolean
   created_at: string
   updated_at: string
 }
@@ -36,17 +39,9 @@ export interface UpdateEventRequest {
 async function request<T>(
   url: string,
   options: RequestInit,
-  token?: string | null,
+  _token?: string | null,
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-    ...(options.body && !(options.body instanceof FormData)
-      ? { 'Content-Type': 'application/json' }
-      : {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
-
-  const res = await fetch(url, { ...options, headers })
+  const res = await fetchWithAuth(url, options)
   const data = await res.json().catch(() => ({}))
 
   if (!res.ok) {
@@ -69,8 +64,11 @@ export async function fetchCategories(token?: string | null): Promise<Category[]
 
 export interface FetchEventsParams {
   creator_id?: number
-  status?: 'published' | 'archived'
+  is_active?: boolean
+  is_completed?: boolean
   category_id?: number
+  limit?: number
+  offset?: number
 }
 
 export async function fetchEvents(
@@ -79,8 +77,11 @@ export async function fetchEvents(
 ): Promise<Event[]> {
   const query = new URLSearchParams()
   if (params?.creator_id) query.set('creator_id', String(params.creator_id))
-  if (params?.status) query.set('status', params.status)
+  if (params?.is_active !== undefined) query.set('is_active', String(params.is_active))
+  if (params?.is_completed !== undefined) query.set('is_completed', String(params.is_completed))
   if (params?.category_id) query.set('category_id', String(params.category_id))
+  if (params?.limit !== undefined) query.set('limit', String(params.limit))
+  if (params?.offset !== undefined) query.set('offset', String(params.offset))
 
   const url = `${EVENT_API_BASE}/events${query.toString() ? `?${query}` : ''}`
 

@@ -116,11 +116,25 @@ export function AuthPage() {
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [signupError, setSignupError] = useState<string | null>(null)
+
   const isFormValid = name.trim() !== '' && isValidEmail(email) && isValidPassword(password)
   const isLoginFormValid = isValidEmail(loginEmail) && loginPassword.trim() !== ''
 
+  const isNetworkError = (err: unknown): boolean => {
+    return err instanceof TypeError && err.message === 'Failed to fetch'
+  }
+
   const handleCreateAccount = async () => {
-    if (!isFormValid || isLoading) return
+    if (isLoading) return
+    if (!isFormValid) {
+      if (name.trim() === '') setSignupError('Введите ваше имя')
+      else if (!isValidEmail(email)) setSignupError('Введите корректный email')
+      else if (!isValidPassword(password)) setSignupError('Пароль должен быть не менее 6 символов')
+      return
+    }
+    setSignupError(null)
     
     if (role === 'space') {
       updateSpaceData({
@@ -138,8 +152,6 @@ export function AuthPage() {
           email: email.trim(),
           password,
         })
-        
-        console.log('Registration successful:', response)
 
         updateData({ 
           token: response.access_token,
@@ -152,7 +164,11 @@ export function AuthPage() {
 
         navigate('/creator/create')
       } catch (err) {
-        console.error('Registration error:', err)
+        if (isNetworkError(err)) {
+          navigate('/*')
+        } else {
+          setSignupError('Пользователь с таким email уже существует')
+        }
       } finally {
         setIsLoading(false)
       }
@@ -160,7 +176,12 @@ export function AuthPage() {
   }
 
   const handleLogin = async () => {
-    if (!isLoginFormValid || isLoading) return
+    if (isLoading) return
+    if (!isLoginFormValid) {
+      setLoginError('Введите email и пароль')
+      return
+    }
+    setLoginError(null)
     
     setIsLoading(true)
     
@@ -169,10 +190,15 @@ export function AuthPage() {
         email: loginEmail.trim(),
         password: loginPassword,
       })
-      
-      console.log('Login successful:', response)
 
-      const avatarId = response.user.creator?.photo?.id ?? (response.user.venue as { logo?: { id: number } })?.logo?.id ?? undefined
+      const avatarId =
+        response.user.creator?.photo?.id
+        ?? response.user.creator?.photo_id
+        ?? response.user.avatar?.id
+        ?? response.user.avatar_id
+        ?? (response.user.venue as { logo?: { id: number }; logo_id?: number })?.logo?.id
+        ?? (response.user.venue as { logo_id?: number })?.logo_id
+        ?? undefined
 
       login(response.access_token, response.refresh_token, {
         id: response.user.id,
@@ -184,7 +210,11 @@ export function AuthPage() {
 
       navigate('/landing/space')
     } catch (err) {
-      console.error('Login error:', err)
+      if (isNetworkError(err)) {
+        navigate('/*')
+      } else {
+        setLoginError('Неверный логин или пароль')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -240,14 +270,16 @@ export function AuthPage() {
                 placeholder="Email" 
                 autoComplete="email"
                 value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
+                error={!!loginError}
+                onChange={(e) => { setLoginEmail(e.target.value); setLoginError(null) }}
               />
               <TextField
                 placeholder="Пароль"
                 autoComplete="current-password"
                 type={showPass ? 'text' : 'password'}
                 value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
+                error={!!loginError}
+                onChange={(e) => { setLoginPassword(e.target.value); setLoginError(null) }}
                 rightSlot={
                   <button
                     type="button"
@@ -259,6 +291,9 @@ export function AuthPage() {
                   </button>
                 }
               />
+              {loginError && (
+                <p className="auth__errorMsg">{loginError}</p>
+              )}
             </div>
 
             <button type="button" className="auth__link">
@@ -269,7 +304,7 @@ export function AuthPage() {
               className="btn--full" 
               size="lg"
               onClick={handleLogin}
-              disabled={!isLoginFormValid || isLoading}
+              disabled={isLoading}
             >
               {isLoading ? 'Вход...' : 'Войти'} {!isLoading && <ArrowRight />}
             </Button>
@@ -336,20 +371,23 @@ export function AuthPage() {
                     }
                     autoComplete="name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    error={!!signupError}
+                    onChange={(e) => { setName(e.target.value); setSignupError(null) }}
                   />
                   <TextField 
                     placeholder="Email" 
                     autoComplete="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    error={!!signupError}
+                    onChange={(e) => { setEmail(e.target.value); setSignupError(null) }}
                   />
                   <TextField
                     placeholder="Пароль"
                     autoComplete="new-password"
                     type={showPass ? 'text' : 'password'}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    error={!!signupError}
+                    onChange={(e) => { setPassword(e.target.value); setSignupError(null) }}
                     rightSlot={
                       <button
                         type="button"
@@ -363,6 +401,9 @@ export function AuthPage() {
                       </button>
                     }
                   />
+                  {signupError && (
+                    <p className="auth__errorMsg">{signupError}</p>
+                  )}
                 </div>
 
                 <div className="auth__checkboxes">
@@ -378,7 +419,7 @@ export function AuthPage() {
                   className="btn--full" 
                   size="lg" 
                   onClick={handleCreateAccount}
-                  disabled={!isFormValid || isLoading}
+                  disabled={isLoading}
                 >
                   {isLoading ? 'Регистрация...' : 'Создать аккаунт'}
                 </Button>

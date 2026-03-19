@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchVenueProfile, fetchImageUrl, fetchVenues } from '../../api/auth'
-import type { VenueProfile, VenueListItem } from '../../api/auth'
+import { fetchVenueProfile, fetchImageUrl, fetchVenues, uploadImage } from '../../api/auth'
+import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
+import type { VenueProfile, VenueListItem, VenuePhoto } from '../../api/auth'
+import type { Event, Category } from '../../api/events'
 import { Footer } from '../../components/layout/Footer'
 import './VenueProfilePage.css'
 
@@ -13,7 +16,13 @@ import iconTiktok   from '../../assets/icons/space_sign_up4/Vector(3).png'
 import iconDzen     from '../../assets/icons/space_sign_up4/Vector(4).png'
 
 
-function PhotoThumb({ imageId, token }: { imageId: number; token: string }) {
+function PhotoThumb({ imageId, token, isOwner, photoRecordId, onDelete }: {
+  imageId: number
+  token: string
+  isOwner?: boolean
+  photoRecordId?: number
+  onDelete?: (id: number) => void
+}) {
   const [url, setUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -29,12 +38,52 @@ function PhotoThumb({ imageId, token }: { imageId: number; token: string }) {
       {url
         ? <img src={url} alt="" className="venueProfile__photoImg" />
         : <div className="venueProfile__photoPlaceholder" />}
+      {isOwner && photoRecordId && (
+        <button type="button" className="venueProfile__photoDeleteBtn" onClick={() => onDelete?.(photoRecordId)}>×</button>
+      )}
+    </div>
+  )
+}
+
+function CompletedEventCard({ event, token, categories, isOwner, onDelete }: {
+  event: Event
+  token: string | null
+  categories: Category[]
+  isOwner: boolean
+  onDelete?: (id: number) => void
+}) {
+  const [coverUrl, setCoverUrl] = useState<string | null>(null)
+  const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
+
+  useEffect(() => {
+    if (!token || !event.cover_photo_id) return
+    fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
+  }, [event.cover_photo_id, token])
+
+  return (
+    <div className="venueProfile__completedCard">
+      <div className="venueProfile__completedCover">
+        {coverUrl
+          ? <img src={coverUrl} alt="" className="venueProfile__completedCoverImg" />
+          : <div className="venueProfile__completedCoverPlaceholder" />}
+      </div>
+      <div className="venueProfile__completedBody">
+        <h3 className="venueProfile__completedTitle">{event.title}</h3>
+        {catName && <span className="venueProfile__completedTag">◇ {catName}</span>}
+        {event.description && <p className="venueProfile__completedDesc">{event.description}</p>}
+        {isOwner && (
+          <button type="button" className="venueProfile__completedDeleteBtn" onClick={() => onDelete?.(event.id)}>
+            Удалить
+          </button>
+        )}
+      </div>
     </div>
   )
 }
 
 
 function RecommendedCard({ venue, token }: { venue: VenueListItem; token: string | null }) {
+  const navigate = useNavigate()
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
@@ -54,7 +103,14 @@ function RecommendedCard({ venue, token }: { venue: VenueListItem; token: string
           : <div className="recCard__coverPlaceholder" />}
       </div>
       <div className="recCard__body">
-        <div className="recCard__nameRow">
+        <div
+          className="recCard__nameRow"
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(`/venue/profile/${venue.user_id}`)}
+          onKeyDown={e => e.key === 'Enter' && navigate(`/venue/profile/${venue.user_id}`)}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="recCard__logo">
             {logoUrl
               ? <img src={logoUrl} alt="" className="recCard__logoImg" />
@@ -104,8 +160,37 @@ function SocialBadge({ href, label, type }: { href: string; label: string; type:
 }
 
 
+async function addVenuePhoto(imageId: number, token: string): Promise<VenuePhoto> {
+  const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/venues/photos`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ image_id: imageId }),
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+async function deleteVenuePhoto(photoId: number, token: string): Promise<void> {
+  const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/venues/photos/${photoId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok && response.status !== 204) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error(JSON.stringify(data))
+  }
+}
+
 export function VenueProfilePage() {
   const { user, token } = useAuth()
+  const { userId: paramUserId } = useParams<{ userId: string }>()
+  const targetUserId = paramUserId ? Number(paramUserId) : user?.id
+  const isOwner = user?.role === 'venue' && !!targetUserId && user?.id === targetUserId
 
   const [profile, setProfile] = useState<VenueProfile | null>(null)
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
@@ -114,13 +199,18 @@ export function VenueProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   const [recommended, setRecommended] = useState<VenueListItem[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [completedEvents, setCompletedEvents] = useState<Event[]>([])
 
   const scrollRef = useRef<HTMLDivElement>(null)
+  const completedScrollRef = useRef<HTMLDivElement>(null)
+  const photoFileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   const loadProfile = () => {
-    if (!user?.id || !token) return
+    if (!targetUserId || !token) return
     setIsLoading(true)
-    fetchVenueProfile(user.id, token)
+    fetchVenueProfile(targetUserId, token)
       .then(data => {
         setProfile(data)
         const coverId = data.cover_photo?.id ?? data.cover_photo_id
@@ -135,13 +225,51 @@ export function VenueProfilePage() {
       .finally(() => setIsLoading(false))
   }
 
-  useEffect(() => { loadProfile() }, [user?.id, token])
+  useEffect(() => { loadProfile() }, [targetUserId, token])
 
   useEffect(() => {
     fetchVenues(token, 6, 0)
       .then(res => setRecommended(res.data.slice(0, 3)))
       .catch(() => {})
+    fetchCategories(token).then(setCategories).catch(() => {})
   }, [token])
+
+  useEffect(() => {
+    if (!targetUserId || !token) return
+    fetchEvents({ creator_id: targetUserId, is_completed: true }, token)
+      .then(setCompletedEvents).catch(() => setCompletedEvents([]))
+  }, [targetUserId, token])
+
+  const handleAddPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !token) return
+    setUploadingPhoto(true)
+    try {
+      const uploaded = await uploadImage(file, 'venue-photo', token)
+      await addVenuePhoto(uploaded.id, token)
+      loadProfile()
+    } catch { /* */ }
+    finally {
+      setUploadingPhoto(false)
+      if (photoFileInputRef.current) photoFileInputRef.current.value = ''
+    }
+  }
+
+  const handleDeletePhoto = async (photoId: number) => {
+    if (!token) return
+    try {
+      await deleteVenuePhoto(photoId, token)
+      loadProfile()
+    } catch { /* */ }
+  }
+
+  const handleDeleteEvent = async (id: number) => {
+    if (!token) return
+    try {
+      await deleteEvent(id, token)
+      setCompletedEvents(prev => prev.filter(e => e.id !== id))
+    } catch { /* */ }
+  }
 
   const scrollLeft  = () => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })
   const scrollRight = () => scrollRef.current?.scrollBy({ left:  300, behavior: 'smooth' })
@@ -193,14 +321,7 @@ export function VenueProfilePage() {
                   </div>
                 </div>
 
-                <div className="venueProfile__actions">
-                  <button type="button" className="venueProfile__saveBtn">
-                    Сохранить
-                  </button>
-                  <button type="button" className="venueProfile__proposeBtn">
-                    Предложить мероприятие
-                  </button>
-                </div>
+                
               </div>
 
             </div>
@@ -233,21 +354,71 @@ export function VenueProfilePage() {
           </aside>
         </div>
 
-        {photoItems.length > 0 && (
-          <section className="venueProfile__photos">
+        {profile.category_ids && profile.category_ids.length > 0 && (
+          <div className="venueProfile__formatsSection">
+            <span className="venueProfile__formatsLabel">Интересующие форматы</span>
+            <div className="venueProfile__formatsTags">
+              {profile.category_ids.map(catId => {
+                const cat = categories.find(c => c.id === catId)
+                return cat ? (
+                  <span key={cat.id} className="venueProfile__formatTag">{cat.name}</span>
+                ) : null
+              })}
+            </div>
+          </div>
+        )}
+
+        <section className="venueProfile__photos">
+          <div className="venueProfile__photosHeader">
+            <h2 className="venueProfile__photosTitle">Фотографии пространства</h2>
+            <div className="venueProfile__photosNav">
+              <button type="button" className="venueProfile__arrowBtn" onClick={scrollLeft}>‹</button>
+              <button type="button" className="venueProfile__arrowBtn" onClick={scrollRight}>›</button>
+            </div>
+          </div>
+
+          <div className="venueProfile__photosScroll" ref={scrollRef}>
+            {isOwner && (
+              <>
+                <input ref={photoFileInputRef} type="file" accept="image/*" onChange={handleAddPhoto} style={{ display: 'none' }} />
+                <button
+                  type="button"
+                  className="venueProfile__photoThumb venueProfile__photoAdd"
+                  onClick={() => photoFileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                >
+                  <span className="venueProfile__photoAddPlus">+</span>
+                  <span className="venueProfile__photoAddText">{uploadingPhoto ? 'Загрузка...' : 'Загрузить фото'}</span>
+                </button>
+              </>
+            )}
+            {photoItems.map(p => (
+              <PhotoThumb key={p.id} imageId={p.image.id} token={token!} isOwner={isOwner} photoRecordId={p.id} onDelete={handleDeletePhoto} />
+            ))}
+            {photoItems.length === 0 && !isOwner && (
+              <p className="venueProfile__emptyMsg">Фотографий пока нет</p>
+            )}
+          </div>
+        </section>
+
+        {(completedEvents.length > 0 || isOwner) && (
+          <section className="venueProfile__completedSection">
             <div className="venueProfile__photosHeader">
-              <h2 className="venueProfile__photosTitle">Фотографии пространства</h2>
+              <h2 className="venueProfile__photosTitle">Проведённые мероприятия</h2>
               <div className="venueProfile__photosNav">
-                <button type="button" className="venueProfile__arrowBtn" onClick={scrollLeft}>‹</button>
-                <button type="button" className="venueProfile__arrowBtn" onClick={scrollRight}>›</button>
+                <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
+                <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
               </div>
             </div>
-
-            <div className="venueProfile__photosScroll" ref={scrollRef}>
-              {photoItems.map(p => (
-                <PhotoThumb key={p.id} imageId={p.image.id} token={token!} />
-              ))}
-            </div>
+            {completedEvents.length > 0 ? (
+              <div className="venueProfile__photosScroll" ref={completedScrollRef}>
+                {completedEvents.map(ev => (
+                  <CompletedEventCard key={ev.id} event={ev} token={token} categories={categories} isOwner={isOwner} onDelete={handleDeleteEvent} />
+                ))}
+              </div>
+            ) : (
+              <p className="venueProfile__emptyMsg">Проведённых мероприятий пока нет</p>
+            )}
           </section>
         )}
 

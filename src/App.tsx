@@ -12,8 +12,12 @@ import { CreatorSuccessPage } from './pages/creator/CreatorSuccessPage'
 import { SpacesCatalogPage } from './pages/spaces/SpacesCatalogPage'
 import { EventsCatalogPage } from './pages/events/EventsCatalogPage'
 import { EventDetailsPage } from './pages/events/EventDetailsPage'
+import { CreateEventPage } from './pages/events/CreateEventPage'
+import { EventSuccessPage } from './pages/events/EventSuccessPage'
+import { CreatorsCatalogPage } from './pages/creators/CreatorsCatalogPage'
 import { VenueProfilePage } from './pages/venue/VenueProfilePage'
 import { CreatorProfilePage } from './pages/creator/CreatorProfilePage'
+import { MyEventsPage } from './pages/my-events/MyEventsPage'
 import { NotFoundPage } from './pages/errors/NotFoundPage'
 import { CreatorRegistrationProvider } from './context/CreatorRegistrationContext'
 import { SpaceRegistrationProvider } from './context/SpaceRegistrationContext'
@@ -38,8 +42,13 @@ export default function App() {
 
         <Route path="/spaces" element={<SpacesCatalogPage />} />
         <Route path="/events" element={<EventsCatalogPage />} />
+        <Route path="/events/create" element={<CreateEventPage />} />
+        <Route path="/events/success" element={<EventSuccessPage />} />
         <Route path="/events/:eventId" element={<EventDetailsPage />} />
+        <Route path="/creators" element={<CreatorsCatalogPage />} />
+        <Route path="/my-events" element={<MyEventsPage />} />
         <Route path="/venue/profile" element={<VenueProfilePage />} />
+        <Route path="/venue/profile/:userId" element={<VenueProfilePage />} />
         <Route path="/creator/profile" element={<CreatorProfilePage />} />
         <Route path="/creator/profile/:userId" element={<CreatorProfilePage />} />
 

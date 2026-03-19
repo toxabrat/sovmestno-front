@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
-import { updateCreatorProfile, uploadImage } from '../../api/auth'
+import { updateCreatorProfile, uploadImage, addCreatorPhoto } from '../../api/auth'
 import './CreatorFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -14,7 +14,7 @@ import iconDzen from '../../assets/icons/space_sign_up4/Vector(5).png'
 
 export function CreatorFinalPage() {
   const navigate = useNavigate()
-  const { data, updateData } = useCreatorRegistration()
+  const { data } = useCreatorRegistration()
 
   const [telegramChannel, setTelegramChannel] = useState(data.telegramChannel)
   const [vk, setVk] = useState(data.vkLink)
@@ -23,22 +23,20 @@ export function CreatorFinalPage() {
   const [dzen, setDzen] = useState(data.dzenLink)
 
   const [isLoading, setIsLoading] = useState(false)
-  const [photoPreview, setPhotoPreview] = useState<string | null>(data.photoPreview)
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([])
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
-  const handleBack = () => navigate('/creator/create')
-  const handleSkip = () => navigate('/creator/success')
-
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !data.token) return
     setUploadingPhoto(true)
     try {
       const preview = URL.createObjectURL(file)
-      setPhotoPreview(preview)
-      const img = await uploadImage(file, 'avatar', data.token)
-      updateData({ photoId: img.id, photoPreview: preview })
+      setPhotoPreviews(prev => [...prev, preview])
+      const img = await uploadImage(file, 'venue-photo', data.token)
+      await addCreatorPhoto(img.id, data.token)
     } catch (err) {
       console.error('Photo upload failed:', err)
     } finally {
@@ -47,20 +45,23 @@ export function CreatorFinalPage() {
     }
   }
 
+  const handleBack = () => navigate('/creator/create')
+  const handleSkip = () => navigate('/creator/success')
+
   const handleSave = async () => {
-    if (!data.token || !data.userId) {
+    if (!data.token || !data.userId || !data.name) {
       navigate('/creator/success')
       return
     }
     setIsLoading(true)
     try {
       await updateCreatorProfile(data.userId, {
+        name: data.name,
         tg_channel_link: telegramChannel,
         vk_link: vk,
         tiktok_link: tiktok,
         youtube_link: youtube,
         dzen_link: dzen,
-        ...(data.photoId ? { photo_id: data.photoId } : {}),
       }, data.token)
       navigate('/creator/success')
     } catch (err) {
@@ -78,8 +79,8 @@ export function CreatorFinalPage() {
         <div className="creatorFinal__headerText">
           <h1 className="creatorFinal__title">Ииии... финальный штрих!</h1>
           <p className="creatorFinal__subtitle">
-            Вы можете добавить фотографии ранее проведённых мероприятий, примеры своих работ или всё то,
-            что посчитаете нужным для своего портфолио. Сделать это можно позже из своего профиля
+            Вы можете добавить ссылки на свои социальные сети. Это поможет площадкам узнать о вас больше.
+            Добавить фотографии портфолио можно будет позже из профиля.
           </p>
         </div>
       </header>
@@ -90,21 +91,9 @@ export function CreatorFinalPage() {
           type="file"
           accept="image/*"
           className="creatorFinal__fileInput"
-          onChange={handlePhotoChange}
+          onChange={handlePhotoSelect}
         />
-        {photoPreview ? (
-          <div className="creatorFinal__photoPreviewWrap">
-            <img src={photoPreview} alt="Фото профиля" className="creatorFinal__photoPreviewImg" />
-            <button
-              type="button"
-              className="creatorFinal__photoChangeBtn"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingPhoto}
-            >
-              {uploadingPhoto ? 'Загрузка...' : 'Изменить фото'}
-            </button>
-          </div>
-        ) : (
+        <div className="creatorFinal__photoGrid">
           <button
             type="button"
             className="creatorFinal__photoBtn"
@@ -116,14 +105,19 @@ export function CreatorFinalPage() {
               {uploadingPhoto ? 'Загрузка...' : 'Загрузить фото'}
             </span>
           </button>
-        )}
+          {photoPreviews.map((src, i) => (
+            <div key={i} className="creatorFinal__photoPreview">
+              <img src={src} alt="" className="creatorFinal__photoPreviewImg" />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="creatorFinal__socialCard">
         <div className="creatorFinal__socialHeader">
           <h2 className="creatorFinal__socialTitle">Социальные сети</h2>
           <p className="creatorFinal__socialSubtitle">
-            Можете поделиться своими ссылками на свои публичные социальные сети
+            Можете поделиться ссылками на свои публичные социальные сети
           </p>
           <img src={socialMediaDecor} alt="" className="creatorFinal__decorSocial" />
         </div>
