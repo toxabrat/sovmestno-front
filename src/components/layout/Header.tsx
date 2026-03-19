@@ -38,23 +38,6 @@ export function Header() {
     navigate('/landing/space')
   }
 
-  const handleDeleteProfile = async () => {
-    if (!token || !user) return
-    const confirmed = window.confirm('Вы уверены, что хотите удалить свою страницу? Это действие необратимо.')
-    if (!confirmed) return
-    setMenuOpen(false)
-    try {
-      if (user.role === 'creator') {
-        await deleteCreatorProfile(user.id, token)
-      } else {
-        await deleteVenueProfile(user.id, token)
-      }
-    } catch { /* ignore, proceed with logout */ }
-    if (refreshToken) await apiLogout(refreshToken)
-    logout()
-    navigate('/landing/space')
-  }
-
   const profilePath = user?.role === 'venue' ? '/venue/profile' : '/creator/profile'
 
   const handleMenuNavigate = useCallback((path: string) => {
@@ -167,7 +150,6 @@ export function Header() {
         <button
           type="button"
           className="header__dropdownItem header__dropdownItem--danger"
-          onClick={handleDeleteProfile}
         >
           Удалить страницу
         </button>
