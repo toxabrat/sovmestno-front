@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Button } from '../ui/Button'
 import { useAuth } from '../../context/AuthContext'
-import { fetchImageUrl, apiLogout, deleteCreatorProfile, deleteVenueProfile } from '../../api/auth'
+import { fetchImageUrl, apiLogout } from '../../api/auth'
 import { fetchApplications } from '../../api/applications'
 import './Header.css'
 

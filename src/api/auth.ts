@@ -596,28 +596,6 @@ export async function deleteCreatorPhoto(photoId: number, token: string): Promis
   }
 }
 
-export async function deleteCreatorProfile(userId: number, token: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/user/users/creators/${userId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!response.ok && response.status !== 204) {
-    const data = await response.json().catch(() => ({}))
-    throw new Error(JSON.stringify(data))
-  }
-}
-
-export async function deleteVenueProfile(userId: number, token: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/user/users/venues/${userId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!response.ok && response.status !== 204) {
-    const data = await response.json().catch(() => ({}))
-    throw new Error(JSON.stringify(data))
-  }
-}
-
 export async function apiLogout(refreshToken: string): Promise<void> {
   await fetch(`${API_BASE_URL}/user/auth/logout`, {
     method: 'POST',
