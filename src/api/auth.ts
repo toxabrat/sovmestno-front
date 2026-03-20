@@ -2,12 +2,60 @@ export const API_BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api`
 
 export async function fetchImageUrl(imageId: number, token: string): Promise<string> {
   const url = `${API_BASE_URL}/user/users/images/${imageId}`
+  
+  // Helper to get auth tokens from localStorage (for use outside React context)
+  const getAuthFromStorage = () => ({
+    token: localStorage.getItem('token'),
+    refreshToken: localStorage.getItem('refreshToken'),
+  })
+  
+  // Helper to update token in localStorage
+  const updateTokenInStorage = (newToken: string) => {
+    localStorage.setItem('token', newToken)
+  }
+  
+  // Try with provided token first
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'image/*,*/*',
     },
   })
+  
+  // If 401, try to refresh token and retry
+  if (response.status === 401) {
+    const { refreshToken } = getAuthFromStorage()
+    if (refreshToken) {
+      try {
+        const refreshData = await refreshAccessToken(refreshToken)
+        updateTokenInStorage(refreshData.access_token)
+        
+        // Retry with new token
+        const retryResponse = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${refreshData.access_token}`,
+            Accept: 'image/*,*/*',
+          },
+        })
+        
+        if (retryResponse.ok) {
+          const contentType = retryResponse.headers.get('content-type') || ''
+          const blob = await retryResponse.blob()
+          if (!contentType.startsWith('image/') && blob.type && !blob.type.startsWith('image/')) {
+            throw new Error('Response is not an image')
+          }
+          return URL.createObjectURL(blob)
+        }
+      } catch (refreshError) {
+        console.warn('Token refresh failed:', refreshError)
+        // Clear invalid tokens
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+      }
+    }
+    throw new Error(`Image load failed: ${response.status} ${response.statusText}`)
+  }
+  
   if (!response.ok) {
     throw new Error(`Image load failed: ${response.status} ${response.statusText}`)
   }

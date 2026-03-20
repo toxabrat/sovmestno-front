@@ -57,8 +57,14 @@ export function Header() {
       return
     }
     let cancelled = false
-    fetchImageUrl(avatarId!, token)
-      .then((url) => {
+    
+    // Helper to get current token from storage (in case it was refreshed)
+    const getCurrentToken = () => localStorage.getItem('token') || token
+    
+    const loadAvatar = async () => {
+      try {
+        const currentToken = getCurrentToken()
+        const url = await fetchImageUrl(avatarId, currentToken)
         if (cancelled) {
           URL.revokeObjectURL(url)
           return
@@ -66,11 +72,14 @@ export function Header() {
         if (avatarUrlRef.current) URL.revokeObjectURL(avatarUrlRef.current)
         avatarUrlRef.current = url
         setAvatarUrl(url)
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) setAvatarUrl(null)
         console.warn('Avatar load failed:', err)
-      })
+      }
+    }
+    
+    loadAvatar()
+    
     return () => {
       cancelled = true
       if (avatarUrlRef.current) {
