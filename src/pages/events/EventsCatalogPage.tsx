@@ -43,7 +43,7 @@ function CreatorHighlight({ creator, token, categories }: {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!token || !creator.photo_id) return
-    fetchImageUrl(creator.photo_id, token).then(setPhotoUrl).catch(() => {})
+    fetchImageUrl(creator.photo_id).then(setPhotoUrl).catch(() => {})
   }, [creator.photo_id, token])
 
   return (
@@ -92,7 +92,7 @@ function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
     if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
-      fetchImageUrl(event.cover_photo_id, token)
+      fetchImageUrl(event.cover_photo_id)
         .then(url => { if (!cancelled) setCoverUrl(url) })
         .catch(() => {})
     }
@@ -100,7 +100,7 @@ function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
       if (cancelled) return
       setCreatorName(info.name)
       if (info.avatarId) {
-        fetchImageUrl(info.avatarId, token)
+        fetchImageUrl(info.avatarId)
           .then(url => { if (!cancelled) setCreatorAvatarUrl(url) })
           .catch(() => {})
       }
@@ -198,7 +198,7 @@ function FeaturedEventCard({ event, token, categories }: {
     if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
-      fetchImageUrl(event.cover_photo_id, token)
+      fetchImageUrl(event.cover_photo_id)
         .then(url => { if (!cancelled) setCoverUrl(url) })
         .catch(() => {})
     }
@@ -206,7 +206,7 @@ function FeaturedEventCard({ event, token, categories }: {
       if (cancelled) return
       setCreatorName(info.name)
       if (info.avatarId) {
-        fetchImageUrl(info.avatarId, token)
+        fetchImageUrl(info.avatarId)
           .then(url => { if (!cancelled) setCreatorAvatarUrl(url) })
           .catch(() => {})
       }
@@ -283,12 +283,12 @@ function EventModal({ event, token, categories, onClose }: {
     if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
-      fetchImageUrl(event.cover_photo_id, token).then(url => { if (!cancelled) setCoverUrl(url) }).catch(() => {})
+      fetchImageUrl(event.cover_photo_id).then(url => { if (!cancelled) setCoverUrl(url) }).catch(() => {})
     }
     getCreatorInfo(event.creator_id, token).then(info => {
       if (cancelled) return
       setCreatorName(info.name)
-      if (info.avatarId) fetchImageUrl(info.avatarId, token).then(url => { if (!cancelled) setCreatorAvatarUrl(url) }).catch(() => {})
+      if (info.avatarId) fetchImageUrl(info.avatarId).then(url => { if (!cancelled) setCreatorAvatarUrl(url) }).catch(() => {})
     })
     return () => { cancelled = true }
   }, [event, token])

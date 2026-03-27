@@ -19,21 +19,22 @@ import iconSocial from '../../assets/playground_profile/Frame 2131328057.png'
 import iconTelegram from '../../assets/icons/space_sign_up4/Vector(1).png'
 import iconVk       from '../../assets/icons/space_sign_up4/Vector(2).png'
 import iconTiktok   from '../../assets/icons/space_sign_up4/Vector(3).png'
-import iconDzen     from '../../assets/icons/space_sign_up4/Vector(4).png'
+import iconYoutube  from '../../assets/icons/space_sign_up4/Vector(4).png'
+import iconDzen     from '../../assets/icons/space_sign_up4/Vector(5).png'
 import bannerFrame  from '../../assets/icons/creator_profile/Frame 2131328372.png'
 
 const SOCIAL_CONFIG = {
-  vk:     { icon: iconVk       },
-  tg:     { icon: iconTelegram },
-  tiktok: { icon: iconTiktok   },
-  dzen:   { icon: iconDzen     },
+  vk:      { icon: iconVk       },
+  tg:      { icon: iconTelegram },
+  tiktok:  { icon: iconTiktok   },
+  youtube: { icon: iconYoutube  },
+  dzen:    { icon: iconDzen     },
 }
 type SocialType = keyof typeof SOCIAL_CONFIG
 
 function SocialBadge({ href, label, type }: { href: string; label: string; type: SocialType }) {
-  const fullHref = href.startsWith('http') ? href : `https://t.me/${label.replace(/^@/, '')}`
   return (
-    <a href={fullHref} target="_blank" rel="noopener noreferrer" className="cp__socialBadge">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="cp__socialBadge">
       <img src={SOCIAL_CONFIG[type].icon} alt="" className="cp__socialBadgeImg" />
       <span className="cp__socialBadgeLabel">{label}</span>
     </a>
@@ -41,17 +42,16 @@ function SocialBadge({ href, label, type }: { href: string; label: string; type:
 }
 
 function PhotoItem({
-  item, token, isOwner, onDelete,
+  item, isOwner, onDelete,
 }: {
   item: CreatorPhotoItem
-  token: string
   isOwner: boolean
   onDelete: (id: number) => void
 }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
-    fetchImageUrl(item.image.id, token).then(setUrl).catch(() => {})
-  }, [item.image.id, token])
+    fetchImageUrl(item.image.id).then(setUrl).catch(() => {})
+  }, [item.image.id])
 
   return (
     <div className="cp__photoThumb">
@@ -90,8 +90,8 @@ function EventCard({
   const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
 
   useEffect(() => {
-    if (!token || !event.cover_photo_id) return
-    fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
+    if (!event.cover_photo_id) return
+    fetchImageUrl(event.cover_photo_id).then(setCoverUrl).catch(() => {})
   }, [event.cover_photo_id, token])
 
   const handleSave = () => {
@@ -174,8 +174,8 @@ function EventRecommendCard({ event, token, categories }: { event: Event; token:
   const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
 
   useEffect(() => {
-    if (!token || !event.cover_photo_id) return
-    fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
+    if (!event.cover_photo_id) return
+    fetchImageUrl(event.cover_photo_id).then(setCoverUrl).catch(() => {})
   }, [event.cover_photo_id, token])
 
   useEffect(() => {
@@ -184,7 +184,7 @@ function EventRecommendCard({ event, token, categories }: { event: Event; token:
       .then(prof => {
         setCreatorName(prof.name)
         const photoId = prof.photo?.id ?? prof.photo_id
-        if (photoId) fetchImageUrl(photoId, token).then(setCreatorPhotoUrl).catch(() => {})
+        if (photoId) fetchImageUrl(photoId).then(setCreatorPhotoUrl).catch(() => {})
       })
       .catch(() => {})
   }, [event.creator_id, token])
@@ -253,7 +253,7 @@ export function CreatorProfilePage() {
         console.log('CreatorProfile data:', JSON.stringify(data, null, 2))
         setProfile(data)
         const photoId = data.photo?.id ?? data.photo_id
-        if (photoId) fetchImageUrl(photoId, token).then(setPhotoUrl).catch(() => {})
+        if (photoId) fetchImageUrl(photoId).then(setPhotoUrl).catch(() => {})
       })
       .catch(() => setError('Не удалось загрузить профиль'))
       .finally(() => setIsLoading(false))
@@ -293,7 +293,7 @@ export function CreatorProfilePage() {
   }
 
   const handlePublishEvent = (id: number) => {
-    navigate(`/events/create?edit=${id}`)
+    navigate(`/events/create?copy=${id}`)
   }
 
   const handleAddPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -320,15 +320,28 @@ export function CreatorProfilePage() {
     } catch { /* */ }
   }
 
-  const clean = (s: string) =>
-    s.replace(/^https?:\/\//, '').replace(/^(t\.me|vk\.com|tiktok\.com)\/?@?/, '').replace(/\/$/, '')
+  const cleanHandle = (s: string) =>
+    s.replace(/^https?:\/\/[^/]+\/?/, '').replace(/^@+/, '').replace(/\/$/, '') || s.replace(/^@+/, '')
+
+  const buildUrl = (type: SocialType, val: string): string => {
+    if (val.startsWith('http')) return val
+    const handle = val.replace(/^@+/, '').trim()
+    if (!handle) return '#'
+    switch (type) {
+      case 'tg': return `https://t.me/${handle}`
+      case 'vk': return `https://vk.com/${handle}`
+      case 'tiktok': return `https://www.tiktok.com/@${handle}`
+      case 'youtube': return `https://www.youtube.com/@${handle}`
+      case 'dzen': return `https://dzen.ru/${handle}`
+    }
+  }
 
   const socials: Array<{ href: string; label: string; type: SocialType }> = []
-  if (profile?.vk_link)          socials.push({ href: profile.vk_link,          label: clean(profile.vk_link),          type: 'vk' })
-  if (profile?.tg_channel_link)  socials.push({ href: profile.tg_channel_link,  label: '@' + clean(profile.tg_channel_link),  type: 'tg' })
-  if (profile?.tg_personal_link) socials.push({ href: profile.tg_personal_link, label: '@' + clean(profile.tg_personal_link), type: 'tg' })
-  if (profile?.tiktok_link)      socials.push({ href: profile.tiktok_link,      label: clean(profile.tiktok_link),      type: 'tiktok' })
-  if (profile?.dzen_link)        socials.push({ href: profile.dzen_link,        label: clean(profile.dzen_link),        type: 'dzen' })
+  if (profile?.vk_link)          socials.push({ href: buildUrl('vk', profile.vk_link),          label: cleanHandle(profile.vk_link),              type: 'vk' })
+  if (profile?.tg_channel_link)  socials.push({ href: buildUrl('tg', profile.tg_channel_link),  label: '@' + cleanHandle(profile.tg_channel_link), type: 'tg' })
+  if (profile?.tiktok_link)      socials.push({ href: buildUrl('tiktok', profile.tiktok_link),  label: '@' + cleanHandle(profile.tiktok_link),    type: 'tiktok' })
+  if (profile?.youtube_link)     socials.push({ href: buildUrl('youtube', profile.youtube_link), label: '@' + cleanHandle(profile.youtube_link),   type: 'youtube' })
+  if (profile?.dzen_link)        socials.push({ href: buildUrl('dzen', profile.dzen_link),      label: cleanHandle(profile.dzen_link),             type: 'dzen' })
 
   const photos = profile?.photos ?? []
 
@@ -415,7 +428,7 @@ export function CreatorProfilePage() {
           <div className="cp__scroll" ref={photosScrollRef}>
             {isOwner && (
               <>
-                <input ref={photoFileInputRef} type="file" accept="image/*" onChange={handleAddPhoto} style={{ display: 'none' }} />
+                <input ref={photoFileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={handleAddPhoto} style={{ display: 'none' }} />
                 <button
                   type="button"
                   className="cp__photoAdd"
@@ -431,7 +444,7 @@ export function CreatorProfilePage() {
               <p className="cp__emptyMsg">Фотографий пока нет</p>
             )}
             {photos.map(item => (
-              <PhotoItem key={item.id} item={item} token={token!} isOwner={isOwner} onDelete={handleDeletePhoto} />
+              <PhotoItem key={item.id} item={item} isOwner={isOwner} onDelete={handleDeletePhoto} />
             ))}
           </div>
         </section>

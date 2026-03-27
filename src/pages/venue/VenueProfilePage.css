@@ -679,3 +679,13 @@
   width: fit-content;
 }
 .venueProfile__completedDeleteBtn:hover { border-color: #e84040; color: #e84040; }
+
+
+.venueProfile__creatorActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  margin-left: auto;
+  width: 50%;
+}

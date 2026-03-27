@@ -9,15 +9,15 @@ import './CreatorsCatalogPage.css'
 import bannerBg from '../../assets/icons/creator_directory/Frame 2131328280.png'
 import searchIcon from '../../assets/icons/creator_directory/A_IconSearch.png'
 
-function CreatorCard({ creator, token }: { creator: CreatorListItem; token: string | null }) {
+function CreatorCard({ creator }: { creator: CreatorListItem }) {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!token || !creator.photo_id) return
+    if (!creator.photo_id) return
     let cancelled = false
-    fetchImageUrl(creator.photo_id, token).then(url => { if (!cancelled) setPhotoUrl(url) }).catch(() => {})
+    fetchImageUrl(creator.photo_id).then(url => { if (!cancelled) setPhotoUrl(url) }).catch(() => {})
     return () => { cancelled = true }
-  }, [creator.photo_id, token])
+  }, [creator.photo_id])
 
   return (
     <Link to={`/creator/profile/${creator.user_id}`} className="ccCard">
@@ -93,7 +93,7 @@ export function CreatorsCatalogPage() {
         ) : (
           <div className="ccPage__grid">
             {filtered.map(c => (
-              <CreatorCard key={c.id} creator={c} token={token} />
+              <CreatorCard key={c.id} creator={c} />
             ))}
           </div>
         )}

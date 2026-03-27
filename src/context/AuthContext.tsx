@@ -5,8 +5,8 @@ export interface User {
   id: number
   email: string
   role: string
-  avatar?: string
-  avatarId?: number
+  avatar_id?: number
+  avatar?: { id: number; file_path: string }
   name?: string
 }
 

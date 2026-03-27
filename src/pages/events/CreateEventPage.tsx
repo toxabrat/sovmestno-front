@@ -11,6 +11,7 @@ export function CreateEventPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const editId = searchParams.get('edit') ? Number(searchParams.get('edit')) : null
+  const copyId = searchParams.get('copy') ? Number(searchParams.get('copy')) : null
   const { token } = useAuth()
 
   const [title, setTitle] = useState('')
@@ -33,17 +34,18 @@ export function CreateEventPage() {
   }, [token])
 
   useEffect(() => {
-    if (!editId || !token) return
-    fetchEventById(editId, token).then(ev => {
+    const sourceId = editId ?? copyId
+    if (!sourceId) return
+    fetchEventById(sourceId, token).then(ev => {
       setTitle(ev.title)
       setDescription(ev.description ?? '')
       setCoverPhotoId(ev.cover_photo_id ?? null)
       setSelectedCategories(ev.category_ids ?? [])
       if (ev.cover_photo_id) {
-        fetchImageUrl(ev.cover_photo_id, token).then(setCoverPreview).catch(() => {})
+        fetchImageUrl(ev.cover_photo_id).then(setCoverPreview).catch(() => {})
       }
     }).catch(() => {})
-  }, [editId, token])
+  }, [editId, copyId, token])
 
   const handleCoverSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -84,7 +86,7 @@ export function CreateEventPage() {
         category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
       }
 
-      if (editId) {
+      if (editId && !copyId) {
         await updateEvent(editId, payload, token)
         await publishEvent(editId, token).catch(() => {})
       } else {
@@ -117,7 +119,7 @@ export function CreateEventPage() {
           </button>
           <div>
             <h1 className="ce__title">
-              {editId ? 'Редактировать мероприятие' : 'Давайте создадим мероприятие'}
+              {copyId ? 'Разместить заново' : editId ? 'Редактировать мероприятие' : 'Давайте создадим мероприятие'}
             </h1>
             <p className="ce__subtitle">
               Вы можете добавить подробные снимки пространства, рассказать о своих пожеланиях
@@ -132,7 +134,7 @@ export function CreateEventPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/gif,image/webp"
               className="ce__fileInput"
               onChange={handleCoverSelect}
             />

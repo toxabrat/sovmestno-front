@@ -1,22 +1,28 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
-import { uploadImage, registerVenue, updateVenueProfile } from '../../api/auth'
+import { useAuth } from '../../context/AuthContext'
+import { uploadImage, registerVenue, updateVenueProfile, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
 import { fetchCategories } from '../../api/events'
 import type { Category } from '../../api/events'
 import './CreateSpacePage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
 import contactsDecor from '../../assets/icons/Frame 2131327962.png'
+import backArrow from '../../assets/icons/Vector 2376.png'
 
 export function CreateSpacePage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isEditMode = searchParams.get('edit') === 'true'
   const { data, updateData } = useSpaceRegistration()
+  const { token: authToken, user: authUser } = useAuth()
 
   const logoInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
 
-  const userName = data.name || 'Пространство'
+  const [profileName, setProfileName] = useState(data.name || '')
+  const userName = profileName || data.name || 'Пространство'
 
   const [about, setAbout] = useState(data.description)
   const [city, setCity] = useState(data.city || 'Москва')
@@ -30,7 +36,17 @@ export function CreateSpacePage() {
   const [coverFile, setCoverFile] = useState<File | null>(data.coverFile || null)
   const [coverPreview, setCoverPreview] = useState<string | null>(data.coverPreview || null)
 
+  const [existingLogoId, setExistingLogoId] = useState<number | null>(data.logoId)
+  const [existingCoverId, setExistingCoverId] = useState<number | null>(data.coverId)
+
+  const [existingTgChannel, setExistingTgChannel] = useState('')
+  const [existingVk, setExistingVk] = useState('')
+  const [existingTiktok, setExistingTiktok] = useState('')
+  const [existingYoutube, setExistingYoutube] = useState('')
+  const [existingDzen, setExistingDzen] = useState('')
+
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false)
 
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<number[]>([])
@@ -40,6 +56,51 @@ export function CreateSpacePage() {
       .then(setCategories)
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!isEditMode || !authToken || !authUser?.id) return
+    setIsLoadingProfile(true)
+    fetchVenueProfile(authUser.id, authToken)
+      .then(async profile => {
+        setProfileName(profile.name || '')
+        setAbout(profile.description || '')
+        setPhone(profile.phone || '')
+        setEmail(profile.work_email || '')
+        setTelegram(profile.tg_personal_link || '')
+        if (profile.category_ids) {
+          setSelectedCategories(profile.category_ids)
+        }
+        const addr = profile.street_address || ''
+        const commaIdx = addr.indexOf(', ')
+        if (commaIdx !== -1) {
+          setCity(addr.slice(0, commaIdx))
+          setStreet(addr.slice(commaIdx + 2))
+        } else if (addr) {
+          setStreet(addr)
+        }
+        if (profile.logo_id) {
+          setExistingLogoId(profile.logo_id)
+          try {
+            const url = await fetchImageUrl(profile.logo_id)
+            setLogoPreview(url)
+          } catch {}
+        }
+        if (profile.cover_photo_id) {
+          setExistingCoverId(profile.cover_photo_id)
+          try {
+            const url = await fetchImageUrl(profile.cover_photo_id)
+            setCoverPreview(url)
+          } catch {}
+        }
+        setExistingTgChannel(profile.tg_channel_link || '')
+        setExistingVk(profile.vk_link || '')
+        setExistingTiktok(profile.tiktok_link || '')
+        setExistingYoutube(profile.youtube_link || '')
+        setExistingDzen(profile.dzen_link || '')
+      })
+      .catch(() => {})
+      .finally(() => setIsLoadingProfile(false))
+  }, [isEditMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleCategory = (id: number) => {
     setSelectedCategories(prev =>
@@ -64,7 +125,8 @@ export function CreateSpacePage() {
   }
 
   const handleBack = () => {
-    navigate('/auth')
+    if (isEditMode) navigate('/venue/profile')
+    else navigate('/auth')
   }
 
   const handleLogoClick = () => {
@@ -95,7 +157,53 @@ export function CreateSpacePage() {
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmitEdit = async () => {
+    if (!isFormValid || isLoading) return
+    if (!authToken || !authUser?.id) return
+
+    setIsLoading(true)
+    try {
+      const address = [city, street].filter(Boolean).join(', ')
+
+      let logoId: number | null = existingLogoId
+      let coverId: number | null = existingCoverId
+
+      if (logoFile) {
+        const res = await uploadImage(logoFile, 'venue-logo', authToken)
+        logoId = res.id
+      }
+
+      if (coverFile) {
+        const res = await uploadImage(coverFile, 'venue-cover', authToken)
+        coverId = res.id
+      }
+
+      await updateVenueProfile(authUser.id, {
+        name: profileName,
+        description: about.trim(),
+        street_address: address,
+        phone: phone.trim() || undefined,
+        work_email: email.trim() || undefined,
+        tg_personal_link: telegram.trim() || undefined,
+        logo_id: logoId ?? undefined,
+        cover_photo_id: coverId ?? undefined,
+        category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
+        tg_channel_link: existingTgChannel || undefined,
+        vk_link: existingVk || undefined,
+        tiktok_link: existingTiktok || undefined,
+        youtube_link: existingYoutube || undefined,
+        dzen_link: existingDzen || undefined,
+      }, authToken)
+
+      navigate('/space/final?edit=true')
+    } catch (err) {
+      console.error('Error updating venue:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSubmitRegister = async () => {
     if (!isFormValid || isLoading) return
     if (!data.name || !data.email || !data.password) {
       console.error('Missing name/email/password in context, redirecting to auth')
@@ -108,33 +216,39 @@ export function CreateSpacePage() {
     try {
       const address = [city, street].filter(Boolean).join(', ')
 
-      const response = await registerVenue({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        description: about.trim(),
-        street_address: address,
-        phone: phone.trim(),
-        work_email: email.trim(),
-        tg_personal_link: telegram.trim(),
-        category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
-      })
+      let token = data.token
+      let refreshToken = data.refreshToken
+      let userId = data.userId
+      let venueId = data.venueId
 
-      const token = response.access_token
-      const refreshToken = response.refresh_token
-      const userId = response.user.id
-      const venueId = response.user.venue?.id ?? null
+      if (!token || !userId) {
+        const response = await registerVenue({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          description: about.trim(),
+          street_address: address,
+          phone: phone.trim(),
+          work_email: email.trim(),
+          tg_personal_link: telegram.trim(),
+          category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
+        })
+        token = response.access_token
+        refreshToken = response.refresh_token
+        userId = response.user.id
+        venueId = response.user.venue?.id ?? null
+      }
 
-      let logoId: number | null = null
-      let coverId: number | null = null
+      let logoId: number | null = existingLogoId
+      let coverId: number | null = existingCoverId
 
       if (logoFile) {
-        const res = await uploadImage(logoFile, 'venue-logo', token)
+        const res = await uploadImage(logoFile, 'venue-logo', token!)
         logoId = res.id
       }
 
       if (coverFile) {
-        const res = await uploadImage(coverFile, 'venue-cover', token)
+        const res = await uploadImage(coverFile, 'venue-cover', token!)
         coverId = res.id
       }
 
@@ -149,7 +263,12 @@ export function CreateSpacePage() {
           logo_id: logoId ?? undefined,
           cover_photo_id: coverId ?? undefined,
           category_ids: selectedCategories.length > 0 ? selectedCategories : undefined,
-        }, token)
+          tg_channel_link: existingTgChannel || undefined,
+          vk_link: existingVk || undefined,
+          tiktok_link: existingTiktok || undefined,
+          youtube_link: existingYoutube || undefined,
+          dzen_link: existingDzen || undefined,
+        }, token!)
       }
 
       updateData({
@@ -179,6 +298,15 @@ export function CreateSpacePage() {
     }
   }
 
+  const handleSubmit = () => {
+    if (isEditMode) handleSubmitEdit()
+    else handleSubmitRegister()
+  }
+
+  if (isEditMode && isLoadingProfile) {
+    return <div className="createSpace" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>Загрузка...</div>
+  }
+
   return (
     <div className="createSpace">
       <header className="createSpace__header">
@@ -188,15 +316,16 @@ export function CreateSpacePage() {
           onClick={handleBack}
           aria-label="Назад"
         >
-          ←
+          <img src={backArrow} alt="Назад" />
         </button>
         <div className="createSpace__headerText">
           <h1 className="createSpace__title">
-            Добро пожаловать, {userName}!
+            {isEditMode ? 'Редактирование профиля' : `Добро пожаловать, ${userName}!`}
           </h1>
           <p className="createSpace__subtitle">
-            Давайте создадим визитную карточку вашего пространства — рассказ о себе
-            поможет найти близких по духу людей для сотрудничества
+            {isEditMode
+              ? 'Обновите информацию о вашем пространстве'
+              : 'Давайте создадим визитную карточку вашего пространства — рассказ о себе поможет найти близких по духу людей для сотрудничества'}
           </p>
         </div>
       </header>
@@ -204,14 +333,14 @@ export function CreateSpacePage() {
       <input
         ref={coverInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         onChange={handleCoverChange}
         style={{ display: 'none' }}
       />
       <input
         ref={logoInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         onChange={handleLogoChange}
         style={{ display: 'none' }}
       />
@@ -376,7 +505,10 @@ export function CreateSpacePage() {
               className="createSpace__contactInput"
               placeholder="@username"
               value={telegram}
-              onChange={(e) => setTelegram(e.target.value)}
+              onChange={(e) => {
+                const stripped = e.target.value.replace(/^@+/, '')
+                setTelegram(stripped ? '@' + stripped : '')
+              }}
             />
           </div>
         </div>
@@ -399,4 +531,3 @@ export function CreateSpacePage() {
     </div>
   )
 }
-

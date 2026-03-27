@@ -6,7 +6,7 @@ import { TextField } from '../../components/ui/TextField'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
-import { registerCreator, login as apiLogin } from '../../api/auth'
+import { registerCreator, login as apiLogin, fetchUserProfile } from '../../api/auth'
 import './AuthPage.css'
 
 type Tab = 'signup' | 'login'
@@ -182,30 +182,30 @@ export function AuthPage() {
       return
     }
     setLoginError(null)
-    
+
     setIsLoading(true)
-    
+
     try {
       const response = await apiLogin({
         email: loginEmail.trim(),
         password: loginPassword,
       })
 
+      const userProfile = await fetchUserProfile(response.access_token)
+
       const avatarId =
-        response.user.creator?.photo?.id
-        ?? response.user.creator?.photo_id
-        ?? response.user.avatar?.id
-        ?? response.user.avatar_id
-        ?? (response.user.venue as { logo?: { id: number }; logo_id?: number })?.logo?.id
-        ?? (response.user.venue as { logo_id?: number })?.logo_id
+        userProfile.profile?.photo_id
+        ?? userProfile.profile?.photo?.id
+        ?? userProfile.profile?.logo_id
+        ?? userProfile.profile?.logo?.id
         ?? undefined
 
       login(response.access_token, response.refresh_token, {
-        id: response.user.id,
-        email: response.user.email,
-        role: response.user.role,
-        avatarId: avatarId ?? undefined,
-        name: response.user.creator?.name || response.user.venue?.name,
+        id: userProfile.user_id,
+        email: userProfile.email,
+        role: userProfile.role,
+        avatar_id: avatarId ?? undefined,
+        name: userProfile.profile?.name,
       })
 
       navigate('/landing/space')

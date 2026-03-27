@@ -21,7 +21,7 @@ export function SpaceSuccessPage() {
         email: data.email,
         role: 'venue',
         name: data.name,
-        avatarId: data.logoId ?? undefined,
+        avatar_id: data.logoId ?? undefined,
       })
       resetData()
     }

@@ -38,9 +38,9 @@ export function EventDetailsPage() {
   }, [token])
 
   useEffect(() => {
-    if (!event?.cover_photo_id || !token) return
-    fetchImageUrl(event.cover_photo_id, token).then(setCoverUrl).catch(() => {})
-  }, [event?.cover_photo_id, token])
+    if (!event?.cover_photo_id) return
+    fetchImageUrl(event.cover_photo_id).then(setCoverUrl).catch(() => {})
+  }, [event?.cover_photo_id])
 
   useEffect(() => {
     if (!event?.creator_id || !token) return
@@ -49,7 +49,7 @@ export function EventDetailsPage() {
         setCreator(data)
         const avatarId = data.photo?.id ?? data.photo_id
         if (avatarId) {
-          fetchImageUrl(avatarId, token).then(setCreatorAvatarUrl).catch(() => {})
+          fetchImageUrl(avatarId).then(setCreatorAvatarUrl).catch(() => {})
         }
       })
       .catch(() => {})

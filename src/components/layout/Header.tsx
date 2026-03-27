@@ -26,9 +26,14 @@ export function Header() {
 
   useEffect(() => {
     if (!token || !isAuthenticated) { setAppCount(0); return }
-    fetchApplications({ role: 'receiver', status: 'pending' }, token)
-      .then(apps => setAppCount(apps.length))
-      .catch(() => setAppCount(0))
+    const refetch = () => {
+      fetchApplications({ role: 'receiver', status: 'pending' }, token)
+        .then(apps => setAppCount(apps.length))
+        .catch(() => setAppCount(0))
+    }
+    refetch()
+    window.addEventListener('app-count-changed', refetch)
+    return () => window.removeEventListener('app-count-changed', refetch)
   }, [token, isAuthenticated])
 
   const handleLogout = async () => {
@@ -39,13 +44,14 @@ export function Header() {
   }
 
   const profilePath = user?.role === 'venue' ? '/venue/profile' : '/creator/profile'
+  const editPath = user?.role === 'venue' ? '/space/create?edit=true' : '/creator/create?edit=true'
 
   const handleMenuNavigate = useCallback((path: string) => {
     setMenuOpen(false)
     navigate(path)
   }, [navigate])
 
-  const avatarId = user?.avatarId
+  const avatarId = user?.avatar_id
 
   useEffect(() => {
     if (!token || !isAuthenticated || !avatarId) {
@@ -57,7 +63,7 @@ export function Header() {
       return
     }
     let cancelled = false
-    fetchImageUrl(avatarId!, token)
+    fetchImageUrl(avatarId!)
       .then((url) => {
         if (cancelled) {
           URL.revokeObjectURL(url)
@@ -135,7 +141,7 @@ export function Header() {
         <button
           type="button"
           className="header__dropdownItem"
-          onClick={() => handleMenuNavigate(profilePath)}
+          onClick={() => handleMenuNavigate(editPath)}
         >
           Редактировать страницу
         </button>

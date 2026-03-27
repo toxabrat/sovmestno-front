@@ -24,7 +24,46 @@
 }
 
 .createSpace__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
   margin-bottom: 32px;
+  margin-left: -40px;
+}
+
+@media (max-width: 600px) {
+  .createSpace__header {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.createSpace__headerText {
+  flex: 1;
+}
+
+.createSpace__backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  margin-top: 14px;
+  opacity: 0.5;
+  transition: opacity 150ms ease;
+}
+
+.createSpace__backBtn:hover {
+  opacity: 1;
+}
+
+.createSpace__backBtn img {
+  width: 32px;
+  height: auto;
+  display: block;
 }
 
 .createSpace__title {
@@ -450,7 +489,9 @@
 .createSpace__contactLabel {
   font-size: 16px;
   color: var(--text);
-  min-width: 150px;
+  width: 190px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .createSpace__contactInput {

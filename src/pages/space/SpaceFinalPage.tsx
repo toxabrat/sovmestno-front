@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
-import { updateVenueProfile, uploadImage, addVenuePhoto } from '../../api/auth'
+import { updateVenueProfile, uploadImage, addVenuePhoto, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
 import { fetchCategories } from '../../api/events'
 import type { Category } from '../../api/events'
 import './SpaceFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
 import socialMediaDecor from '../../assets/icons/social media.png'
+import backArrow from '../../assets/icons/Vector 2376.png'
 import iconTelegram from '../../assets/icons/space_sign_up4/Vector(1).png'
 import iconVk from '../../assets/icons/space_sign_up4/Vector(2).png'
 import iconTiktok from '../../assets/icons/space_sign_up4/Vector(3).png'
@@ -17,10 +18,15 @@ import iconDzen from '../../assets/icons/space_sign_up4/Vector(5).png'
 
 export function SpaceFinalPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isEditMode = searchParams.get('edit') === 'true'
   const { data, updateData } = useSpaceRegistration()
-  const { token: authToken } = useAuth()
+  const { token: authToken, user: authUser } = useAuth()
 
   const photoInputRef = useRef<HTMLInputElement>(null)
+
+  const activeToken = data.token || authToken
+  const activeUserId = data.userId || authUser?.id || null
 
   const [photos, setPhotos] = useState<Array<{ preview: string; uploading: boolean }>>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -31,12 +37,59 @@ export function SpaceFinalPage() {
   const [youtube, setYoutube] = useState(data.youtubeLink)
   const [dzen, setDzen] = useState(data.dzenLink)
   const [isLoading, setIsLoading] = useState(false)
+  const [profileName, setProfileName] = useState(data.name || '')
 
-  const activeToken = data.token || authToken
+  const [storedDescription, setStoredDescription] = useState(data.description || '')
+  const [storedStreetAddress, setStoredStreetAddress] = useState(
+    [data.city, data.street].filter(Boolean).join(', ')
+  )
+  const [storedPhone, setStoredPhone] = useState(data.phone || '')
+  const [storedWorkEmail, setStoredWorkEmail] = useState(data.workEmail || '')
+  const [storedTgPersonal, setStoredTgPersonal] = useState(data.telegramPersonal || '')
+  const [storedLogoId, setStoredLogoId] = useState<number | null>(data.logoId)
+  const [storedCoverId, setStoredCoverId] = useState<number | null>(data.coverId)
 
   useEffect(() => {
     fetchCategories(activeToken).then(setCategories).catch(() => {})
   }, [activeToken])
+
+  useEffect(() => {
+    if (!isEditMode || !activeToken || !activeUserId) return
+    fetchVenueProfile(activeUserId, activeToken)
+      .then(async profile => {
+        setProfileName(profile.name || '')
+        setStoredDescription(profile.description || '')
+        setStoredStreetAddress(profile.street_address || '')
+        setStoredPhone(profile.phone || '')
+        setStoredWorkEmail(profile.work_email || '')
+        setStoredTgPersonal(profile.tg_personal_link || '')
+        setStoredLogoId(profile.logo_id ?? null)
+        setStoredCoverId(profile.cover_photo_id ?? null)
+        setTelegram(profile.tg_channel_link || '')
+        setVk(profile.vk_link || '')
+        setTiktok(profile.tiktok_link || '')
+        setYoutube(profile.youtube_link || '')
+        setDzen(profile.dzen_link || '')
+        if (profile.category_ids) {
+          setSelectedCategoryIds(profile.category_ids)
+        }
+        if (profile.photos && profile.photos.length > 0) {
+          const results = await Promise.allSettled(
+            profile.photos.map(p => fetchImageUrl(p.image_id))
+          )
+          const urls = results
+            .filter(r => r.status === 'fulfilled')
+            .map(r => (r as PromiseFulfilledResult<string>).value)
+          setPhotos(urls.map(url => ({ preview: url, uploading: false })))
+        }
+      })
+      .catch(() => {})
+  }, [isEditMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const withAt = (val: string) => {
+    const stripped = val.replace(/^@+/, '')
+    return stripped ? '@' + stripped : ''
+  }
 
   const allSelected = categories.length > 0 && selectedCategoryIds.length === categories.length
 
@@ -57,7 +110,8 @@ export function SpaceFinalPage() {
   }
 
   const handleBack = () => {
-    navigate('/space/create')
+    if (isEditMode) navigate('/space/create?edit=true')
+    else navigate('/space/create')
   }
 
   const handlePhotoClick = () => {
@@ -73,10 +127,10 @@ export function SpaceFinalPage() {
       const idx = photos.length
       setPhotos(prev => [...prev, { preview, uploading: true }])
 
-      if (data.token) {
+      if (activeToken) {
         try {
-          const uploaded = await uploadImage(file, 'venue-photo', data.token)
-          await addVenuePhoto(uploaded.id, data.token)
+          const uploaded = await uploadImage(file, 'venue-photo', activeToken)
+          await addVenuePhoto(uploaded.id, activeToken)
         } catch (err) {
           console.error('Error uploading venue photo:', err)
         }
@@ -89,44 +143,52 @@ export function SpaceFinalPage() {
   }
 
   const handleSkip = () => {
-    navigate('/space/success')
+    if (isEditMode) navigate('/venue/profile')
+    else navigate('/space/success')
   }
 
   const submitData = async () => {
-    if (!data.token || !data.userId) {
-      console.error('No token or userId, navigating to success anyway')
-      navigate('/space/success')
+    if (!activeToken || !activeUserId) {
+      console.error('No token or userId, navigating to destination')
+      handleSkip()
       return
     }
 
     setIsLoading(true)
 
     try {
-      const streetAddress = [data.city, data.street].filter(Boolean).join(', ')
-      await updateVenueProfile(data.userId, {
-        name: data.name,
-        description: data.description || undefined,
-        street_address: streetAddress || undefined,
+      await updateVenueProfile(activeUserId, {
+        name: profileName || data.name,
+        description: storedDescription || undefined,
+        street_address: storedStreetAddress || undefined,
+        phone: storedPhone || undefined,
+        work_email: storedWorkEmail || undefined,
+        tg_personal_link: storedTgPersonal || undefined,
+        logo_id: storedLogoId ?? undefined,
+        cover_photo_id: storedCoverId ?? undefined,
         tg_channel_link: telegram || undefined,
         vk_link: vk || undefined,
         tiktok_link: tiktok || undefined,
         youtube_link: youtube || undefined,
         dzen_link: dzen || undefined,
         category_ids: selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
-      }, data.token!)
+      }, activeToken)
 
-      updateData({
-        telegramChannel: telegram,
-        vkLink: vk,
-        tiktokLink: tiktok,
-        youtubeLink: youtube,
-        dzenLink: dzen,
-      })
+      if (!isEditMode) {
+        updateData({
+          telegramChannel: telegram,
+          vkLink: vk,
+          tiktokLink: tiktok,
+          youtubeLink: youtube,
+          dzenLink: dzen,
+        })
+      }
 
-      navigate('/space/success')
+      if (isEditMode) navigate('/venue/profile')
+      else navigate('/space/success')
     } catch (err) {
       console.error('Error updating venue social links:', err)
-      navigate('/space/success')
+      handleSkip()
     } finally {
       setIsLoading(false)
     }
@@ -139,19 +201,20 @@ export function SpaceFinalPage() {
   return (
     <div className="spaceFinal">
       <header className="spaceFinal__header">
-        <button 
-          type="button" 
+        <button
+          type="button"
           className="spaceFinal__backBtn"
           onClick={handleBack}
           aria-label="Назад"
         >
-          ←
+          <img src={backArrow} alt="Назад" />
         </button>
         <div className="spaceFinal__headerText">
-          <h1 className="spaceFinal__title">Ииии... финальный штрих!</h1>
+          <h1 className="spaceFinal__title">{isEditMode ? 'Редактирование профиля' : 'Ииии... финальный штрих!'}</h1>
           <p className="spaceFinal__subtitle">
-            Вы можете добавить подробные снимки пространства, рассказать о своих пожеланиях
-            и поделиться ссылками на соц сети. Сделать это можно позже из своего профиля
+            {isEditMode
+              ? 'Обновите фотографии, форматы мероприятий и ссылки на социальные сети'
+              : 'Вы можете добавить подробные снимки пространства, рассказать о своих пожеланиях и поделиться ссылками на соц сети. Сделать это можно позже из своего профиля'}
           </p>
         </div>
       </header>
@@ -159,7 +222,7 @@ export function SpaceFinalPage() {
       <input
         ref={photoInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         multiple
         onChange={handlePhotoChange}
         style={{ display: 'none' }}
@@ -188,7 +251,7 @@ export function SpaceFinalPage() {
             Выберете форматы мероприятий, которые вы хотели бы проводить в своём пространстве
           </p>
         </div>
-        
+
           <div className="spaceFinal__formatsContent">
           <label className="spaceFinal__selectAll">
             <input
@@ -236,9 +299,9 @@ export function SpaceFinalPage() {
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="Вставьте ссылку telegram-канал"
+              placeholder="@channel"
               value={telegram}
-              onChange={(e) => setTelegram(e.target.value)}
+              onChange={(e) => setTelegram(withAt(e.target.value))}
             />
           </div>
 
@@ -249,9 +312,9 @@ export function SpaceFinalPage() {
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="Вставьте ссылку vk"
+              placeholder="id или короткое имя"
               value={vk}
-              onChange={(e) => setVk(e.target.value)}
+              onChange={(e) => setVk(e.target.value.replace(/^@+/, ''))}
             />
           </div>
 
@@ -262,9 +325,9 @@ export function SpaceFinalPage() {
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="Вставьте ссылку tik-tok"
+              placeholder="@username"
               value={tiktok}
-              onChange={(e) => setTiktok(e.target.value)}
+              onChange={(e) => setTiktok(withAt(e.target.value))}
             />
           </div>
 
@@ -275,9 +338,9 @@ export function SpaceFinalPage() {
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="Вставьте ссылку на youtube"
+              placeholder="@channel"
               value={youtube}
-              onChange={(e) => setYoutube(e.target.value)}
+              onChange={(e) => setYoutube(withAt(e.target.value))}
             />
           </div>
 
@@ -288,9 +351,9 @@ export function SpaceFinalPage() {
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="Вставьте ссылку на dzen"
+              placeholder="название канала"
               value={dzen}
-              onChange={(e) => setDzen(e.target.value)}
+              onChange={(e) => setDzen(e.target.value.replace(/^@+/, ''))}
             />
           </div>
         </div>
@@ -303,7 +366,7 @@ export function SpaceFinalPage() {
           onClick={handleSkip}
           disabled={isLoading}
         >
-          {isLoading ? 'Загрузка...' : 'Пропустить'}
+          {isLoading ? 'Загрузка...' : (isEditMode ? 'Отмена' : 'Пропустить')}
         </button>
         <button
           type="button"

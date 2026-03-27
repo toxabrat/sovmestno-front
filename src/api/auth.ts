@@ -1,10 +1,11 @@
 export const API_BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api`
 
-export async function fetchImageUrl(imageId: number, token: string): Promise<string> {
+import { fetchWithAuth } from './apiClient'
+
+export async function fetchImageUrl(imageId: number): Promise<string> {
   const url = `${API_BASE_URL}/user/users/images/${imageId}`
-  const response = await fetch(url, {
+  const response = await fetchWithAuth(url, {
     headers: {
-      Authorization: `Bearer ${token}`,
       Accept: 'image/*,*/*',
     },
   })
@@ -499,6 +500,36 @@ export async function fetchVenueProfile(userId: number, token: string): Promise<
   })
   const data = await response.json().catch(() => ({}))
   console.log('fetchVenueProfile raw:', JSON.stringify(data))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+export interface UserProfile {
+  user_id: number
+  email: string
+  role: string
+  profile?: {
+    id: number
+    user_id: number
+    name: string
+    description?: string
+    photo_id?: number
+    photo?: { id: number; file_path: string; bucket_name: string }
+    phone?: string
+    work_email?: string
+    logo_id?: number
+    logo?: { id: number; file_path: string; bucket_name: string }
+  }
+}
+
+export async function fetchUserProfile(token: string): Promise<UserProfile> {
+  const response = await fetch(`${API_BASE_URL}/user/users/me`, {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(JSON.stringify(data))
   return data
 }

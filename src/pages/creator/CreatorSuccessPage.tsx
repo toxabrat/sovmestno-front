@@ -21,7 +21,7 @@ export function CreatorSuccessPage() {
         email: data.email,
         role: 'creator',
         name: data.name,
-        avatarId: data.photoId ?? undefined,
+        avatar_id: data.photoId ?? undefined,
       })
       resetData()
     }

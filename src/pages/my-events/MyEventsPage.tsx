@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import { Footer } from '../../components/layout/Footer'
 import {
-  fetchApplications,
-  createApplication,
   acceptApplication,
-  rejectApplication,
-  fetchCollaborations,
-  completeCollaboration,
   cancelCollaboration,
+  completeCollaboration,
+  createApplication,
+  fetchApplications,
+  fetchCollaborations,
+  rejectApplication,
   type Application as APIApplication,
   type Collaboration,
 } from '../../api/applications'
-import { fetchEventById, fetchEvents, fetchCategories } from '../../api/events'
-import { fetchCreatorProfile, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
 import type { VenueListItem } from '../../api/auth'
+import { fetchCreatorProfile, fetchImageUrl, fetchVenueProfile } from '../../api/auth'
 import type { Event as APIEvent, Category } from '../../api/events'
-import './MyEventsPage.css'
+import { fetchCategories, fetchEventById, fetchEvents } from '../../api/events'
+import { Footer } from '../../components/layout/Footer'
+import { useAuth } from '../../context/AuthContext'
 import '../spaces/SpacesCatalogPage.css'
+import './MyEventsPage.css'
 
 type SidebarTab = 'applications' | 'current' | 'saved'
 type FilterTab = 'all' | 'mutual' | 'invite' | 'declined' | 'waiting'
@@ -62,7 +62,7 @@ const STATUS_LABELS: Record<UIStatus, string> = {
   mutual:   'Взаимно',
   request:  'Запрос',
   declined: 'Отказано :(',
-  waiting:  'Жди ответ',
+  waiting:  'Ждём ответ',
 }
 const STATUS_BG: Record<UIStatus, string> = {
   mutual:   '#D8F772',
@@ -82,7 +82,7 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'mutual',   label: 'Взаимно' },
   { key: 'invite',   label: 'Приглашает' },
   { key: 'declined', label: 'Отказано :(' },
-  { key: 'waiting',  label: 'Жди ответ' },
+  { key: 'waiting',  label: 'Ждём ответ' },
 ]
 
 const AVATAR_COLORS = ['#e8c96d', '#a8d8a8', '#d8a8e0', '#a8c8e8', '#e8a8a8', '#c8d8f0']
@@ -489,19 +489,17 @@ function VenueCollabCard({ item, onComplete, onCancel }: {
   )
 }
 
-function SavedVenueCard({ venue, token, onRemove, onPropose }: {
+function SavedVenueCard({ venue, onRemove, onPropose }: {
   venue: VenueListItem
-  token: string | null
   onRemove: (userId: number) => void
   onPropose: (venue: VenueListItem) => void
 }) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!token) return
     const logoId = venue.logo_id ?? (venue.logo as { id?: number } | undefined)?.id
-    if (logoId) fetchImageUrl(logoId, token).then(setLogoUrl).catch(() => {})
-  }, [venue, token])
+    if (logoId) fetchImageUrl(logoId).then(setLogoUrl).catch(() => {})
+  }, [venue])
 
   return (
     <div className="me__savedCard">
@@ -539,14 +537,15 @@ function SavedEventCard({ ev, token, isInvited, onRemove, onInvite }: {
   const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!token) return
-    if (ev.cover_photo_id) fetchImageUrl(ev.cover_photo_id, token).then(setCoverUrl).catch(() => {})
-    fetchCreatorProfile(ev.creator_id, token)
-      .then(p => {
-        setCreatorName(p.name)
-        if (p.photo_id) fetchImageUrl(p.photo_id, token).then(setCreatorAvatarUrl).catch(() => {})
-      })
-      .catch(() => {})
+    if (ev.cover_photo_id) fetchImageUrl(ev.cover_photo_id).then(setCoverUrl).catch(() => {})
+    if (token) {
+      fetchCreatorProfile(ev.creator_id, token)
+        .then(p => {
+          setCreatorName(p.name)
+          if (p.photo_id) fetchImageUrl(p.photo_id).then(setCreatorAvatarUrl).catch(() => {})
+        })
+        .catch(() => {})
+    }
   }, [ev, token])
 
   return (
@@ -586,12 +585,12 @@ function SavedEventCard({ ev, token, isInvited, onRemove, onInvite }: {
   )
 }
 
-function ProposeEventThumb({ imageId, token }: { imageId?: number; token: string }) {
+function ProposeEventThumb({ imageId }: { imageId?: number }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!imageId) return
-    fetchImageUrl(imageId, token).then(setUrl).catch(() => {})
-  }, [imageId, token])
+    fetchImageUrl(imageId).then(setUrl).catch(() => {})
+  }, [imageId])
   return (
     <div className="proposeModal__eventThumb">
       {url ? <img src={url} alt="" /> : <div className="proposeModal__eventThumbPlaceholder" />}
@@ -657,7 +656,7 @@ function ProposeEventModal({
                     className={`proposeModal__eventRow ${selected === ev.id ? 'proposeModal__eventRow--selected' : ''}`}
                     onClick={() => setSelected(ev.id)}
                   >
-                    <ProposeEventThumb imageId={ev.cover_photo_id} token={token} />
+                    <ProposeEventThumb imageId={ev.cover_photo_id} />
                     <div className="proposeModal__eventInfo">
                       <span className="proposeModal__eventTitle">{ev.title}</span>
                       {cat && <span className="proposeModal__eventTag"><span>◇</span> {cat.name}</span>}
@@ -738,7 +737,7 @@ export function MyEventsPage() {
               phone = prof.phone || ''
               email = prof.work_email || ''
               if (prof.logo_id) {
-                try { avatarUrl = await fetchImageUrl(prof.logo_id, token) } catch { /* */ }
+                try { avatarUrl = await fetchImageUrl(prof.logo_id) } catch { /* */ }
               }
             } else {
               const prof = await fetchCreatorProfile(otherUserId, token)
@@ -747,7 +746,7 @@ export function MyEventsPage() {
               phone = prof.phone || ''
               email = prof.work_email || ''
               if (prof.photo_id) {
-                try { avatarUrl = await fetchImageUrl(prof.photo_id, token) } catch { /* */ }
+                try { avatarUrl = await fetchImageUrl(prof.photo_id) } catch { /* */ }
               }
             }
           } catch { /* */ }
@@ -807,7 +806,7 @@ export function MyEventsPage() {
               phone = prof.phone || ''
               email = prof.work_email || ''
               if (prof.photo_id) {
-                try { avatarUrl = await fetchImageUrl(prof.photo_id, token) } catch { /* */ }
+                try { avatarUrl = await fetchImageUrl(prof.photo_id) } catch { /* */ }
               }
             } else {
               const prof = await fetchVenueProfile(otherId, token)
@@ -816,7 +815,7 @@ export function MyEventsPage() {
               phone = prof.phone || ''
               email = prof.work_email || ''
               if (prof.logo_id) {
-                try { avatarUrl = await fetchImageUrl(prof.logo_id, token) } catch { /* */ }
+                try { avatarUrl = await fetchImageUrl(prof.logo_id) } catch { /* */ }
               }
             }
           } catch { /* */ }
@@ -903,6 +902,7 @@ export function MyEventsPage() {
     try {
       await acceptApplication(appId, token)
       await loadApplications()
+      window.dispatchEvent(new CustomEvent('app-count-changed'))
     } catch (err) {
       console.error('Accept failed:', err)
     }
@@ -913,6 +913,7 @@ export function MyEventsPage() {
     try {
       await rejectApplication(appId, token)
       await loadApplications()
+      window.dispatchEvent(new CustomEvent('app-count-changed'))
     } catch (err) {
       console.error('Reject failed:', err)
     }
@@ -968,8 +969,8 @@ export function MyEventsPage() {
 
   return (
     <div className="me">
-      <div className="me__layout">
-        <aside className="me__sidebar">
+      <div className="me__body">
+      <aside className="me__sidebar">
           <button
             type="button"
             className={`me__sideBtn ${sidebarTab === 'applications' ? 'me__sideBtn--active' : ''}`}
@@ -992,8 +993,9 @@ export function MyEventsPage() {
           >
             {savedLabel}
           </button>
-        </aside>
+      </aside>
 
+      <div className="me__contentWrap">
         <main className="me__main">
           {sidebarTab === 'applications' && (
             <>
@@ -1112,7 +1114,6 @@ export function MyEventsPage() {
                       <SavedVenueCard
                         key={v.user_id}
                         venue={v}
-                        token={token}
                         onRemove={(uid) => { removeSavedVenue(uid); setSavedVenues(prev => prev.filter(x => x.user_id !== uid)) }}
                         onPropose={(venue) => setProposeVenue(venue)}
                       />
@@ -1125,6 +1126,7 @@ export function MyEventsPage() {
             </>
           )}
         </main>
+      </div>
       </div>
 
       <Footer />

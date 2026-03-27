@@ -88,7 +88,7 @@ function ProposeModal({
                     className={`proposeModal__eventRow ${selected === ev.id ? 'proposeModal__eventRow--selected' : ''}`}
                     onClick={() => setSelected(ev.id)}
                   >
-                    <EventThumb eventId={ev.cover_photo_id} token={token} />
+                    <EventThumb eventId={ev.cover_photo_id} />
                     <div className="proposeModal__eventInfo">
                       <span className="proposeModal__eventTitle">{ev.title}</span>
                       {cat && (
@@ -124,12 +124,12 @@ function ProposeModal({
   )
 }
 
-function EventThumb({ eventId, token }: { eventId?: number; token: string }) {
+function EventThumb({ eventId }: { eventId?: number }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!eventId) return
-    fetchImageUrl(eventId, token).then(setUrl).catch(() => {})
-  }, [eventId, token])
+    fetchImageUrl(eventId).then(setUrl).catch(() => {})
+  }, [eventId])
   return (
     <div className="proposeModal__eventThumb">
       {url ? <img src={url} alt="" /> : <div className="proposeModal__eventThumbPlaceholder" />}
@@ -178,14 +178,13 @@ function VenueCard({
   }, [initialVenue.user_id, token, initialVenue.description, initialVenue.street_address, initialVenue.address])
 
   useEffect(() => {
-    if (!token) return
     let cancelled = false
     const coverId = venue.cover_photo_id ?? (venue.cover_photo as { id?: number } | undefined)?.id
     const logoId = venue.logo_id ?? (venue.logo as { id?: number } | undefined)?.id
-    if (coverId) fetchImageUrl(coverId, token).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
-    if (logoId) fetchImageUrl(logoId, token).then(u => { if (!cancelled) setLogoUrl(u) }).catch(() => {})
+    if (coverId) fetchImageUrl(coverId).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
+    if (logoId) fetchImageUrl(logoId).then(u => { if (!cancelled) setLogoUrl(u) }).catch(() => {})
     return () => { cancelled = true }
-  }, [venue.cover_photo_id, venue.logo_id, venue.cover_photo, venue.logo, token])
+  }, [venue.cover_photo_id, venue.logo_id, venue.cover_photo, venue.logo])
 
   const handleSave = () => {
     const nowSaved = toggleSavedVenue(venue.user_id)
@@ -266,16 +265,16 @@ function CategoryBannerRow({
   )
 }
 
-function HeroBanner({ featuredVenue, token, onNavigate }: { featuredVenue: VenueListItem | null; token: string | null; onNavigate?: (userId: number) => void }) {
+function HeroBanner({ featuredVenue, onNavigate }: { featuredVenue: VenueListItem | null; onNavigate?: (userId: number) => void }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!featuredVenue || !token) return
+    if (!featuredVenue) return
     let cancelled = false
     const coverId = featuredVenue.cover_photo_id ?? (featuredVenue.cover_photo as { id?: number } | undefined)?.id
-    if (coverId) fetchImageUrl(coverId, token).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
+    if (coverId) fetchImageUrl(coverId).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
     return () => { cancelled = true }
-  }, [featuredVenue, token])
+  }, [featuredVenue])
 
   return (
     <div className="heroBanner">
@@ -368,7 +367,7 @@ export function SpacesCatalogPage() {
     <div className="spacesCatalog">
       <div className="spacesCatalog__content">
 
-        <HeroBanner featuredVenue={featuredVenue} token={token} onNavigate={handleNavigateToVenue} />
+        <HeroBanner featuredVenue={featuredVenue} onNavigate={handleNavigateToVenue} />
 
         {isLoading ? (
           <div className="spacesCatalog__loading">Загрузка...</div>

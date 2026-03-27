@@ -1,8 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { AuthPage } from './pages/auth/AuthPage'
-import { SpaceLandingPage } from './pages/landing/SpaceLandingPage'
-import { CreatorLandingPage } from './pages/landing/CreatorLandingPage'
+import { SpaceLandingPrototype } from './pages/landing/SpaceLandingPrototype'
+import { CreatorLandingPrototype } from './pages/landing/CreatorLandingPrototype'
 import { CreateSpacePage } from './pages/space/CreateSpacePage'
 import { SpaceFinalPage } from './pages/space/SpaceFinalPage'
 import { SpaceSuccessPage } from './pages/space/SpaceSuccessPage'
@@ -29,8 +29,8 @@ export default function App() {
     <CreatorRegistrationProvider>
     <SpaceRegistrationProvider>
     <Routes>
-      <Route path="/landing/space" element={<SpaceLandingPage />} />
-      <Route path="/landing/creator" element={<CreatorLandingPage />} />
+      <Route path="/landing/space" element={<SpaceLandingPrototype />} />
+      <Route path="/landing/creator" element={<CreatorLandingPrototype />} />
 
       <Route element={<AppShell />}>
         <Route path="/" element={<Navigate to="/landing/space" replace />} />
