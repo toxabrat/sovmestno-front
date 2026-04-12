@@ -295,7 +295,7 @@
   background: #f0f0f4;
   border-color: #d0d0d0;
   color: #999;
-  cursor: default;
+  cursor: pointer;
 }
 .venueCard__saveBtn:disabled { cursor: default; opacity: 0.8; }
 

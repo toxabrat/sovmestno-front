@@ -32,16 +32,26 @@
   height: 732px;
 }
 
-.clp__heroImg {
+.clp__heroCard {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
+  background: #6c7efe;
+  border-radius: 40px;
+  padding: 0 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .clp__heroToggle {
   position: absolute;
-  top: 0;
+  top: 0px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -49,6 +59,91 @@
   border-radius: 100px;
   padding: 3px;
   z-index: 10;
+}
+
+.clp__heroTitle {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 1024px) {
+  .clp__heroTitle { font-size: 48px; }
+}
+
+@media (max-width: 768px) {
+  .clp__heroTitle { font-size: 32px; margin-bottom: 32px; }
+}
+
+.clp__heroTitleLast {
+  position: relative;
+  display: inline-block;
+}
+
+.clp__heroLine {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 100%;
+  max-width: 350px;
+  height: 4px;
+  background: #d8f772;
+  border-radius: 2px;
+}
+
+.clp__heroSubtitle {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .clp__heroSubtitle { font-size: 15px; margin-bottom: 20px; }
+}
+
+.clp__heroBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 0 40px;
+  font-size: 18px;
+  font-weight: 500;
+  background: #d8f772;
+  color: #000;
+  border-radius: 100px;
+  text-decoration: none;
+  position: relative;
+  z-index: 2;
+  transition: filter 150ms ease;
+  flex-shrink: 0;
+}
+
+.clp__heroBtn:hover {
+  filter: brightness(0.95);
+}
+
+.clp__heroStar {
+  position: absolute;
+  top: 80px;
+  left: calc(50% - 360px);
+  width: 78px;
+  height: 78px;
+  z-index: 1;
+  object-fit: contain;
+}
+
+@media (max-width: 1100px) {
+  .clp__heroStar { display: none; }
 }
 
 .clp__heroToggleBtn {
@@ -73,16 +168,6 @@
   color: #fff;
 }
 
-.clp__heroOverlayBtn {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 399px;
-  height: 72px;
-  border-radius: 100px;
-  display: block;
-}
 
 .clp__benefits {
   display: flex;

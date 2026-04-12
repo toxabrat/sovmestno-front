@@ -13,7 +13,7 @@ import ctaHconnect from '../../assets/icons/landing_creator/prototype/cta_hconne
 import downArrow from '../../assets/icons/landing_creator/prototype/down_arrow.png'
 import heroCard from '../../assets/icons/landing_creator/prototype/hero_card.png'
 import heroCard1 from '../../assets/icons/landing_creator/prototype/hero_card1.png'
-import heroImg from '../../assets/icons/landing_creator/prototype/hero_headline.png'
+import heroStar from '../../assets/icons/hero-star.svg'
 import roleCardUnion from '../../assets/icons/landing_creator/prototype/role_card_union.png'
 import sectionAcquaint from '../../assets/icons/landing_creator/prototype/section_acquaint.png'
 import sectionPrivacy from '../../assets/icons/landing_creator/prototype/section_privacy.png'
@@ -64,22 +64,44 @@ export function CreatorLandingPrototype() {
 
       <section className="clp__section clp__section--padded">
         <div className="clp__heroWrap">
-          <img src={heroImg} alt="Совместно — для креаторов" className="clp__heroImg" />
-          <div className="clp__heroToggle">
-            <button
-              className={`clp__heroToggleBtn ${tab === 'space' ? 'clp__heroToggleBtn--active' : ''}`}
-              onClick={() => handleTab('space')}
-            >
-              Площадкам
-            </button>
-            <button
-              className={`clp__heroToggleBtn ${tab === 'creator' ? 'clp__heroToggleBtn--active' : ''}`}
-              onClick={() => handleTab('creator')}
-            >
-              Креаторам
-            </button>
+          <div className="clp__heroCard">
+            <div className="clp__heroToggle">
+              <button
+                className={`clp__heroToggleBtn ${tab === 'space' ? 'clp__heroToggleBtn--active' : ''}`}
+                onClick={() => handleTab('space')}
+              >
+                Площадкам
+              </button>
+              <button
+                className={`clp__heroToggleBtn ${tab === 'creator' ? 'clp__heroToggleBtn--active' : ''}`}
+                onClick={() => handleTab('creator')}
+              >
+                Креаторам
+              </button>
+            </div>
+
+            <h1 className="clp__heroTitle">
+              Скрепляем людей
+              <br />
+              в события, созданные
+              <br />
+              <span className="clp__heroTitleLast">
+                совместно
+                <span className="clp__heroLine" />
+              </span>
+            </h1>
+
+            <p className="clp__heroSubtitle">
+              Сервис для кооперации общественных пространств
+              <br />и организаторов мероприятий
+            </p>
+
+            <Link to="/spaces" className="clp__heroBtn">
+              Искать пространство →
+            </Link>
+
+            <img src={heroStar} alt="" className="clp__heroStar" />
           </div>
-          <Link to="/events" className="clp__heroOverlayBtn" aria-label="Искать мероприятие" />
         </div>
       </section>
 

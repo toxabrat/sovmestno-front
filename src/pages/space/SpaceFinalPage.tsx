@@ -86,12 +86,7 @@ export function SpaceFinalPage() {
       .catch(() => {})
   }, [isEditMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const withAt = (val: string) => {
-    const stripped = val.replace(/^@+/, '')
-    return stripped ? '@' + stripped : ''
-  }
-
-  const allSelected = categories.length > 0 && selectedCategoryIds.length === categories.length
+  const allSelected =categories.length > 0 && selectedCategoryIds.length === categories.length
 
   const handleSelectAll = () => {
     if (allSelected) {
@@ -293,67 +288,67 @@ export function SpaceFinalPage() {
 
         <div className="spaceFinal__socialFields">
           <div className="spaceFinal__socialRow">
-            <div className="spaceFinal__socialIcon">
+            <div className={`spaceFinal__socialIcon${telegram.trim() ? ' spaceFinal__socialIcon--active' : ''}`}>
               <img src={iconTelegram} alt="Telegram" />
             </div>
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="@channel"
+              placeholder="Вставьте ссылку на telegram-канал"
               value={telegram}
-              onChange={(e) => setTelegram(withAt(e.target.value))}
+              onChange={(e) => setTelegram(e.target.value)}
             />
           </div>
 
           <div className="spaceFinal__socialRow">
-            <div className="spaceFinal__socialIcon">
+            <div className={`spaceFinal__socialIcon${vk.trim() ? ' spaceFinal__socialIcon--active' : ''}`}>
               <img src={iconVk} alt="VK" />
             </div>
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="id или короткое имя"
+              placeholder="Вставьте ссылку vk"
               value={vk}
-              onChange={(e) => setVk(e.target.value.replace(/^@+/, ''))}
+              onChange={(e) => setVk(e.target.value)}
             />
           </div>
 
           <div className="spaceFinal__socialRow">
-            <div className="spaceFinal__socialIcon">
+            <div className={`spaceFinal__socialIcon${tiktok.trim() ? ' spaceFinal__socialIcon--active' : ''}`}>
               <img src={iconTiktok} alt="TikTok" />
             </div>
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="@username"
+              placeholder="Вставьте ссылку tik-tok"
               value={tiktok}
-              onChange={(e) => setTiktok(withAt(e.target.value))}
+              onChange={(e) => setTiktok(e.target.value)}
             />
           </div>
 
           <div className="spaceFinal__socialRow">
-            <div className="spaceFinal__socialIcon">
+            <div className={`spaceFinal__socialIcon${youtube.trim() ? ' spaceFinal__socialIcon--active' : ''}`}>
               <img src={iconYoutube} alt="YouTube" />
             </div>
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="@channel"
+              placeholder="Вставьте ссылку на youtube"
               value={youtube}
-              onChange={(e) => setYoutube(withAt(e.target.value))}
+              onChange={(e) => setYoutube(e.target.value)}
             />
           </div>
 
           <div className="spaceFinal__socialRow">
-            <div className="spaceFinal__socialIcon">
+            <div className={`spaceFinal__socialIcon${dzen.trim() ? ' spaceFinal__socialIcon--active' : ''}`}>
               <img src={iconDzen} alt="Dzen" />
             </div>
             <input
               type="text"
               className="spaceFinal__socialInput"
-              placeholder="название канала"
+              placeholder="Вставьте ссылку на dzen"
               value={dzen}
-              onChange={(e) => setDzen(e.target.value.replace(/^@+/, ''))}
+              onChange={(e) => setDzen(e.target.value)}
             />
           </div>
         </div>

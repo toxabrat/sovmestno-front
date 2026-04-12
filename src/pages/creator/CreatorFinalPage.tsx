@@ -88,11 +88,6 @@ export function CreatorFinalPage() {
     }
   }
 
-  const withAt = (val: string) => {
-    const stripped = val.replace(/^@+/, '')
-    return stripped ? '@' + stripped : ''
-  }
-
   const handleBack = () => {
     if (isEditMode) navigate('/creator/create?edit=true')
     else navigate('/creator/create')
@@ -186,14 +181,14 @@ export function CreatorFinalPage() {
 
         <div className="creatorFinal__socialFields">
           {[
-            { icon: iconTelegram, placeholder: '@channel',          value: telegramChannel, onChange: (v: string) => setTelegramChannel(withAt(v)) },
-            { icon: iconVk,       placeholder: 'id или короткое имя', value: vk,           onChange: (v: string) => setVk(v.replace(/^@+/, '')) },
-            { icon: iconTiktok,   placeholder: '@username',         value: tiktok,          onChange: (v: string) => setTiktok(withAt(v)) },
-            { icon: iconYoutube,  placeholder: '@channel',          value: youtube,         onChange: (v: string) => setYoutube(withAt(v)) },
-            { icon: iconDzen,     placeholder: 'название канала',   value: dzen,            onChange: (v: string) => setDzen(v.replace(/^@+/, '')) },
+            { icon: iconTelegram, placeholder: 'Вставьте ссылку на telegram-канал', value: telegramChannel, onChange: (v: string) => setTelegramChannel(v) },
+            { icon: iconVk,       placeholder: 'Вставьте ссылку vk',             value: vk,              onChange: (v: string) => setVk(v) },
+            { icon: iconTiktok,   placeholder: 'Вставьте ссылку tik-tok',        value: tiktok,          onChange: (v: string) => setTiktok(v) },
+            { icon: iconYoutube,  placeholder: 'Вставьте ссылку на youtube',     value: youtube,         onChange: (v: string) => setYoutube(v) },
+            { icon: iconDzen,     placeholder: 'Вставьте ссылку на dzen',        value: dzen,            onChange: (v: string) => setDzen(v) },
           ].map(({ icon, placeholder, value, onChange }, i) => (
             <div key={i} className="creatorFinal__socialRow">
-              <div className="creatorFinal__socialIcon">
+              <div className={`creatorFinal__socialIcon${value.trim() ? ' creatorFinal__socialIcon--active' : ''}`}>
                 <img src={icon} alt="" />
               </div>
               <input

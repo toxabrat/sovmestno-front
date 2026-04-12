@@ -5,7 +5,8 @@ import { fetchVenueProfile, fetchImageUrl, fetchVenues, uploadImage } from '../.
 import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
 import type { VenueProfile, VenueListItem, VenuePhoto } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
-import { createApplication } from '../../api/applications'
+import { createApplication, fetchApplications } from '../../api/applications'
+import type { Application } from '../../api/applications'
 import { Footer } from '../../components/layout/Footer'
 import '../spaces/SpacesCatalogPage.css'
 import './VenueProfilePage.css'
@@ -305,6 +306,7 @@ export function VenueProfilePage() {
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [myEvents, setMyEvents] = useState<Event[]>([])
   const [myCategories, setMyCategories] = useState<Category[]>([])
+  const [sentApplications, setSentApplications] = useState<Application[]>([])
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const completedScrollRef = useRef<HTMLDivElement>(null)
@@ -371,6 +373,7 @@ export function VenueProfilePage() {
     if (!showProposeModal || !token || !user?.id) return
     fetchEvents({ creator_id: user.id }, token).then(setMyEvents).catch(() => {})
     fetchCategories(token).then(setMyCategories).catch(() => {})
+    fetchApplications({ role: 'sender', limit: 100 }, token).then(setSentApplications).catch(() => {})
   }, [showProposeModal, token, user?.id])
 
   const handleSave = () => {
@@ -575,7 +578,7 @@ export function VenueProfilePage() {
       {recommended.length > 0 && (
         <section className="venueProfile__recommended">
           <div className="venueProfile__recommendedInner">
-            <h2 className="venueProfile__recommendedTitle">Вам моугут понравится эти пространства</h2>
+            <h2 className="venueProfile__recommendedTitle">Вам могут понравиться эти пространства</h2>
             <div className="venueProfile__recommendedGrid">
               {recommended.map(v => (
                 <RecommendedCard key={v.id} venue={v} />
@@ -589,7 +592,7 @@ export function VenueProfilePage() {
         <ProposeModal
           venueUserId={targetUserId}
           venueName={profile.name}
-          myEvents={myEvents}
+          myEvents={myEvents.filter(ev => !sentApplications.some(a => a.event_id === ev.id && a.receiver_id === targetUserId && a.receiver_type === 'venue'))}
           categories={myCategories}
           token={token}
           onClose={() => setShowProposeModal(false)}

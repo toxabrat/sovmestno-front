@@ -5,7 +5,8 @@ import { fetchVenues, fetchImageUrl } from '../../api/auth'
 import type { VenueListItem } from '../../api/auth'
 import { fetchEvents, fetchCategories } from '../../api/events'
 import type { Event, Category } from '../../api/events'
-import { createApplication } from '../../api/applications'
+import { createApplication, fetchApplications } from '../../api/applications'
+import type { Application } from '../../api/applications'
 import { Footer } from '../../components/layout/Footer'
 import './SpacesCatalogPage.css'
 
@@ -26,12 +27,14 @@ function ProposeModal({
   myEvents,
   categories,
   token,
+  onProposed,
   onClose,
 }: {
   venue: VenueListItem
   myEvents: Event[]
   categories: Category[]
   token: string
+  onProposed?: (eventId: number) => void
   onClose: () => void
 }) {
   const [selected, setSelected] = useState<number | null>(null)
@@ -48,6 +51,7 @@ function ProposeModal({
         event_id: selected,
       }, token)
       setSent(true)
+      onProposed?.(selected)
     } catch (err) {
       console.error('Propose failed:', err)
     } finally {
@@ -225,10 +229,9 @@ function VenueCard({
             <button
               type="button"
               className={`venueCard__saveBtn ${saved ? 'venueCard__saveBtn--saved' : ''}`}
-              disabled={saved}
               onClick={handleSave}
             >
-              {saved ? 'Сохранено' : 'Сохранить'}
+              {saved ? 'Отменить сохранение' : 'Сохранить'}
             </button>
             <button type="button" className="venueCard__proposeBtn" onClick={() => onPropose?.(venue)}>
               Предложить мероприятие
@@ -325,6 +328,7 @@ export function SpacesCatalogPage() {
 
   const [myEvents, setMyEvents] = useState<Event[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [sentApplications, setSentApplications] = useState<Application[]>([])
   const [proposeVenue, setProposeVenue] = useState<VenueListItem | null>(null)
 
   useEffect(() => {
@@ -342,6 +346,7 @@ export function SpacesCatalogPage() {
     if (!isCreator || !user?.id || !token) return
     fetchEvents({ creator_id: user.id, is_active: true }, token).then(setMyEvents).catch(() => {})
     fetchCategories(token).then(setCategories).catch(() => {})
+    fetchApplications({ role: 'sender', limit: 100 }, token).then(setSentApplications).catch(() => {})
   }, [isCreator, user?.id, token])
 
   const handlePropose = useCallback((venue: VenueListItem) => {
@@ -372,7 +377,9 @@ export function SpacesCatalogPage() {
         {isLoading ? (
           <div className="spacesCatalog__loading">Загрузка...</div>
         ) : venues.length === 0 ? (
-          <div className="spacesCatalog__empty">Пространства не найдены</div>
+          <div className="spacesCatalog__empty">
+            {!token ? 'Войдите в аккаунт, чтобы увидеть доступные пространства' : 'Пространства не найдены'}
+          </div>
         ) : (
           <>
             <div className="spacesCatalog__grid">
@@ -421,9 +428,10 @@ export function SpacesCatalogPage() {
       {proposeVenue && token && (
         <ProposeModal
           venue={proposeVenue}
-          myEvents={myEvents}
+          myEvents={myEvents.filter(ev => !sentApplications.some(a => a.event_id === ev.id && a.receiver_id === proposeVenue.user_id && a.receiver_type === 'venue'))}
           categories={categories}
           token={token}
+          onProposed={(eventId) => setSentApplications(prev => [...prev, { event_id: eventId, receiver_id: proposeVenue.user_id, receiver_type: 'venue' } as Application])}
           onClose={() => setProposeVenue(null)}
         />
       )}

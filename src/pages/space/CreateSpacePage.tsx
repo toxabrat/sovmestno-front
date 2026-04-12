@@ -503,12 +503,9 @@ export function CreateSpacePage() {
             <input
               type="text"
               className="createSpace__contactInput"
-              placeholder="@username"
+              placeholder="sovmestnomedia"
               value={telegram}
-              onChange={(e) => {
-                const stripped = e.target.value.replace(/^@+/, '')
-                setTelegram(stripped ? '@' + stripped : '')
-              }}
+              onChange={(e) => setTelegram(e.target.value)}
             />
           </div>
         </div>

@@ -260,6 +260,12 @@
 
 .catalogCard__titleLink { text-decoration: none; }
 
+.catalogCard__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .catalogCard__tag {
   display: inline-flex;
   align-items: center;
@@ -270,7 +276,20 @@
   border-radius: 100px;
   font-size: 12px;
   font-weight: 500;
-  width: fit-content;
+  white-space: nowrap;
+}
+
+.catalogCard__tagMore {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  background: #f0ecff;
+  color: #6b5ce7;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0.65;
 }
 
 .catalogCard__desc {
@@ -341,7 +360,7 @@
   background: #f0f0f4;
   border-color: #d0d0d0;
   color: #999;
-  cursor: default;
+  cursor: pointer;
 }
 .catalogCard__saveBtn:disabled { cursor: default; opacity: 0.8; }
 

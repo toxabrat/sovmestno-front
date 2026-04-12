@@ -5,7 +5,8 @@ import { fetchEvents, fetchCategories } from '../../api/events'
 import { fetchImageUrl, fetchCreators } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
 import type { CreatorListItem } from '../../api/auth'
-import { createApplication } from '../../api/applications'
+import { createApplication, fetchApplications } from '../../api/applications'
+import type { Application } from '../../api/applications'
 import { Footer } from '../../components/layout/Footer'
 import './EventsCatalogPage.css'
 
@@ -73,20 +74,24 @@ function toggleSavedEvent(id: number) {
   return next.includes(id)
 }
 
-function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
+function CatalogEventCard({ event, token, categories, isVenue, initialInviteSent, onInviteSent, onClick }: {
   event: Event
   token: string | null
   categories: Category[]
   isVenue: boolean
+  initialInviteSent?: boolean
+  onInviteSent?: () => void
   onClick: () => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [creatorName, setCreatorName] = useState<string>('')
   const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null)
   const [saved, setSaved] = useState(() => getSavedEvents().includes(event.id))
-  const [inviteSent, setInviteSent] = useState(false)
+  const [inviteSent, setInviteSent] = useState(initialInviteSent ?? false)
   const [sending, setSending] = useState(false)
-  const cat = categories.find(c => event.category_ids?.includes(c.id))
+  const eventCats = categories.filter(c => event.category_ids?.includes(c.id))
+  const visibleCats = eventCats.slice(0, 3)
+  const hiddenCatCount = eventCats.length - visibleCats.length
 
   useEffect(() => {
     if (!token) return
@@ -121,6 +126,7 @@ function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
     try {
       await createApplication({ receiver_id: event.creator_id, receiver_type: 'creator', event_id: event.id }, token)
       setInviteSent(true)
+      onInviteSent?.()
     } catch (err) {
       console.error('Invite failed:', err)
     } finally {
@@ -142,7 +148,16 @@ function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
       </div>
       <div className="catalogCard__body">
         <h3 className="catalogCard__title">{event.title}</h3>
-        {cat && <span className="catalogCard__tag">◇ {cat.name}</span>}
+        {visibleCats.length > 0 && (
+          <div className="catalogCard__tags">
+            {visibleCats.map(c => (
+              <span key={c.id} className="catalogCard__tag">◇ {c.name}</span>
+            ))}
+            {hiddenCatCount > 0 && (
+              <span className="catalogCard__tagMore">и ещё {hiddenCatCount}</span>
+            )}
+          </div>
+        )}
         {event.description && (
           <p className="catalogCard__desc">{event.description}</p>
         )}
@@ -165,10 +180,9 @@ function CatalogEventCard({ event, token, categories, isVenue, onClick }: {
             <button
               type="button"
               className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
-              disabled={saved}
               onClick={handleSave}
             >
-              {saved ? 'Сохранено' : 'Сохранить'}
+              {saved ? 'Отменить сохранение' : 'Сохранить'}
             </button>
             {inviteSent ? (
               <span className="catalogCard__sentLabel">Заявка отправлена!</span>
@@ -265,19 +279,20 @@ function MidBannerRow({ event, token, categories, onScrollToCatalog }: {
   )
 }
 
-function EventModal({ event, token, categories, onClose }: {
+function EventModal({ event, token, categories, initialInviteSent, onClose }: {
   event: Event
   token: string | null
   categories: Category[]
+  initialInviteSent?: boolean
   onClose: () => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [creatorName, setCreatorName] = useState('')
   const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
+  const [sent, setSent] = useState(initialInviteSent ?? false)
   const [saved, setSaved] = useState(() => getSavedEvents().includes(event.id))
-  const cat = categories.find(c => event.category_ids?.includes(c.id))
+  const modalCats = categories.filter(c => event.category_ids?.includes(c.id))
 
   useEffect(() => {
     if (!token) return
@@ -325,7 +340,16 @@ function EventModal({ event, token, categories, onClose }: {
           </div>
           <div className="eventModal__body">
             <h2 className="eventModal__title">{event.title}</h2>
-            {cat && <span className="eventModal__tag">◇ {cat.name}</span>}
+            {modalCats.length > 0 && (
+              <div className="catalogCard__tags">
+                {modalCats.slice(0, 3).map(c => (
+                  <span key={c.id} className="eventModal__tag">◇ {c.name}</span>
+                ))}
+                {modalCats.length > 3 && (
+                  <span className="catalogCard__tagMore">и ещё {modalCats.length - 3}</span>
+                )}
+              </div>
+            )}
             {event.description && <p className="eventModal__desc">{event.description}</p>}
             {creatorName && (
               <Link to={`/creator/profile/${event.creator_id}`} className="eventModal__creator" onClick={onClose}>
@@ -342,10 +366,9 @@ function EventModal({ event, token, categories, onClose }: {
                 <button
                   type="button"
                   className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
-                  disabled={saved}
                   onClick={handleSave}
                 >
-                  {saved ? 'Сохранено' : 'Сохранить'}
+                  {saved ? 'Отменить сохранение' : 'Сохранить'}
                 </button>
                 <button type="button" className="catalogCard__proposeBtn" disabled={sending} onClick={handleInvite}>
                   {sending ? 'Отправка...' : 'Пригласить провести'}
@@ -375,6 +398,7 @@ export function EventsCatalogPage() {
 
   const [creators, setCreators] = useState<CreatorListItem[]>([])
   const [, setHighlightedCreator] = useState<CreatorListItem | null>(null)
+  const [sentApplications, setSentApplications] = useState<Application[]>([])
 
   const [modalEvent, setModalEvent] = useState<Event | null>(null)
   const catalogRef = useRef<HTMLElement>(null)
@@ -406,6 +430,13 @@ export function EventsCatalogPage() {
       })
       .catch(() => {})
   }, [token])
+
+  useEffect(() => {
+    if (!isVenue || !token) return
+    fetchApplications({ role: 'sender', limit: 100 }, token)
+      .then(setSentApplications)
+      .catch(() => {})
+  }, [isVenue, token])
 
   const filtered = selectedCat === FILTER_ALL
     ? allEvents
@@ -473,7 +504,9 @@ export function EventsCatalogPage() {
           {isLoading ? (
             <div className="eventsCatalog__loading">Загрузка...</div>
           ) : filtered.length === 0 ? (
-            <div className="eventsCatalog__empty">Мероприятия не найдены</div>
+            <div className="eventsCatalog__empty">
+              {!token ? 'Войдите в аккаунт, чтобы увидеть доступные мероприятия' : 'Мероприятия не найдены'}
+            </div>
           ) : (
             <>
               <div className="eventsCatalog__grid">
@@ -484,6 +517,8 @@ export function EventsCatalogPage() {
                     token={token}
                     categories={categories}
                     isVenue={isVenue}
+                    initialInviteSent={sentApplications.some(a => a.event_id === event.id && a.receiver_id === event.creator_id && a.receiver_type === 'creator')}
+                    onInviteSent={() => setSentApplications(prev => [...prev, { event_id: event.id, receiver_id: event.creator_id, receiver_type: 'creator' } as Application])}
                     onClick={() => setModalEvent(event)}
                   />
                 ))}
@@ -510,6 +545,7 @@ export function EventsCatalogPage() {
           event={modalEvent}
           token={token}
           categories={categories}
+          initialInviteSent={sentApplications.some(a => a.event_id === modalEvent.id && a.receiver_id === modalEvent.creator_id && a.receiver_type === 'creator')}
           onClose={() => setModalEvent(null)}
         />
       )}

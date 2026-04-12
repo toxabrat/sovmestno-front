@@ -230,6 +230,8 @@
   height: 34px;
   object-fit: contain;
   flex-shrink: 0;
+  border-radius: 36px;
+  filter: brightness(0) saturate(100%) invert(54%) sepia(75%) saturate(1200%) hue-rotate(208deg) brightness(103%);
 }
 
 .venueProfile__socialBadgeLabel {

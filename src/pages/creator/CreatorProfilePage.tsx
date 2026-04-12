@@ -9,7 +9,8 @@ import {
   deleteCreatorPhoto,
 } from '../../api/auth'
 import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
-import { createApplication } from '../../api/applications'
+import { createApplication, fetchApplications } from '../../api/applications'
+import type { Application } from '../../api/applications'
 import type { CreatorProfile, CreatorPhotoItem } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
 import { Footer } from '../../components/layout/Footer'
@@ -69,6 +70,7 @@ function PhotoItem({
 
 function EventCard({
   event, token, categories, isOwner, isVenueVisitor, creatorUserId,
+  initialInviteSent,
   onDelete, onPublish, onEdit,
 }: {
   event: Event
@@ -77,6 +79,7 @@ function EventCard({
   isOwner: boolean
   isVenueVisitor: boolean
   creatorUserId?: number
+  initialInviteSent?: boolean
   onDelete?: (id: number) => void
   onPublish?: (id: number) => void
   onEdit?: (id: number) => void
@@ -85,9 +88,11 @@ function EventCard({
   const [saved, setSaved] = useState(() => {
     try { return (JSON.parse(localStorage.getItem('savedEvents') || '[]') as number[]).includes(event.id) } catch { return false }
   })
-  const [inviteSent, setInviteSent] = useState(false)
+  const [inviteSent, setInviteSent] = useState(initialInviteSent ?? false)
   const [sending, setSending] = useState(false)
-  const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
+  const eventCats = categories.filter(c => event.category_ids?.includes(c.id))
+  const visibleCats = eventCats.slice(0, 3)
+  const hiddenCatCount = eventCats.length - visibleCats.length
 
   useEffect(() => {
     if (!event.cover_photo_id) return
@@ -122,7 +127,16 @@ function EventCard({
       </div>
       <div className="cp__eventBody">
         <h3 className="cp__eventTitle">{event.title}</h3>
-        {catName && <span className="cp__eventTag">{catName}</span>}
+        {visibleCats.length > 0 && (
+          <div className="cp__eventTags">
+            {visibleCats.map(c => (
+              <span key={c.id} className="cp__eventTag">{c.name}</span>
+            ))}
+            {hiddenCatCount > 0 && (
+              <span className="cp__eventTagMore">и ещё {hiddenCatCount}</span>
+            )}
+          </div>
+        )}
         {event.description && <p className="cp__eventDesc">{event.description}</p>}
 
         {isOwner && (
@@ -171,7 +185,7 @@ function EventRecommendCard({ event, token, categories }: { event: Event; token:
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [creatorName, setCreatorName] = useState<string>('')
   const [creatorPhotoUrl, setCreatorPhotoUrl] = useState<string | null>(null)
-  const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
+  const recCats = categories.filter(c => event.category_ids?.includes(c.id))
 
   useEffect(() => {
     if (!event.cover_photo_id) return
@@ -198,7 +212,16 @@ function EventRecommendCard({ event, token, categories }: { event: Event; token:
       </div>
       <div className="cp__recEventBody">
         <h3 className="cp__recEventTitle">{event.title}</h3>
-        {catName && <span className="cp__recEventTag">◇ {catName}</span>}
+        {recCats.length > 0 && (
+          <div className="cp__eventTags">
+            {recCats.slice(0, 2).map(c => (
+              <span key={c.id} className="cp__recEventTag">◇ {c.name}</span>
+            ))}
+            {recCats.length > 2 && (
+              <span className="cp__eventTagMore">и ещё {recCats.length - 2}</span>
+            )}
+          </div>
+        )}
         {event.description && <p className="cp__recEventDesc">{event.description}</p>}
         {creatorName && (
           <div
@@ -238,6 +261,7 @@ export function CreatorProfilePage() {
   const [activeEvents, setActiveEvents] = useState<Event[]>([])
   const [completedEvents, setCompletedEvents] = useState<Event[]>([])
   const [recommendedEvents, setRecommendedEvents] = useState<Event[]>([])
+  const [sentApplications, setSentApplications] = useState<Application[]>([])
 
   const photoFileInputRef = useRef<HTMLInputElement>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -278,6 +302,13 @@ export function CreatorProfilePage() {
     fetchEvents({ creator_id: targetUserId, is_completed: true }, token)
       .then(setCompletedEvents).catch(() => {})
   }, [targetUserId, token])
+
+  useEffect(() => {
+    if (!isVenueVisitor || !token) return
+    fetchApplications({ role: 'sender', limit: 100 }, token)
+      .then(setSentApplications)
+      .catch(() => {})
+  }, [isVenueVisitor, token])
 
   const handleDeleteEvent = async (id: number) => {
     if (!token) return
@@ -387,7 +418,7 @@ export function CreatorProfilePage() {
           </aside>
         </div>
 
-        {activeEvents.length > 0 && (
+        {activeEvents.length > 0 && isVenueVisitor && (
           <div className="cp__banner" style={{ backgroundImage: `url(${bannerFrame})` }}>
             <div className="cp__bannerOverlay">
               <h2 className="cp__bannerTitle">Это мероприятие ищет пространство</h2>
@@ -409,6 +440,7 @@ export function CreatorProfilePage() {
               {activeEvents.map(ev => (
                 <EventCard key={ev.id} event={ev} token={token} categories={categories}
                   isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
+                  initialInviteSent={sentApplications.some(a => a.event_id === ev.id && a.receiver_id === targetUserId && a.receiver_type === 'creator')}
                   onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
               ))}
             </div>
@@ -462,7 +494,7 @@ export function CreatorProfilePage() {
               <div className="cp__scroll" ref={completedScrollRef}>
                 {completedEvents.map(ev => (
                   <EventCard key={ev.id} event={ev} token={token} categories={categories}
-                    isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
+                    isOwner={isOwner} isVenueVisitor={false} creatorUserId={targetUserId}
                     onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
                 ))}
               </div>

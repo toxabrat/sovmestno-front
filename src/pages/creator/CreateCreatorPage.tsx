@@ -217,7 +217,7 @@ export function CreateCreatorPage() {
             <div className="createCreator__aboutWrapper">
               <textarea
                 className="createCreator__about"
-                placeholder="Расскажите о ценностях и атмосфере вашего пространства"
+                placeholder="Расскажите о себе, своих интересах и деятельности"
                 value={about}
                 onChange={handleAboutChange}
               />
@@ -282,10 +282,7 @@ export function CreateCreatorPage() {
               className="createCreator__contactInput"
               placeholder="sovmestnomedia"
               value={telegram}
-              onChange={(e) => {
-                const stripped = e.target.value.replace(/^@+/, '')
-                setTelegram(stripped ? '@' + stripped : '')
-              }}
+              onChange={(e) => setTelegram(e.target.value)}
             />
           </div>
         </div>

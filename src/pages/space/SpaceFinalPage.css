@@ -390,9 +390,12 @@
 }
 
 .spaceFinal__socialIcon img {
-  width: 20px;
-  height: 20px;
+  border-radius: 36px;
   object-fit: contain;
+}
+
+.spaceFinal__socialIcon--active img {
+  filter: brightness(0) saturate(100%) invert(54%) sepia(75%) saturate(1200%) hue-rotate(208deg) brightness(103%);
 }
 
 .spaceFinal__socialInput {

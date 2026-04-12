@@ -4,8 +4,7 @@ import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
 import './SpaceLandingPrototype.css'
 
-import heroCardSpace from '../../assets/icons/landing_space/prototype/hero_card(1).png'
-import heroCardCreator from '../../assets/icons/landing_space/prototype/hero_card(1).png'
+import heroStar from '../../assets/icons/hero-star.svg'
 import heartsImg from '../../assets/icons/landing_space/prototype/hearts.png'
 import benefit1 from '../../assets/icons/landing_space/prototype/benefit1.png'
 import benefit2 from '../../assets/icons/landing_space/prototype/benefit2.png'
@@ -45,28 +44,44 @@ export function SpaceLandingPrototype() {
 
       <section className="slp__section slp__section--padded">
         <div className="slp__heroWrap">
-          <img
-            src={tab === 'space' ? heroCardSpace : heroCardCreator}
-            alt="Скрепляем людей в события, созданные совместно"
-            className="slp__heroImg"
-          />
+          <div className="slp__heroCard">
+            <div className="slp__heroToggle">
+              <button
+                className={`slp__heroToggleBtn ${tab === 'space' ? 'slp__heroToggleBtn--active' : ''}`}
+                onClick={() => handleTab('space')}
+              >
+                Площадкам
+              </button>
+              <button
+                className={`slp__heroToggleBtn ${tab === 'creator' ? 'slp__heroToggleBtn--active' : ''}`}
+                onClick={() => handleTab('creator')}
+              >
+                Креаторам
+              </button>
+            </div>
 
-          <div className="slp__heroToggle">
-            <button
-              className={`slp__heroToggleBtn ${tab === 'space' ? 'slp__heroToggleBtn--active' : ''}`}
-              onClick={() => handleTab('space')}
-            >
-              Площадкам
-            </button>
-            <button
-              className={`slp__heroToggleBtn ${tab === 'creator' ? 'slp__heroToggleBtn--active' : ''}`}
-              onClick={() => handleTab('creator')}
-            >
-              Креаторам
-            </button>
+            <h1 className="slp__heroTitle">
+              Скрепляем людей
+              <br />
+              в события, созданные
+              <br />
+              <span className="slp__heroTitleLast">
+                совместно
+                <span className="slp__heroLine" />
+              </span>
+            </h1>
+
+            <p className="slp__heroSubtitle">
+              Сервис для кооперации общественных пространств
+              <br />и организаторов мероприятий
+            </p>
+
+            <Link to="/events" className="slp__heroBtn">
+              Искать мероприятие →
+            </Link>
+
+            <img src={heroStar} alt="" className="slp__heroStar" />
           </div>
-
-          <Link to="/events" className="slp__heroOverlayBtn" aria-label="Искать мероприятие" />
         </div>
       </section>
 

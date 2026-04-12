@@ -191,7 +191,7 @@ export function CreateEventPage() {
           <div className="ce__categorySectionLeft">
             <h2 className="ce__categoryTitle">Формат мероприятия</h2>
             <p className="ce__categoryDesc">
-              Выберете наиболее близкий к вашей идее описание формата мероприятия
+              Выберите наиболее близкий к вашей идее описание формата мероприятия
             </p>
           </div>
           <div className="ce__categoryChips">
