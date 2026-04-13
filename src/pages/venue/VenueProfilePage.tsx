@@ -431,6 +431,7 @@ export function VenueProfilePage() {
 
         <div className="venueProfile__layout">
 
+          <div className="venueProfile__mainCol">
           <div className="venueProfile__main">
             <div className="venueProfile__card">
 
@@ -478,6 +479,21 @@ export function VenueProfilePage() {
             </div>
           </div>
 
+          {profile.category_ids && profile.category_ids.length > 0 && (
+            <div className="venueProfile__formatsSection">
+              <span className="venueProfile__formatsLabel">Интересующие форматы</span>
+              <div className="venueProfile__formatsTags">
+                {profile.category_ids.map(catId => {
+                  const cat = categories.find(c => c.id === catId)
+                  return cat ? (
+                    <span key={cat.id} className="venueProfile__formatTag">{cat.name}</span>
+                  ) : null
+                })}
+              </div>
+            </div>
+          )}
+          </div>
+
           <aside className="venueProfile__sidebar">
             {address && (
               <div className="venueProfile__sideCard">
@@ -504,20 +520,6 @@ export function VenueProfilePage() {
             )}
           </aside>
         </div>
-
-        {profile.category_ids && profile.category_ids.length > 0 && (
-          <div className="venueProfile__formatsSection">
-            <span className="venueProfile__formatsLabel">Интересующие форматы</span>
-            <div className="venueProfile__formatsTags">
-              {profile.category_ids.map(catId => {
-                const cat = categories.find(c => c.id === catId)
-                return cat ? (
-                  <span key={cat.id} className="venueProfile__formatTag">{cat.name}</span>
-                ) : null
-              })}
-            </div>
-          </div>
-        )}
 
         <section className="venueProfile__photos">
           <div className="venueProfile__photosHeader">
@@ -554,11 +556,13 @@ export function VenueProfilePage() {
 
         {(completedEvents.length > 0 || isOwner) && (
           <section className="venueProfile__completedSection">
-            <div className="venueProfile__photosHeader">
-              <h2 className="venueProfile__photosTitle">Проведённые мероприятия</h2>
-              <div className="venueProfile__photosNav">
-                <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
-                <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
+            <div className="venueProfile__sectionCard">
+              <div className="venueProfile__photosHeader">
+                <h2 className="venueProfile__photosTitle">Проведённые мероприятия</h2>
+                <div className="venueProfile__photosNav">
+                  <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}>‹</button>
+                  <button type="button" className="venueProfile__arrowBtn" onClick={() => completedScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}>›</button>
+                </div>
               </div>
             </div>
             {completedEvents.length > 0 ? (

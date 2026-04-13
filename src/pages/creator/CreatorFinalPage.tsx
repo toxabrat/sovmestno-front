@@ -133,11 +133,11 @@ export function CreatorFinalPage() {
       <header className="creatorFinal__header">
         <button type="button" className="creatorFinal__backBtn" onClick={handleBack} aria-label="Назад"><img src={backArrow} alt="Назад" /></button>
         <div className="creatorFinal__headerText">
-          <h1 className="creatorFinal__title">{isEditMode ? 'Редактирование профиля' : 'Ииии... финальный штрих!'}</h1>
+          <h1 className="creatorFinal__title">{isEditMode ? 'Редактирование профиля' : 'Иии... финальный штрих!'}</h1>
           <p className="creatorFinal__subtitle">
             {isEditMode
               ? 'Обновите ссылки на социальные сети и фотографии портфолио'
-              : 'Вы можете добавить ссылки на свои социальные сети. Это поможет площадкам узнать о вас больше. Добавить фотографии портфолио можно будет позже из профиля.'}
+              : 'Вы можете добавить фотографии ранее проведённых мероприятий, примеры своих работ или всё то, что посчитаете нужным для своего портфолио Сделать это можно позже из своего профиля'}
           </p>
         </div>
       </header>

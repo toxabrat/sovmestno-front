@@ -438,28 +438,6 @@ export function CreateSpacePage() {
         </div>
       </div>
 
-      {categories.length > 0 && (
-        <div className="createSpace__categorySection">
-          <div className="createSpace__categorySectionLeft">
-            <h2 className="createSpace__categorySectionTitle">Интересующие форматы</h2>
-            <p className="createSpace__categorySectionDesc">
-              Выберите форматы мероприятий, которые вам интересны
-            </p>
-          </div>
-          <div className="createSpace__categoryChips">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`createSpace__chip ${selectedCategories.includes(cat.id) ? 'createSpace__chip--active' : ''}`}
-                onClick={() => toggleCategory(cat.id)}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="createSpace__contactsCard">
         <img src={contactsDecor} alt="" className="createSpace__contactsDecor" />
