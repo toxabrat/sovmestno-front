@@ -3,8 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { uploadImage, registerVenue, updateVenueProfile, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
-import { fetchCategories } from '../../api/events'
-import type { Category } from '../../api/events'
 import './CreateSpacePage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -48,14 +46,7 @@ export function CreateSpacePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingProfile, setIsLoadingProfile] = useState(false)
 
-  const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<number[]>([])
-
-  useEffect(() => {
-    fetchCategories()
-      .then(setCategories)
-      .catch(() => {})
-  }, [])
 
   useEffect(() => {
     if (!isEditMode || !authToken || !authUser?.id) return
@@ -101,12 +92,6 @@ export function CreateSpacePage() {
       .catch(() => {})
       .finally(() => setIsLoadingProfile(false))
   }, [isEditMode]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const toggleCategory = (id: number) => {
-    setSelectedCategories(prev =>
-      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id],
-    )
-  }
 
   const maxAboutLength = 400
 
