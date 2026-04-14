@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { uploadImage, registerVenue, updateVenueProfile, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
+import { getBackendError } from '../../errors/errorMessages'
 import './CreateSpacePage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -185,7 +186,7 @@ export function CreateSpacePage() {
       navigate('/space/final?edit=true')
     } catch (err) {
       console.error('Error updating venue:', err)
-      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
+      setBackendError(getBackendError(err))
     } finally {
       setIsLoading(false)
     }
@@ -281,7 +282,7 @@ export function CreateSpacePage() {
       navigate('/space/final')
     } catch (err) {
       console.error('Error registering venue:', err)
-      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
+      setBackendError(getBackendError(err))
     } finally {
       setIsLoading(false)
     }

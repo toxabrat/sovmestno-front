@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { uploadImage, updateCreatorProfile, fetchCreatorProfile, fetchImageUrl } from '../../api/auth'
+import { getBackendError } from '../../errors/errorMessages'
 import './CreateCreatorPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -160,7 +161,7 @@ export function CreateCreatorPage() {
       navigate(isEditMode ? '/creator/final?edit=true' : '/creator/final')
     } catch (err) {
       console.error('Error updating profile:', err)
-      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
+      setBackendError(getBackendError(err))
     } finally {
       setIsLoading(false)
     }

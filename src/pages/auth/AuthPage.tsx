@@ -7,6 +7,7 @@ import { useCreatorRegistration } from '../../context/CreatorRegistrationContext
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { registerCreator, login as apiLogin, fetchUserProfile } from '../../api/auth'
+import { getBackendError } from '../../errors/errorMessages'
 import './AuthPage.css'
 
 type Tab = 'signup' | 'login'
@@ -167,8 +168,7 @@ export function AuthPage() {
         if (isNetworkError(err)) {
           navigate('/*')
         } else {
-          const backendMsg = (() => { try { return JSON.parse((err as Error).message)?.errors?.[0]?.message } catch { return null } })()
-          setSignupError(backendMsg ?? 'Пользователь с таким email уже существует')
+          setSignupError(getBackendError(err, 'Пользователь с таким email уже существует'))
         }
       } finally {
         setIsLoading(false)

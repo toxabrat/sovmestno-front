@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { updateVenueProfile, uploadImage, addVenuePhoto, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
 import { fetchCategories } from '../../api/events'
 import type { Category } from '../../api/events'
+import { getBackendError } from '../../errors/errorMessages'
 import './SpaceFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -185,7 +186,7 @@ export function SpaceFinalPage() {
       else navigate('/space/success')
     } catch (err) {
       console.error('Error updating venue social links:', err)
-      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
+      setBackendError(getBackendError(err))
     } finally {
       setIsLoading(false)
     }

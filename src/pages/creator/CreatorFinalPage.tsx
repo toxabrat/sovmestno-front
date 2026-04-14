@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { updateCreatorProfile, uploadImage, addCreatorPhoto, fetchCreatorProfile, fetchImageUrl } from '../../api/auth'
+import { getBackendError } from '../../errors/errorMessages'
 import './CreatorFinalPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -124,7 +125,7 @@ export function CreatorFinalPage() {
       else navigate('/creator/success')
     } catch (err) {
       console.error('Error saving profile:', err)
-      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
+      setBackendError(getBackendError(err))
     } finally {
       setIsLoading(false)
     }
