@@ -38,6 +38,7 @@ export function CreatorFinalPage() {
   const [storedPhotoId, setStoredPhotoId] = useState<number | null>(data.photoId)
 
   const [isLoading, setIsLoading] = useState(false)
+  const [backendError, setBackendError] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([])
@@ -104,6 +105,7 @@ export function CreatorFinalPage() {
       return
     }
     setIsLoading(true)
+    setBackendError(null)
     try {
       await updateCreatorProfile(activeUserId, {
         name: profileName || data.name,
@@ -122,7 +124,7 @@ export function CreatorFinalPage() {
       else navigate('/creator/success')
     } catch (err) {
       console.error('Error saving profile:', err)
-      handleSkip()
+      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
     } finally {
       setIsLoading(false)
     }
@@ -202,6 +204,8 @@ export function CreatorFinalPage() {
           ))}
         </div>
       </div>
+
+      {backendError && <p className="creatorFinal__backendError">{backendError}</p>}
 
       <div className="creatorFinal__footer">
         <button type="button" className="creatorFinal__skipBtn" onClick={handleSkip} disabled={isLoading}>

@@ -14,7 +14,7 @@ import downArrow from '../../assets/icons/landing_creator/prototype/down_arrow.p
 import heroCard from '../../assets/icons/landing_creator/prototype/hero_card.png'
 import heroCard1 from '../../assets/icons/landing_creator/prototype/hero_card1.png'
 import heroStar from '../../assets/icons/hero-star.svg'
-import roleCardUnion from '../../assets/icons/landing_creator/prototype/role_card_union.png'
+import roleCardUnionOrigin from '../../assets/icons/landing_creator/prototype/role_card_union_origin.png'
 import sectionAcquaint from '../../assets/icons/landing_creator/prototype/section_acquaint.png'
 import sectionPrivacy from '../../assets/icons/landing_creator/prototype/section_privacy.png'
 import upArrow from '../../assets/icons/landing_creator/prototype/up_arrow.png'
@@ -146,7 +146,17 @@ export function CreatorLandingPrototype() {
 
         </div>
 
-        <img src={roleCardUnion} alt="" className="clp__roleCardUnion" />
+        <div className="clp__roleCardWrap">
+          <img src={roleCardUnionOrigin} alt="" className="clp__roleCardUnion" />
+          <div className="clp__roleCardText clp__roleCardText--space">
+            <h3 className="clp__roleCardTitle">Пространство</h3>
+            <p className="clp__roleCardDesc">Я представляю общественное пространство<br/>и хочу найти подходящее мероприятие</p>
+          </div>
+          <div className="clp__roleCardText clp__roleCardText--creator">
+            <h3 className="clp__roleCardTitle">Креатор</h3>
+            <p className="clp__roleCardDesc">Я организатор мероприятий,<br/>хочу найти места для<br/>их проведения</p>
+          </div>
+        </div>
       </section>
 
       <section className="clp__section clp__section--padded clp__centeredSection">

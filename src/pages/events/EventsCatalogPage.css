@@ -16,10 +16,40 @@
   .eventsCatalog__content { padding: 16px 16px 60px; gap: 16px; }
 }
 
-.eventsCatalog__heroBanner {
-  width: 100%;
+.eventsCatalog__heroBannerWrap {
+  position: relative;
   border-radius: 20px;
+  overflow: hidden;
+}
+
+.eventsCatalog__heroBannerImg {
+  width: 100%;
   display: block;
+  border-radius: 20px;
+}
+
+.eventsCatalog__heroBannerText {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+}
+
+.eventsCatalog__heroBannerTitle {
+  font-family: 'Golos Text', sans-serif;
+  font-size: 50px;
+  font-weight: 700;
+  color: #D8F772;
+  line-height: 1.1;
+  margin: 0 0 10px;
+}
+
+.eventsCatalog__heroBannerSub {
+  font-family: 'Golos Text', cursive;
+  font-size: 18px;
+  font-weight: 400;
+  color: #E9FF9F;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .eventsCatalog__creatorsSection {

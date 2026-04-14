@@ -461,3 +461,12 @@
 .spaceFinal__saveBtn:hover {
   filter: brightness(0.95);
 }
+
+.spaceFinal__backendError {
+  margin: -28px 0px 0px;
+  padding: 25px;
+  font-size: 14px;
+  color: #e84040;
+  line-height: 1.4;
+  text-align: center;
+}

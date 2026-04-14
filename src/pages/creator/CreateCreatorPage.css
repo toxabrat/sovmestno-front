@@ -372,3 +372,10 @@
     justify-content: center;
   }
 }
+
+.createCreator__backendError {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #e84040;
+  line-height: 1.4;
+}

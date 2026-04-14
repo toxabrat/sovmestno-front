@@ -45,6 +45,7 @@ export function CreateSpacePage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingProfile, setIsLoadingProfile] = useState(false)
+  const [backendError, setBackendError] = useState<string | null>(null)
 
   const [selectedCategories, setSelectedCategories] = useState<number[]>([])
 
@@ -147,6 +148,7 @@ export function CreateSpacePage() {
     if (!authToken || !authUser?.id) return
 
     setIsLoading(true)
+    setBackendError(null)
     try {
       const address = [city, street].filter(Boolean).join(', ')
 
@@ -183,6 +185,7 @@ export function CreateSpacePage() {
       navigate('/space/final?edit=true')
     } catch (err) {
       console.error('Error updating venue:', err)
+      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
     } finally {
       setIsLoading(false)
     }
@@ -278,6 +281,7 @@ export function CreateSpacePage() {
       navigate('/space/final')
     } catch (err) {
       console.error('Error registering venue:', err)
+      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
     } finally {
       setIsLoading(false)
     }
@@ -473,6 +477,8 @@ export function CreateSpacePage() {
           </div>
         </div>
       </div>
+
+      {backendError && <p className="createSpace__backendError">{backendError}</p>}
 
       <div className="createSpace__footer">
         <button

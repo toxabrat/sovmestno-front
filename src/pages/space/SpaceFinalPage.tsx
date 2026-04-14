@@ -37,6 +37,7 @@ export function SpaceFinalPage() {
   const [youtube, setYoutube] = useState(data.youtubeLink)
   const [dzen, setDzen] = useState(data.dzenLink)
   const [isLoading, setIsLoading] = useState(false)
+  const [backendError, setBackendError] = useState<string | null>(null)
   const [profileName, setProfileName] = useState(data.name || '')
 
   const [storedDescription, setStoredDescription] = useState(data.description || '')
@@ -150,6 +151,7 @@ export function SpaceFinalPage() {
     }
 
     setIsLoading(true)
+    setBackendError(null)
 
     try {
       await updateVenueProfile(activeUserId, {
@@ -183,7 +185,7 @@ export function SpaceFinalPage() {
       else navigate('/space/success')
     } catch (err) {
       console.error('Error updating venue social links:', err)
-      handleSkip()
+      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
     } finally {
       setIsLoading(false)
     }
@@ -353,6 +355,8 @@ export function SpaceFinalPage() {
           </div>
         </div>
       </div>
+
+      {backendError && <p className="spaceFinal__backendError">{backendError}</p>}
 
       <div className="spaceFinal__footer">
         <button

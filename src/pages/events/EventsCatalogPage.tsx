@@ -10,7 +10,7 @@ import type { Application } from '../../api/applications'
 import { Footer } from '../../components/layout/Footer'
 import './EventsCatalogPage.css'
 
-import heroBanner from '../../assets/icons/event_catalog/Frame 2131328070.png'
+import heroBannerBg from '../../assets/icons/event_catalog/Frame 2131328071.png'
 import midBannerBg from '../../assets/icons/event_catalog/Frame 2131328266.png'
 import iconFire from '../../assets/icons/event_catalog/A_Button(small).png'
 
@@ -448,7 +448,13 @@ export function EventsCatalogPage() {
     <div className="eventsCatalog">
       <div className="eventsCatalog__content">
 
-        <img src={heroBanner} alt="Мероприятия под любой вайб и цели" className="eventsCatalog__heroBanner" />
+        <div className="eventsCatalog__heroBannerWrap">
+          <img src={heroBannerBg} alt="" className="eventsCatalog__heroBannerImg" />
+          <div className="eventsCatalog__heroBannerText">
+            <h1 className="eventsCatalog__heroBannerTitle">Мероприятия под<br/>любой вайб и цели</h1>
+            <p className="eventsCatalog__heroBannerSub">Каталог готовых идей<br/>и желающих их реализовать</p>
+          </div>
+        </div>
 
         {creators.length > 0 && (
           <section className="eventsCatalog__creatorsSection">

@@ -167,7 +167,8 @@ export function AuthPage() {
         if (isNetworkError(err)) {
           navigate('/*')
         } else {
-          setSignupError('Пользователь с таким email уже существует')
+          const backendMsg = (() => { try { return JSON.parse((err as Error).message)?.errors?.[0]?.message } catch { return null } })()
+          setSignupError(backendMsg ?? 'Пользователь с таким email уже существует')
         }
       } finally {
         setIsLoading(false)

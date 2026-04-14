@@ -41,6 +41,7 @@ export function CreateCreatorPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingProfile, setIsLoadingProfile] = useState(false)
+  const [backendError, setBackendError] = useState<string | null>(null)
 
   const maxAboutLength = 400
 
@@ -116,6 +117,7 @@ export function CreateCreatorPage() {
     }
 
     setIsLoading(true)
+    setBackendError(null)
 
     try {
       let photoId: number | null = isEditMode ? existingPhotoId : null
@@ -158,6 +160,7 @@ export function CreateCreatorPage() {
       navigate(isEditMode ? '/creator/final?edit=true' : '/creator/final')
     } catch (err) {
       console.error('Error updating profile:', err)
+      try { setBackendError(JSON.parse((err as Error).message)?.errors?.[0]?.message ?? 'Что-то пошло не так') } catch { setBackendError('Что-то пошло не так') }
     } finally {
       setIsLoading(false)
     }
@@ -287,6 +290,8 @@ export function CreateCreatorPage() {
           </div>
         </div>
       </div>
+
+      {backendError && <p className="createCreator__backendError">{backendError}</p>}
 
       <div className="createCreator__footer">
         <button

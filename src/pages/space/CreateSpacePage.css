@@ -655,3 +655,10 @@
   border-color: #5b5bd4;
   color: #fff;
 }
+
+.createSpace__backendError {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #e84040;
+  line-height: 1.4;
+}
