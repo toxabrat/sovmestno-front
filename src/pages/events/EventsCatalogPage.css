@@ -30,22 +30,22 @@
 
 .eventsCatalog__heroBannerText {
   position: absolute;
-  top: 28px;
-  left: 40px;
+  top: 5%;
+  left: 4.5%;
 }
 
 .eventsCatalog__heroBannerTitle {
   font-family: 'Golos Text', sans-serif;
-  font-size: 50px;
+  font-size: clamp(18px, 3.5vw, 50px);
   font-weight: 700;
   color: #D8F772;
   line-height: 1.1;
-  margin: 0 0 10px;
+  margin: 0 0 0.2em;
 }
 
 .eventsCatalog__heroBannerSub {
-  font-family: 'Golos Text', cursive;
-  font-size: 18px;
+  font-family: 'Golos Text', sans-serif;
+  font-size: clamp(11px, 1.3vw, 18px);
   font-weight: 400;
   color: #E9FF9F;
   margin: 0;

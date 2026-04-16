@@ -241,26 +241,27 @@
 .clp__roleCardText--space {
   top: 8%;
   left: 3%;
-  max-width: 360px;
+  max-width: 28%;
 }
 
 .clp__roleCardText--creator {
   top: 42%;
   left: 36%;
+  max-width: 28%;
 }
 
 .clp__roleCardTitle {
   font-family: 'Golos Text', sans-serif;
-  font-size: 33px;
+  font-size: clamp(14px, 2.5vw, 33px);
   font-weight: 400;
   color: #313235;
-  margin: 0 0 8px;
+  margin: 0 0 0.25em;
   line-height: 1.2;
 }
 
 .clp__roleCardDesc {
   font-family: 'Golos Text', sans-serif;
-  font-size: 22px;
+  font-size: clamp(11px, 1.7vw, 22px);
   font-weight: 400;
   color: #98989A;
   margin: 0;
