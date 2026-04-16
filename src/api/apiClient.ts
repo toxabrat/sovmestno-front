@@ -4,7 +4,10 @@ type LogoutFn = () => void
 type UpdateTokenFn = (token: string) => void
 type GetAuthFn = () => { token: string | null; refreshToken: string | null }
 
-let getAuth: GetAuthFn = () => ({ token: null, refreshToken: null })
+let getAuth: GetAuthFn = () => ({
+  token: localStorage.getItem('token'),
+  refreshToken: localStorage.getItem('refreshToken'),
+})
 let onUpdateToken: UpdateTokenFn = () => {}
 let onLogout: LogoutFn = () => {}
 

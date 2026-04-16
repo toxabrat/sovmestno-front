@@ -334,6 +334,7 @@ export function VenueProfilePage() {
   useEffect(() => { loadProfile() }, [targetUserId, token])
 
   useEffect(() => {
+    if (!token) return
     fetchVenues(token, 6, 0)
       .then(res => setRecommended(res.data.slice(0, 3)))
       .catch(() => {})

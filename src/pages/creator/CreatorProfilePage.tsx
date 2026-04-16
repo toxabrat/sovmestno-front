@@ -289,6 +289,7 @@ export function CreatorProfilePage() {
   }, [targetUserId, token])
 
   useEffect(() => {
+    if (!token) return
     fetchCategories(token).then(setCategories).catch(() => {})
     fetchEvents({ is_active: true }, token)
       .then(evts => setRecommendedEvents(evts.filter(e => e.creator_id !== targetUserId).slice(0, 2)))

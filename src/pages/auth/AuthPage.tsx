@@ -6,7 +6,7 @@ import { TextField } from '../../components/ui/TextField'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
-import { registerCreator, login as apiLogin, fetchUserProfile } from '../../api/auth'
+import { registerCreator, registerVenue, login as apiLogin, fetchUserProfile } from '../../api/auth'
 import { getBackendError } from '../../errors/errorMessages'
 import './AuthPage.css'
 
@@ -138,12 +138,31 @@ export function AuthPage() {
     setSignupError(null)
     
     if (role === 'space') {
-      updateSpaceData({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-      })
-      navigate('/space/create')
+      setIsLoading(true)
+      try {
+        const response = await registerVenue({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        })
+        updateSpaceData({
+          token: response.access_token,
+          refreshToken: response.refresh_token,
+          userId: response.user.id,
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        })
+        navigate('/space/create')
+      } catch (err) {
+        if (isNetworkError(err)) {
+          navigate('/*')
+        } else {
+          setSignupError(getBackendError(err, 'Пользователь с таким email уже существует'))
+        }
+      } finally {
+        setIsLoading(false)
+      }
     } else if (role === 'creator') {
       setIsLoading(true)
 
