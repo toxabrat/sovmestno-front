@@ -271,7 +271,7 @@ export function CreatorLandingPrototype() {
         <div className="clp__telegramWrap">
           <img src={telegramSection} alt="Подписаться на Telegram" className="clp__fullSectionImg" />
           <a
-            href="https://t.me/sovmestno"
+            href="https://t.me/+jkx2g8mkGB1iYzYy"
             target="_blank"
             rel="noopener noreferrer"
             className="clp__telegramOverlayBtn"

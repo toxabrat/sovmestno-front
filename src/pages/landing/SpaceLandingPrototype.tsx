@@ -236,7 +236,7 @@ export function SpaceLandingPrototype() {
         <div className="slp__telegramWrap">
           <img src={telegramSection} alt="Подписаться на Telegram" className="slp__fullSectionImg" style={{ borderRadius: 40 }} />
           <a
-            href="https://t.me/sovmestno"
+            href="https://t.me/+jkx2g8mkGB1iYzYy"
             target="_blank"
             rel="noopener noreferrer"
             className="slp__telegramOverlayBtn"

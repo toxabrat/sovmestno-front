@@ -71,12 +71,12 @@ export async function fetchWithAuth(
 
       if (response.status === 401) {
         const { refreshToken } = getAuth()
-        if (refreshToken) await apiLogout(refreshToken)
+        if (refreshToken) apiLogout(refreshToken).catch(() => {})
         onLogout()
       }
     } catch {
       const { refreshToken } = getAuth()
-      if (refreshToken) await apiLogout(refreshToken).catch(() => {})
+      if (refreshToken) apiLogout(refreshToken).catch(() => {})
       onLogout()
     }
   }
