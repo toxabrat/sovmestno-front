@@ -40,9 +40,8 @@ async function getCreatorInfo(
 }
 
 
-function CreatorHighlight({ creator, token, categories }: {
+function CreatorHighlight({ creator, categories }: {
   creator: CreatorListItem
-  token: string | null
   categories: Category[]
 }) {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
@@ -493,7 +492,7 @@ export function EventsCatalogPage() {
             </div>
             <div className="eventsCatalog__creatorsRow">
               {creators.map(c => (
-                <CreatorHighlight key={c.id} creator={c} token={token} categories={categories} />
+                <CreatorHighlight key={c.id} creator={c} categories={categories} />
               ))}
             </div>
           </section>
