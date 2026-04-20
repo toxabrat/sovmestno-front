@@ -6,7 +6,7 @@ import { TextField } from '../../components/ui/TextField'
 import { useCreatorRegistration } from '../../context/CreatorRegistrationContext'
 import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
-import { registerCreator, registerVenue, login as apiLogin, fetchUserProfile } from '../../api/auth'
+import { registerCreator, registerVenue, login as apiLogin, fetchUserProfile, subscribeNewsletter } from '../../api/auth'
 import { getBackendError } from '../../errors/errorMessages'
 import './AuthPage.css'
 
@@ -117,6 +117,10 @@ export function AuthPage() {
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
+  const [newsletterChecked, setNewsletterChecked] = useState(true)
+  const [consentChecked, setConsentChecked] = useState(false)
+  const [consentError, setConsentError] = useState(false)
+
   const [loginError, setLoginError] = useState<string | null>(null)
   const [signupError, setSignupError] = useState<string | null>(null)
 
@@ -129,6 +133,10 @@ export function AuthPage() {
 
   const handleCreateAccount = async () => {
     if (isLoading) return
+    if (!consentChecked) {
+      setConsentError(true)
+      return
+    }
     if (!isFormValid) {
       if (name.trim() === '') setSignupError('Введите ваше имя')
       else if (!isValidEmail(email)) setSignupError('Введите корректный email')
@@ -153,6 +161,7 @@ export function AuthPage() {
           email: email.trim(),
           password,
         })
+        if (newsletterChecked) subscribeNewsletter(email.trim()).catch(() => {})
         navigate('/space/create')
       } catch (err) {
         if (isNetworkError(err)) {
@@ -173,15 +182,15 @@ export function AuthPage() {
           password,
         })
 
-        updateData({ 
+        updateData({
           token: response.access_token,
           refreshToken: response.refresh_token,
           userId: response.user.id,
-          name: name.trim(), 
-          email: email.trim(), 
+          name: name.trim(),
+          email: email.trim(),
           password,
         })
-
+        if (newsletterChecked) subscribeNewsletter(email.trim()).catch(() => {})
         navigate('/creator/create')
       } catch (err) {
         if (isNetworkError(err)) {
@@ -427,10 +436,20 @@ export function AuthPage() {
                 </div>
 
                 <div className="auth__checkboxes">
-                  <Checkbox defaultChecked>
+                  <Checkbox
+                    checked={newsletterChecked}
+                    onChange={e => setNewsletterChecked(e.target.checked)}
+                  >
                     Я согласен получать рекламную рассылку от Sovmestno
                   </Checkbox>
-                  <Checkbox>
+                  <Checkbox
+                    checked={consentChecked}
+                    error={consentError}
+                    onChange={(e) => {
+                      setConsentChecked(e.target.checked)
+                      if (e.target.checked) setConsentError(false)
+                    }}
+                  >
                     Даю согласие на обработку персональных данных
                   </Checkbox>
                 </div>

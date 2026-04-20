@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchVenueProfile, fetchImageUrl, fetchVenues, uploadImage } from '../../api/auth'
+import { fetchVenueProfile, fetchPublicVenueProfile, fetchImageUrl, fetchVenues, fetchPublicVenues, uploadImage, fetchFavoriteVenues, addFavoriteVenue, removeFavoriteVenue } from '../../api/auth'
 import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
 import type { VenueProfile, VenueListItem, VenuePhoto } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
@@ -299,10 +299,7 @@ export function VenueProfilePage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [completedEvents, setCompletedEvents] = useState<Event[]>([])
 
-  const [isSaved, setIsSaved] = useState(() => {
-    if (!targetUserId) return false
-    try { return (JSON.parse(localStorage.getItem('savedVenues') || '[]') as number[]).includes(targetUserId) } catch { return false }
-  })
+  const [isSaved, setIsSaved] = useState(false)
   const [showProposeModal, setShowProposeModal] = useState(false)
   const [myEvents, setMyEvents] = useState<Event[]>([])
   const [myCategories, setMyCategories] = useState<Category[]>([])
@@ -314,9 +311,14 @@ export function VenueProfilePage() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   const loadProfile = () => {
-    if (!targetUserId || !token) return
+    if (!targetUserId) return
     setIsLoading(true)
-    fetchVenueProfile(targetUserId, token)
+    setCoverUrl(null)
+    setLogoUrl(null)
+    const fetcher = token
+      ? fetchVenueProfile(targetUserId, token)
+      : fetchPublicVenueProfile(targetUserId)
+    fetcher
       .then(data => {
         setProfile(data)
         const coverId = data.cover_photo?.id ?? data.cover_photo_id
@@ -334,10 +336,15 @@ export function VenueProfilePage() {
   useEffect(() => { loadProfile() }, [targetUserId, token])
 
   useEffect(() => {
-    if (!token) return
-    fetchVenues(token, 6, 0)
-      .then(res => setRecommended(res.data.slice(0, 3)))
+    if (!targetUserId || !token || user?.role !== 'creator') return
+    fetchFavoriteVenues(token)
+      .then(list => setIsSaved(list.some(v => v.user_id === targetUserId)))
       .catch(() => {})
+  }, [targetUserId, token, user?.role])
+
+  useEffect(() => {
+    const venuesFetcher = token ? fetchVenues(token, 6, 0) : fetchPublicVenues(6, 0)
+    venuesFetcher.then(res => setRecommended(res.data.slice(0, 3))).catch(() => {})
     fetchCategories(token).then(setCategories).catch(() => {})
   }, [token])
 
@@ -377,12 +384,16 @@ export function VenueProfilePage() {
     fetchApplications({ role: 'sender', limit: 100 }, token).then(setSentApplications).catch(() => {})
   }, [showProposeModal, token, user?.id])
 
-  const handleSave = () => {
-    if (!targetUserId) return
-    const saved = JSON.parse(localStorage.getItem('savedVenues') || '[]') as number[]
-    const next = saved.includes(targetUserId) ? saved.filter(x => x !== targetUserId) : [...saved, targetUserId]
-    localStorage.setItem('savedVenues', JSON.stringify(next))
-    setIsSaved(next.includes(targetUserId))
+  const handleSave = async () => {
+    if (!targetUserId || !token) return
+    const nowSaved = !isSaved
+    setIsSaved(nowSaved)
+    try {
+      if (nowSaved) await addFavoriteVenue(targetUserId, token)
+      else await removeFavoriteVenue(targetUserId, token)
+    } catch {
+      setIsSaved(!nowSaved)
+    }
   }
 
   const handleDeleteEvent = async (id: number) => {

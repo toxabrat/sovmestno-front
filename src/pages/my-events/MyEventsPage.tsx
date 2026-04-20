@@ -12,9 +12,9 @@ import {
   type Collaboration,
 } from '../../api/applications'
 import type { VenueListItem } from '../../api/auth'
-import { fetchCreatorProfile, fetchImageUrl, fetchVenueProfile } from '../../api/auth'
+import { fetchCreatorProfile, fetchImageUrl, fetchVenueProfile, fetchFavoriteVenues, removeFavoriteVenue } from '../../api/auth'
 import type { Event as APIEvent, Category } from '../../api/events'
-import { fetchCategories, fetchEventById, fetchEvents } from '../../api/events'
+import { fetchCategories, fetchEventById, fetchEvents, fetchFavoriteEvents, removeFavoriteEvent } from '../../api/events'
 import { Footer } from '../../components/layout/Footer'
 import { useAuth } from '../../context/AuthContext'
 import '../spaces/SpacesCatalogPage.css'
@@ -87,20 +87,6 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
 
 const AVATAR_COLORS = ['#e8c96d', '#a8d8a8', '#d8a8e0', '#a8c8e8', '#e8a8a8', '#c8d8f0']
 
-function getSavedVenueIds(): number[] {
-  try { return JSON.parse(localStorage.getItem('savedVenues') || '[]') } catch { return [] }
-}
-function getSavedEventIds(): number[] {
-  try { return JSON.parse(localStorage.getItem('savedEvents') || '[]') } catch { return [] }
-}
-function removeSavedVenue(id: number) {
-  const arr = getSavedVenueIds().filter(x => x !== id)
-  localStorage.setItem('savedVenues', JSON.stringify(arr))
-}
-function removeSavedEvent(id: number) {
-  const arr = getSavedEventIds().filter(x => x !== id)
-  localStorage.setItem('savedEvents', JSON.stringify(arr))
-}
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -857,29 +843,11 @@ export function MyEventsPage() {
     setSavedLoading(true)
     try {
       if (isVenue) {
-        const ids = getSavedEventIds()
-        if (ids.length > 0) {
-          const evts = await Promise.all(
-            ids.map(id => fetchEventById(id, token).catch(() => null))
-          )
-          setSavedEvents(evts.filter((e): e is APIEvent => e !== null))
-        } else {
-          setSavedEvents([])
-        }
+        const evts = await fetchFavoriteEvents(token)
+        setSavedEvents(evts)
       } else {
-        const ids = getSavedVenueIds()
-        if (ids.length > 0) {
-          const venues = await Promise.all(
-            ids.map(id =>
-              fetchVenueProfile(id, token)
-                .then(v => ({ ...v, user_id: id } as VenueListItem))
-                .catch(() => null)
-            )
-          )
-          setSavedVenues(venues.filter((v): v is VenueListItem => v !== null))
-        } else {
-          setSavedVenues([])
-        }
+        const venues = await fetchFavoriteVenues(token)
+        setSavedVenues(venues)
       }
     } catch { /* */ }
     finally { setSavedLoading(false) }
@@ -1092,7 +1060,7 @@ export function MyEventsPage() {
                         key={ev.id}
                         ev={ev}
                         token={token}
-                        onRemove={(id) => { removeSavedEvent(id); setSavedEvents(prev => prev.filter(e => e.id !== id)) }}
+                        onRemove={(id) => { if (token) removeFavoriteEvent(id, token).catch(() => {}); setSavedEvents(prev => prev.filter(e => e.id !== id)) }}
                         isInvited={invitedEventIds.has(ev.id)}
                         onInvite={async (evt) => {
                           if (!token) return
@@ -1114,7 +1082,7 @@ export function MyEventsPage() {
                       <SavedVenueCard
                         key={v.user_id}
                         venue={v}
-                        onRemove={(uid) => { removeSavedVenue(uid); setSavedVenues(prev => prev.filter(x => x.user_id !== uid)) }}
+                        onRemove={(uid) => { if (token) removeFavoriteVenue(uid, token).catch(() => {}); setSavedVenues(prev => prev.filter(x => x.user_id !== uid)) }}
                         onPropose={(venue) => setProposeVenue(venue)}
                       />
                     ))}

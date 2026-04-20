@@ -18,6 +18,7 @@ interface AuthContextType {
   login: (accessToken: string, refreshToken: string, user: User) => void
   logout: () => void
   updateToken: (accessToken: string) => void
+  updateUser: (updates: Partial<User>) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -76,6 +77,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', accessToken)
   }, [])
 
+  const updateUser = useCallback((updates: Partial<User>) => {
+    setUser(prev => {
+      if (!prev) return prev
+      const updated = { ...prev, ...updates }
+      localStorage.setItem('user', JSON.stringify(updated))
+      return updated
+    })
+  }, [])
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -85,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login: handleLogin,
       logout: handleLogout,
       updateToken,
+      updateUser,
     }}>
       {children}
     </AuthContext.Provider>

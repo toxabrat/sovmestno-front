@@ -151,3 +151,29 @@ export async function publishEvent(id: number, token: string): Promise<void> {
     token,
   )
 }
+
+export async function fetchPublicEvents(params?: FetchEventsParams): Promise<Event[]> {
+  const query = new URLSearchParams()
+  if (params?.creator_id) query.set('creator_id', String(params.creator_id))
+  if (params?.category_id) query.set('category_id', String(params.category_id))
+  if (params?.limit !== undefined) query.set('limit', String(params.limit))
+  if (params?.offset !== undefined) query.set('offset', String(params.offset))
+  const url = `${EVENT_API_BASE}/public/events${query.toString() ? `?${query}` : ''}`
+  const res = await fetch(url, { headers: { Accept: 'application/json' } })
+  const raw = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(JSON.stringify(raw))
+  if (Array.isArray(raw)) return raw
+  return (raw as { events?: Event[]; data?: Event[] }).events ?? (raw as { data?: Event[] }).data ?? []
+}
+
+export async function fetchFavoriteEvents(token: string): Promise<Event[]> {
+  return request<Event[]>(`${EVENT_API_BASE}/events/favorites`, {}, token).catch(() => [])
+}
+
+export async function addFavoriteEvent(eventId: number, token: string): Promise<void> {
+  await request<unknown>(`${EVENT_API_BASE}/events/favorites/${eventId}`, { method: 'PUT' }, token)
+}
+
+export async function removeFavoriteEvent(eventId: number, token: string): Promise<void> {
+  await request<unknown>(`${EVENT_API_BASE}/events/favorites/${eventId}`, { method: 'DELETE' }, token)
+}

@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
   fetchCreatorProfile,
+  fetchPublicCreatorProfile,
   fetchImageUrl,
   uploadImage,
   addCreatorPhoto,
   deleteCreatorPhoto,
 } from '../../api/auth'
-import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
+import { fetchEvents, fetchCategories, deleteEvent, fetchFavoriteEvents, addFavoriteEvent, removeFavoriteEvent } from '../../api/events'
 import { createApplication, fetchApplications } from '../../api/applications'
 import type { Application } from '../../api/applications'
 import type { CreatorProfile, CreatorPhotoItem } from '../../api/auth'
@@ -70,7 +71,7 @@ function PhotoItem({
 
 function EventCard({
   event, token, categories, isOwner, isVenueVisitor, creatorUserId,
-  initialInviteSent,
+  initialInviteSent, initialSaved,
   onDelete, onPublish, onEdit,
 }: {
   event: Event
@@ -80,14 +81,13 @@ function EventCard({
   isVenueVisitor: boolean
   creatorUserId?: number
   initialInviteSent?: boolean
+  initialSaved?: boolean
   onDelete?: (id: number) => void
   onPublish?: (id: number) => void
   onEdit?: (id: number) => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
-  const [saved, setSaved] = useState(() => {
-    try { return (JSON.parse(localStorage.getItem('savedEvents') || '[]') as number[]).includes(event.id) } catch { return false }
-  })
+  const [saved, setSaved] = useState(initialSaved ?? false)
   const [inviteSent, setInviteSent] = useState(initialInviteSent ?? false)
   const [sending, setSending] = useState(false)
   const eventCats = categories.filter(c => event.category_ids?.includes(c.id))
@@ -99,13 +99,16 @@ function EventCard({
     fetchImageUrl(event.cover_photo_id).then(setCoverUrl).catch(() => {})
   }, [event.cover_photo_id, token])
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!token) return
+    const nowSaved = !saved
+    setSaved(nowSaved)
     try {
-      const arr: number[] = JSON.parse(localStorage.getItem('savedEvents') || '[]')
-      if (!arr.includes(event.id)) arr.push(event.id)
-      localStorage.setItem('savedEvents', JSON.stringify(arr))
-    } catch { /* */ }
-    setSaved(true)
+      if (nowSaved) await addFavoriteEvent(event.id, token)
+      else await removeFavoriteEvent(event.id, token)
+    } catch {
+      setSaved(!nowSaved)
+    }
   }
 
   const handleInvite = async () => {
@@ -161,7 +164,6 @@ function EventCard({
             <button
               type="button"
               className={`cp__eventSaveBtn ${saved ? 'cp__eventSaveBtn--saved' : ''}`}
-              disabled={saved}
               onClick={handleSave}
             >
               {saved ? 'Сохранено' : 'Сохранить'}
@@ -262,6 +264,7 @@ export function CreatorProfilePage() {
   const [completedEvents, setCompletedEvents] = useState<Event[]>([])
   const [recommendedEvents, setRecommendedEvents] = useState<Event[]>([])
   const [sentApplications, setSentApplications] = useState<Application[]>([])
+  const [savedEventIds, setSavedEventIds] = useState<number[]>([])
 
   const photoFileInputRef = useRef<HTMLInputElement>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -271,10 +274,14 @@ export function CreatorProfilePage() {
   const photosScrollRef = useRef<HTMLDivElement>(null)
 
   const loadProfile = () => {
-    if (!targetUserId || !token) return
-    fetchCreatorProfile(targetUserId, token)
+    if (!targetUserId) return
+    setIsLoading(true)
+    setPhotoUrl(null)
+    const fetcher = token
+      ? fetchCreatorProfile(targetUserId, token)
+      : fetchPublicCreatorProfile(targetUserId)
+    fetcher
       .then(data => {
-        console.log('CreatorProfile data:', JSON.stringify(data, null, 2))
         setProfile(data)
         const photoId = data.photo?.id ?? data.photo_id
         if (photoId) fetchImageUrl(photoId).then(setPhotoUrl).catch(() => {})
@@ -308,6 +315,9 @@ export function CreatorProfilePage() {
     if (!isVenueVisitor || !token) return
     fetchApplications({ role: 'sender', limit: 100 }, token)
       .then(setSentApplications)
+      .catch(() => {})
+    fetchFavoriteEvents(token)
+      .then(evts => setSavedEventIds(evts.map(e => e.id)))
       .catch(() => {})
   }, [isVenueVisitor, token])
 
@@ -441,6 +451,7 @@ export function CreatorProfilePage() {
               {activeEvents.map(ev => (
                 <EventCard key={ev.id} event={ev} token={token} categories={categories}
                   isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
+                  initialSaved={savedEventIds.includes(ev.id)}
                   initialInviteSent={sentApplications.some(a => a.event_id === ev.id && a.receiver_id === targetUserId && a.receiver_type === 'creator')}
                   onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
               ))}

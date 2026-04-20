@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchCreators, fetchImageUrl } from '../../api/auth'
+import { fetchCreators, fetchPublicCreators, fetchImageUrl } from '../../api/auth'
 import type { CreatorListItem } from '../../api/auth'
 import { Footer } from '../../components/layout/Footer'
 import './CreatorsCatalogPage.css'
@@ -44,11 +44,11 @@ export function CreatorsCatalogPage() {
 
   useEffect(() => {
     setIsLoading(true)
-    fetchCreators(token, LIMIT, offset)
-      .then(res => {
-        setCreators(res.data)
-        setTotal(res.total)
-      })
+    const fetcher = token
+      ? fetchCreators(token, LIMIT, offset)
+      : fetchPublicCreators(LIMIT, offset)
+    fetcher
+      .then(res => { setCreators(res.data); setTotal(res.total) })
       .catch(() => setCreators([]))
       .finally(() => setIsLoading(false))
   }, [token, offset])

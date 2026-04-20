@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchEvents, fetchCategories } from '../../api/events'
-import { fetchImageUrl, fetchCreators } from '../../api/auth'
+import { fetchEvents, fetchPublicEvents, fetchCategories, fetchFavoriteEvents, addFavoriteEvent, removeFavoriteEvent } from '../../api/events'
+import { fetchImageUrl, fetchCreators, fetchPublicCreators } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
 import type { CreatorListItem } from '../../api/auth'
 import { createApplication, fetchApplications } from '../../api/applications'
@@ -18,13 +18,17 @@ const creatorCache: Record<number, { name: string; avatarId?: number }> = {}
 
 async function getCreatorInfo(
   creatorId: number,
-  token: string,
+  token: string | null,
 ): Promise<{ name: string; avatarId?: number }> {
   if (creatorCache[creatorId]) return creatorCache[creatorId]
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/creators/${creatorId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const base = import.meta.env.VITE_API_URL ?? ''
+    const url = token
+      ? `${base}/api/user/users/creators/${creatorId}`
+      : `${base}/api/user/public/creators/${creatorId}`
+    const headers: Record<string, string> = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(url, { headers })
     if (!res.ok) throw new Error()
     const data = await res.json()
     const info = { name: data.name ?? 'Креатор', avatarId: data.photo_id ?? undefined }
@@ -43,9 +47,9 @@ function CreatorHighlight({ creator, token, categories }: {
 }) {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   useEffect(() => {
-    if (!token || !creator.photo_id) return
+    if (!creator.photo_id) return
     fetchImageUrl(creator.photo_id).then(setPhotoUrl).catch(() => {})
-  }, [creator.photo_id, token])
+  }, [creator.photo_id])
 
   return (
     <Link to={`/creator/profile/${creator.user_id}`} className="creatorHighlight" style={{ textDecoration: 'none' }}>
@@ -64,21 +68,12 @@ function CreatorHighlight({ creator, token, categories }: {
   )
 }
 
-function getSavedEvents(): number[] {
-  try { return JSON.parse(localStorage.getItem('savedEvents') || '[]') } catch { return [] }
-}
-function toggleSavedEvent(id: number) {
-  const saved = getSavedEvents()
-  const next = saved.includes(id) ? saved.filter(x => x !== id) : [...saved, id]
-  localStorage.setItem('savedEvents', JSON.stringify(next))
-  return next.includes(id)
-}
-
-function CatalogEventCard({ event, token, categories, isVenue, initialInviteSent, onInviteSent, onClick }: {
+function CatalogEventCard({ event, token, categories, isVenue, initialSaved, initialInviteSent, onInviteSent, onClick }: {
   event: Event
   token: string | null
   categories: Category[]
   isVenue: boolean
+  initialSaved?: boolean
   initialInviteSent?: boolean
   onInviteSent?: () => void
   onClick: () => void
@@ -86,7 +81,7 @@ function CatalogEventCard({ event, token, categories, isVenue, initialInviteSent
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [creatorName, setCreatorName] = useState<string>('')
   const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null)
-  const [saved, setSaved] = useState(() => getSavedEvents().includes(event.id))
+  const [saved, setSaved] = useState(initialSaved ?? false)
   const [inviteSent, setInviteSent] = useState(initialInviteSent ?? false)
   const [sending, setSending] = useState(false)
   const eventCats = categories.filter(c => event.category_ids?.includes(c.id))
@@ -94,7 +89,6 @@ function CatalogEventCard({ event, token, categories, isVenue, initialInviteSent
   const hiddenCatCount = eventCats.length - visibleCats.length
 
   useEffect(() => {
-    if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
       fetchImageUrl(event.cover_photo_id)
@@ -113,10 +107,17 @@ function CatalogEventCard({ event, token, categories, isVenue, initialInviteSent
     return () => { cancelled = true }
   }, [event.cover_photo_id, event.creator_id, token])
 
-  const handleSave = (e: React.MouseEvent) => {
+  const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    const nowSaved = toggleSavedEvent(event.id)
+    if (!token) return
+    const nowSaved = !saved
     setSaved(nowSaved)
+    try {
+      if (nowSaved) await addFavoriteEvent(event.id, token)
+      else await removeFavoriteEvent(event.id, token)
+    } catch {
+      setSaved(!nowSaved)
+    }
   }
 
   const handleInvite = async (e: React.MouseEvent) => {
@@ -209,7 +210,6 @@ function FeaturedEventCard({ event, token, categories }: {
   const cat = categories.find(c => event.category_ids?.includes(c.id))
 
   useEffect(() => {
-    if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
       fetchImageUrl(event.cover_photo_id)
@@ -279,11 +279,12 @@ function MidBannerRow({ event, token, categories, onScrollToCatalog }: {
   )
 }
 
-function EventModal({ event, token, categories, initialInviteSent, onClose }: {
+function EventModal({ event, token, categories, initialInviteSent, initialSaved, onClose }: {
   event: Event
   token: string | null
   categories: Category[]
   initialInviteSent?: boolean
+  initialSaved?: boolean
   onClose: () => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
@@ -291,11 +292,10 @@ function EventModal({ event, token, categories, initialInviteSent, onClose }: {
   const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(initialInviteSent ?? false)
-  const [saved, setSaved] = useState(() => getSavedEvents().includes(event.id))
+  const [saved, setSaved] = useState(initialSaved ?? false)
   const modalCats = categories.filter(c => event.category_ids?.includes(c.id))
 
   useEffect(() => {
-    if (!token) return
     let cancelled = false
     if (event.cover_photo_id) {
       fetchImageUrl(event.cover_photo_id).then(url => { if (!cancelled) setCoverUrl(url) }).catch(() => {})
@@ -325,9 +325,16 @@ function EventModal({ event, token, categories, initialInviteSent, onClose }: {
     }
   }
 
-  const handleSave = () => {
-    const nowSaved = toggleSavedEvent(event.id)
+  const handleSave = async () => {
+    if (!token) return
+    const nowSaved = !saved
     setSaved(nowSaved)
+    try {
+      if (nowSaved) await addFavoriteEvent(event.id, token)
+      else await removeFavoriteEvent(event.id, token)
+    } catch {
+      setSaved(!nowSaved)
+    }
   }
 
   return (
@@ -399,6 +406,7 @@ export function EventsCatalogPage() {
   const [creators, setCreators] = useState<CreatorListItem[]>([])
   const [, setHighlightedCreator] = useState<CreatorListItem | null>(null)
   const [sentApplications, setSentApplications] = useState<Application[]>([])
+  const [savedEventIds, setSavedEventIds] = useState<number[]>([])
 
   const [modalEvent, setModalEvent] = useState<Event | null>(null)
   const catalogRef = useRef<HTMLElement>(null)
@@ -416,14 +424,20 @@ export function EventsCatalogPage() {
   useEffect(() => {
     setIsLoading(true)
     setVisibleCount(PAGE_SIZE)
-    fetchEvents({ is_active: true, limit: 100 }, token)
+    const fetcher = token
+      ? fetchEvents({ is_active: true, limit: 100 }, token)
+      : fetchPublicEvents({ limit: 100 })
+    fetcher
       .then(events => setAllEvents(events))
       .catch(() => setAllEvents([]))
       .finally(() => setIsLoading(false))
   }, [token])
 
   useEffect(() => {
-    fetchCreators(token, 100, 0)
+    const fetcher = token
+      ? fetchCreators(token, 100, 0)
+      : fetchPublicCreators(100, 0)
+    fetcher
       .then(res => {
         setCreators(res.data)
         if (res.data.length > 0) setHighlightedCreator(res.data[0])
@@ -435,6 +449,9 @@ export function EventsCatalogPage() {
     if (!isVenue || !token) return
     fetchApplications({ role: 'sender', limit: 100 }, token)
       .then(setSentApplications)
+      .catch(() => {})
+    fetchFavoriteEvents(token)
+      .then(evts => setSavedEventIds(evts.map(e => e.id)))
       .catch(() => {})
   }, [isVenue, token])
 
@@ -510,9 +527,7 @@ export function EventsCatalogPage() {
           {isLoading ? (
             <div className="eventsCatalog__loading">Загрузка...</div>
           ) : filtered.length === 0 ? (
-            <div className="eventsCatalog__empty">
-              {!token ? 'Войдите в аккаунт, чтобы увидеть доступные мероприятия' : 'Мероприятия не найдены'}
-            </div>
+            <div className="eventsCatalog__empty">Мероприятия не найдены</div>
           ) : (
             <>
               <div className="eventsCatalog__grid">
@@ -523,6 +538,7 @@ export function EventsCatalogPage() {
                     token={token}
                     categories={categories}
                     isVenue={isVenue}
+                    initialSaved={savedEventIds.includes(event.id)}
                     initialInviteSent={sentApplications.some(a => a.event_id === event.id && a.receiver_id === event.creator_id && a.receiver_type === 'creator')}
                     onInviteSent={() => setSentApplications(prev => [...prev, { event_id: event.id, receiver_id: event.creator_id, receiver_type: 'creator' } as Application])}
                     onClick={() => setModalEvent(event)}
@@ -551,6 +567,7 @@ export function EventsCatalogPage() {
           event={modalEvent}
           token={token}
           categories={categories}
+          initialSaved={savedEventIds.includes(modalEvent.id)}
           initialInviteSent={sentApplications.some(a => a.event_id === modalEvent.id && a.receiver_id === modalEvent.creator_id && a.receiver_type === 'creator')}
           onClose={() => setModalEvent(null)}
         />

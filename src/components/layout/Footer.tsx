@@ -1,11 +1,29 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import './Footer.css'
 
 import iconTelegram from '../../assets/icons/footer/Vector(9).png'
 import iconSocial from '../../assets/icons/footer/Vector(10).png'
 import iconStar from '../../assets/icons/footer/Vector(11).png'
 import logoText from '../../assets/icons/footer/СОВМЕСТНО(1).png'
+import { subscribeNewsletter } from '../../api/auth'
 
 export function Footer() {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+
+  const handleSubscribe = async () => {
+    const trimmed = email.trim()
+    if (!trimmed || status === 'loading' || status === 'done') return
+    setStatus('loading')
+    try {
+      await subscribeNewsletter(trimmed)
+      setStatus('done')
+    } catch {
+      setStatus('error')
+    }
+  }
+
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -17,13 +35,24 @@ export function Footer() {
               type="email"
               placeholder="E-MAIL"
               className="footer__emailInput"
+              value={email}
+              onChange={e => { setEmail(e.target.value); if (status === 'error') setStatus('idle') }}
+              disabled={status === 'done'}
             />
-            <button type="button" className="footer__subscribeBtn">
-              ПОДПИСАТЬСЯ
+            <button
+              type="button"
+              className="footer__subscribeBtn"
+              onClick={handleSubscribe}
+              disabled={status === 'loading' || status === 'done'}
+            >
+              {status === 'done' ? 'ПОДПИСАН' : status === 'loading' ? '...' : 'ПОДПИСАТЬСЯ'}
             </button>
           </div>
+          {status === 'error' && (
+            <p style={{ color: '#e53935', fontSize: '12px', marginTop: '4px' }}>Ошибка. Попробуйте ещё раз.</p>
+          )}
           <div className="footer__socialIcons">
-            <a href="https://t.me/sovmestno" target="_blank" rel="noopener noreferrer" className="footer__socialLink">
+            <a href="https://t.me/+jkx2g8mkGB1iYzYy" target="_blank" rel="noopener noreferrer" className="footer__socialLink">
               <img src={iconTelegram} alt="Telegram" className="footer__socialIcon" />
             </a>
             <a href="#" className="footer__socialLink">
@@ -34,11 +63,11 @@ export function Footer() {
         </div>
 
         <div className="footer__nav">
-          <a href="#" className="footer__navLink">Площадки</a>
-          <a href="#" className="footer__navLink">Мероприятия</a>
-          <a href="#" className="footer__navLink">Креаторы</a>
-          <a href="#" className="footer__navLink">Кейсы</a>
-          <a href="#" className="footer__navLink">О нас</a>
+          <Link to="/spaces" className="footer__navLink">Площадки</Link>
+          <Link to="/events" className="footer__navLink">Мероприятия</Link>
+          <Link to="/creators" className="footer__navLink">Креаторы</Link>
+          <Link to="/landing/space" className="footer__navLink">Кейсы</Link>
+          <Link to="/landing/space" className="footer__navLink">О нас</Link>
         </div>
 
         <div className="footer__brand">

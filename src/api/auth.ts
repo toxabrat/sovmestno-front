@@ -627,6 +627,75 @@ export async function deleteCreatorPhoto(photoId: number, token: string): Promis
   }
 }
 
+export async function fetchFavoriteVenues(token: string): Promise<VenueListItem[]> {
+  const response = await fetch(`${API_BASE_URL}/user/users/me/favorites/venues`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) return []
+  const data = await response.json().catch(() => [])
+  return Array.isArray(data) ? data : []
+}
+
+export async function addFavoriteVenue(userId: number, token: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/user/users/me/favorites/venues/${userId}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export async function removeFavoriteVenue(userId: number, token: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/user/users/me/favorites/venues/${userId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export async function subscribeNewsletter(email: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/user/newsletter/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+}
+
+export async function fetchPublicVenues(limit = 20, offset = 0): Promise<VenueListResponse> {
+  const url = `${API_BASE_URL}/user/public/venues?limit=${limit}&offset=${offset}`
+  const response = await fetch(url, { headers: { Accept: 'application/json' } })
+  const raw = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(raw))
+  const items: VenueListItem[] = raw.data ?? raw.venues ?? raw.items ?? (Array.isArray(raw) ? raw : [])
+  const total: number = raw.total ?? raw.count ?? raw.total_count ?? items.length
+  return { data: items, total, limit, offset }
+}
+
+export async function fetchPublicCreators(limit = 20, offset = 0): Promise<CreatorListResponse> {
+  const url = `${API_BASE_URL}/user/public/creators?limit=${limit}&offset=${offset}`
+  const response = await fetch(url, { headers: { Accept: 'application/json' } })
+  const raw = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(raw))
+  const items: CreatorListItem[] = raw.data ?? raw.creators ?? raw.items ?? (Array.isArray(raw) ? raw : [])
+  const total: number = raw.total ?? raw.count ?? items.length
+  return { data: items, total, limit, offset }
+}
+
+export async function fetchPublicVenueProfile(userId: number): Promise<VenueProfile> {
+  const response = await fetch(`${API_BASE_URL}/user/public/venues/${userId}`, {
+    headers: { Accept: 'application/json' },
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
+export async function fetchPublicCreatorProfile(userId: number): Promise<CreatorProfile> {
+  const response = await fetch(`${API_BASE_URL}/user/public/creators/${userId}`, {
+    headers: { Accept: 'application/json' },
+  })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(JSON.stringify(data))
+  return data
+}
+
 export async function apiLogout(refreshToken: string): Promise<void> {
   await fetch(`${API_BASE_URL}/user/auth/logout`, {
     method: 'POST',

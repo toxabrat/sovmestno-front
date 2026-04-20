@@ -15,7 +15,7 @@ export function CreateSpacePage() {
   const [searchParams] = useSearchParams()
   const isEditMode = searchParams.get('edit') === 'true'
   const { data, updateData } = useSpaceRegistration()
-  const { token: authToken, user: authUser } = useAuth()
+  const { token: authToken, user: authUser, updateUser } = useAuth()
 
   const logoInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -183,6 +183,7 @@ export function CreateSpacePage() {
         dzen_link: existingDzen || undefined,
       }, authToken)
 
+      if (logoId != null) updateUser({ avatar_id: logoId })
       navigate('/space/final?edit=true')
     } catch (err) {
       console.error('Error updating venue:', err)

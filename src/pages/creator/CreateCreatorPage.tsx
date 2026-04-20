@@ -15,7 +15,7 @@ export function CreateCreatorPage() {
   const [searchParams] = useSearchParams()
   const isEditMode = searchParams.get('edit') === 'true'
   const { data, updateData } = useCreatorRegistration()
-  const { token: authToken, user: authUser } = useAuth()
+  const { token: authToken, user: authUser, updateUser } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const activeToken = isEditMode ? authToken : data.token
@@ -145,7 +145,9 @@ export function CreateCreatorPage() {
         }),
       }, activeToken)
 
-      if (!isEditMode) {
+      if (isEditMode) {
+        if (photoId != null) updateUser({ avatar_id: photoId })
+      } else {
         updateData({
           description: about.trim(),
           city,

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { fetchVenues, fetchImageUrl } from '../../api/auth'
+import { fetchVenues, fetchPublicVenues, fetchImageUrl, fetchFavoriteVenues, addFavoriteVenue, removeFavoriteVenue } from '../../api/auth'
 import type { VenueListItem } from '../../api/auth'
 import { fetchEvents, fetchCategories } from '../../api/events'
 import type { Event, Category } from '../../api/events'
@@ -141,40 +141,36 @@ function EventThumb({ eventId }: { eventId?: number }) {
   )
 }
 
-function getSavedVenues(): number[] {
-  try { return JSON.parse(localStorage.getItem('savedVenues') || '[]') } catch { return [] }
-}
-function toggleSavedVenue(id: number) {
-  const saved = getSavedVenues()
-  const next = saved.includes(id) ? saved.filter(x => x !== id) : [...saved, id]
-  localStorage.setItem('savedVenues', JSON.stringify(next))
-  return next.includes(id)
-}
-
 function VenueCard({
   venue: initialVenue,
   token,
   isCreator,
+  initialSaved,
   onPropose,
   onNavigate,
 }: {
   venue: VenueListItem
   token: string | null
   isCreator: boolean
+  initialSaved?: boolean
   onPropose?: (venue: VenueListItem) => void
   onNavigate?: (userId: number) => void
 }) {
   const [venue, setVenue] = useState<VenueListItem>(initialVenue)
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
-  const [saved, setSaved] = useState(() => getSavedVenues().includes(initialVenue.user_id))
+  const [saved, setSaved] = useState(initialSaved ?? false)
 
   useEffect(() => {
     if (initialVenue.description && (initialVenue.street_address || initialVenue.address)) return
     let cancelled = false
+    const base = import.meta.env.VITE_API_URL ?? ''
+    const url = token
+      ? `${base}/api/user/users/venues/${initialVenue.user_id}`
+      : `${base}/api/user/public/venues/${initialVenue.user_id}`
     const headers: Record<string, string> = {}
     if (token) headers['Authorization'] = `Bearer ${token}`
-    fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/venues/${initialVenue.user_id}`, { headers })
+    fetch(url, { headers })
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data && !cancelled) setVenue(prev => ({ ...prev, ...data })) })
       .catch(() => {})
@@ -190,9 +186,16 @@ function VenueCard({
     return () => { cancelled = true }
   }, [venue.cover_photo_id, venue.logo_id, venue.cover_photo, venue.logo])
 
-  const handleSave = () => {
-    const nowSaved = toggleSavedVenue(venue.user_id)
+  const handleSave = async () => {
+    if (!token) return
+    const nowSaved = !saved
     setSaved(nowSaved)
+    try {
+      if (nowSaved) await addFavoriteVenue(venue.user_id, token)
+      else await removeFavoriteVenue(venue.user_id, token)
+    } catch {
+      setSaved(!nowSaved)
+    }
   }
 
   return (
@@ -330,10 +333,14 @@ export function SpacesCatalogPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [sentApplications, setSentApplications] = useState<Application[]>([])
   const [proposeVenue, setProposeVenue] = useState<VenueListItem | null>(null)
+  const [savedVenueIds, setSavedVenueIds] = useState<number[]>([])
 
   useEffect(() => {
     setIsLoading(true)
-    fetchVenues(token, LIMIT, offset)
+    const fetcher = token
+      ? fetchVenues(token, LIMIT, offset)
+      : fetchPublicVenues(LIMIT, offset)
+    fetcher
       .then(res => {
         setVenues(res.data ?? [])
         setTotal(res.total ?? 0)
@@ -347,6 +354,7 @@ export function SpacesCatalogPage() {
     fetchEvents({ creator_id: user.id, is_active: true }, token).then(setMyEvents).catch(() => {})
     fetchCategories(token).then(setCategories).catch(() => {})
     fetchApplications({ role: 'sender', limit: 100 }, token).then(setSentApplications).catch(() => {})
+    fetchFavoriteVenues(token).then(list => setSavedVenueIds(list.map(v => v.user_id))).catch(() => {})
   }, [isCreator, user?.id, token])
 
   const handlePropose = useCallback((venue: VenueListItem) => {
@@ -377,14 +385,12 @@ export function SpacesCatalogPage() {
         {isLoading ? (
           <div className="spacesCatalog__loading">Загрузка...</div>
         ) : venues.length === 0 ? (
-          <div className="spacesCatalog__empty">
-            {!token ? 'Войдите в аккаунт, чтобы увидеть доступные пространства' : 'Пространства не найдены'}
-          </div>
+          <div className="spacesCatalog__empty">Пространства не найдены</div>
         ) : (
           <>
             <div className="spacesCatalog__grid">
               {beforeBanner.map(venue => (
-                <VenueCard key={venue.id} venue={venue} token={token} isCreator={isCreator} onPropose={handlePropose} onNavigate={handleNavigateToVenue} />
+                <VenueCard key={venue.id} venue={venue} token={token} isCreator={isCreator} initialSaved={savedVenueIds.includes(venue.user_id)} onPropose={handlePropose} onNavigate={handleNavigateToVenue} />
               ))}
             </div>
 
@@ -399,7 +405,7 @@ export function SpacesCatalogPage() {
             {afterBanner.length > 0 && (
               <div className="spacesCatalog__grid spacesCatalog__grid--after">
                 {afterBanner.map(venue => (
-                  <VenueCard key={venue.id} venue={venue} token={token} isCreator={isCreator} onPropose={handlePropose} onNavigate={handleNavigateToVenue} />
+                  <VenueCard key={venue.id} venue={venue} token={token} isCreator={isCreator} initialSaved={savedVenueIds.includes(venue.user_id)} onPropose={handlePropose} onNavigate={handleNavigateToVenue} />
                 ))}
               </div>
             )}
