@@ -20,7 +20,7 @@ export function CreateEventPage() {
   const [categories, setCategories] = useState<Category[]>([])
 
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
-  const [coverPhotoId, setCoverPhotoId] = useState<number | null>(null)
+  const [coverPhotoId, setCoverPhotoId] = useState<string | null>(null)
   const [uploadingCover, setUploadingCover] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 

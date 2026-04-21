@@ -21,7 +21,7 @@ import iconDzen     from '../../assets/icons/space_sign_up4/Vector(5).png'
 
 
 function PhotoThumb({ imageId, isOwner, photoRecordId, onDelete }: {
-  imageId: number
+  imageId: string
   isOwner?: boolean
   photoRecordId?: number
   onDelete?: (id: number) => void
@@ -84,7 +84,7 @@ function CompletedEventCard({ event, categories, isOwner, onDelete }: {
 }
 
 
-function EventThumb({ eventId }: { eventId?: number }) {
+function EventThumb({ eventId }: { eventId?: string }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!eventId) return
@@ -256,7 +256,7 @@ function SocialBadge({ href, label, type }: { href: string; label: string; type:
 }
 
 
-async function addVenuePhoto(imageId: number, token: string): Promise<VenuePhoto> {
+async function addVenuePhoto(imageId: string, token: string): Promise<VenuePhoto> {
   const response = await fetch(`${import.meta.env.VITE_API_URL ?? ''}/api/user/users/venues/photos`, {
     method: 'POST',
     headers: {

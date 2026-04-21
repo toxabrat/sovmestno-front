@@ -36,7 +36,7 @@ export function CreatorFinalPage() {
   const [storedPhone, setStoredPhone] = useState(data.phone || '')
   const [storedWorkEmail, setStoredWorkEmail] = useState(data.workEmail || '')
   const [storedTgPersonal, setStoredTgPersonal] = useState(data.telegramPersonal || '')
-  const [storedPhotoId, setStoredPhotoId] = useState<number | null>(data.photoId)
+  const [storedPhotoId, setStoredPhotoId] = useState<string | null>(data.photoId)
 
   const [isLoading, setIsLoading] = useState(false)
   const [backendError, setBackendError] = useState<string | null>(null)

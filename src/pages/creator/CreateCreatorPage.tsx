@@ -32,7 +32,7 @@ export function CreateCreatorPage() {
 
   const [photoFile, setPhotoFile] = useState<File | null>(data.photoFile || null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(data.photoPreview || null)
-  const [existingPhotoId, setExistingPhotoId] = useState<number | null>(data.photoId)
+  const [existingPhotoId, setExistingPhotoId] = useState<string | null>(data.photoId)
 
   const [existingTgChannel, setExistingTgChannel] = useState('')
   const [existingVk, setExistingVk] = useState('')
@@ -121,7 +121,7 @@ export function CreateCreatorPage() {
     setBackendError(null)
 
     try {
-      let photoId: number | null = isEditMode ? existingPhotoId : null
+      let photoId: string | null = isEditMode ? existingPhotoId : null
 
       if (photoFile) {
         const uploadResponse = await uploadImage(photoFile, 'avatar', activeToken)

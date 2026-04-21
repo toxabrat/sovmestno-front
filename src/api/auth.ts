@@ -2,7 +2,7 @@ export const API_BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api`
 
 import { fetchWithAuth } from './apiClient'
 
-export async function fetchImageUrl(imageId: number): Promise<string> {
+export async function fetchImageUrl(imageId: string): Promise<string> {
   const url = `${API_BASE_URL}/user/users/images/${imageId}`
   const response = await fetchWithAuth(url, {
     headers: {
@@ -29,8 +29,8 @@ export interface AuthUser {
   id: number
   email: string
   role: string
-  avatar_id?: number
-  avatar?: { id: number; file_path: string }
+  avatar_id?: string
+  avatar?: { id: string; file_path: string }
   created_at: string
   updated_at: string
   creator?: {
@@ -39,14 +39,14 @@ export interface AuthUser {
     description: string
     phone: string
     work_email: string
-    photo_id?: number
-    photo?: { id: number; file_path: string }
+    photo_id?: string
+    photo?: { id: string; file_path: string }
   }
   venue?: {
     id: number
     name: string
-    logo?: { id: number; file_path: string }
-    logo_id?: number
+    logo?: { id: string; file_path: string }
+    logo_id?: string
   }
 }
 
@@ -129,7 +129,7 @@ export interface UploadImageResponse {
   file_name: string
   file_path: string
   file_type: string
-  id: number
+  id: string
   image_type: string
 }
 
@@ -170,7 +170,7 @@ export interface UpdateCreatorRequest {
   description?: string
   phone?: string
   work_email?: string
-  photo_id?: number
+  photo_id?: string
   tg_personal_link?: string
   tg_channel_link?: string
   vk_link?: string
@@ -186,7 +186,7 @@ export interface UpdateCreatorResponse {
   description: string
   phone: string
   work_email: string
-  photo_id: number
+  photo_id: string
   tg_personal_link: string
   tg_channel_link: string
   vk_link: string
@@ -246,8 +246,8 @@ export interface RegisterVenueRequest {
   tiktok_link?: string
   youtube_link?: string
   dzen_link?: string
-  logo_id?: number
-  cover_photo_id?: number
+  logo_id?: string
+  cover_photo_id?: string
   category_ids?: number[]
 }
 
@@ -294,8 +294,8 @@ export interface UpdateVenueRequest {
   tiktok_link?: string
   youtube_link?: string
   dzen_link?: string
-  logo_id?: number
-  cover_photo_id?: number
+  logo_id?: string
+  cover_photo_id?: string
   category_ids?: number[]
 }
 
@@ -307,8 +307,8 @@ export interface UpdateVenueResponse {
   address: string
   phone: string
   work_email: string
-  logo_id: number
-  cover_photo_id: number
+  logo_id: string
+  cover_photo_id: string
   tg_personal_link: string
   tg_channel_link: string
   vk_link: string
@@ -328,11 +328,11 @@ export interface VenueListItem {
   street_address?: string
   phone?: string
   work_email?: string
-  logo_id?: number
-  cover_photo_id?: number
+  logo_id?: string
+  cover_photo_id?: string
   category_ids?: number[]
-  logo?: { id: number; file_path: string }
-  cover_photo?: { id: number; file_path: string }
+  logo?: { id: string; file_path: string }
+  cover_photo?: { id: string; file_path: string }
   tg_personal_link?: string
   tg_channel_link?: string
   vk_link?: string
@@ -384,9 +384,9 @@ export async function fetchVenues(
 export interface VenuePhoto {
   id: number
   venue_id: number
-  image_id: number
+  image_id: string
   image: {
-    id: number
+    id: string
     file_path: string
     bucket_name: string
   }
@@ -407,11 +407,11 @@ export interface VenueProfile {
   tiktok_link?: string
   youtube_link?: string
   dzen_link?: string
-  logo_id?: number
-  cover_photo_id?: number
+  logo_id?: string
+  cover_photo_id?: string
   category_ids?: number[]
-  logo?: { id: number; file_path: string; bucket_name: string }
-  cover_photo?: { id: number; file_path: string; bucket_name: string }
+  logo?: { id: string; file_path: string; bucket_name: string }
+  cover_photo?: { id: string; file_path: string; bucket_name: string }
   photos?: VenuePhoto[]
   created_at: string
   updated_at: string
@@ -420,8 +420,8 @@ export interface VenueProfile {
 export interface CreatorPhotoItem {
   id: number
   creator_id: number
-  image_id: number
-  image: { id: number; file_path: string; bucket_name: string }
+  image_id: string
+  image: { id: string; file_path: string; bucket_name: string }
 }
 
 export interface CreatorProfile {
@@ -431,8 +431,8 @@ export interface CreatorProfile {
   description?: string
   phone?: string
   work_email?: string
-  photo_id?: number
-  photo?: { id: number; file_path: string; bucket_name: string }
+  photo_id?: string
+  photo?: { id: string; file_path: string; bucket_name: string }
   photos?: CreatorPhotoItem[]
   tg_personal_link?: string
   tg_channel_link?: string
@@ -461,8 +461,8 @@ export interface CreatorListItem {
   user_id: number
   name: string
   description?: string
-  photo_id?: number
-  photo?: { id: number; file_path: string; bucket_name?: string }
+  photo_id?: string
+  photo?: { id: string; file_path: string; bucket_name?: string }
   created_at: string
   updated_at: string
 }
@@ -513,12 +513,12 @@ export interface UserProfile {
     user_id: number
     name: string
     description?: string
-    photo_id?: number
-    photo?: { id: number; file_path: string; bucket_name: string }
+    photo_id?: string
+    photo?: { id: string; file_path: string; bucket_name: string }
     phone?: string
     work_email?: string
-    logo_id?: number
-    logo?: { id: number; file_path: string; bucket_name: string }
+    logo_id?: string
+    logo?: { id: string; file_path: string; bucket_name: string }
   }
 }
 
@@ -586,7 +586,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshT
   return data
 }
 
-export async function addVenuePhoto(imageId: number, token: string): Promise<VenuePhoto> {
+export async function addVenuePhoto(imageId: string, token: string): Promise<VenuePhoto> {
   const response = await fetch(`${API_BASE_URL}/user/users/venues/photos`, {
     method: 'POST',
     headers: {
@@ -601,7 +601,7 @@ export async function addVenuePhoto(imageId: number, token: string): Promise<Ven
   return data
 }
 
-export async function addCreatorPhoto(imageId: number, token: string): Promise<CreatorPhotoItem> {
+export async function addCreatorPhoto(imageId: string, token: string): Promise<CreatorPhotoItem> {
   const response = await fetch(`${API_BASE_URL}/user/users/creators/photos`, {
     method: 'POST',
     headers: {

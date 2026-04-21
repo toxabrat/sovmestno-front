@@ -16,10 +16,10 @@ interface SpaceRegistrationData {
   telegramPersonal: string
   logoFile: File | null
   logoPreview: string | null
-  logoId: number | null
+  logoId: string | null
   coverFile: File | null
   coverPreview: string | null
-  coverId: number | null
+  coverId: string | null
   telegramChannel: string
   vkLink: string
   tiktokLink: string

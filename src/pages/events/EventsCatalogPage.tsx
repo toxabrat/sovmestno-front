@@ -14,12 +14,12 @@ import heroBannerBg from '../../assets/icons/event_catalog/Frame 2131328071.png'
 import midBannerBg from '../../assets/icons/event_catalog/Frame 2131328266.png'
 import iconFire from '../../assets/icons/event_catalog/A_Button(small).png'
 
-const creatorCache: Record<number, { name: string; avatarId?: number }> = {}
+const creatorCache: Record<number, { name: string; avatarId?: string }> = {}
 
 async function getCreatorInfo(
   creatorId: number,
   token: string | null,
-): Promise<{ name: string; avatarId?: number }> {
+): Promise<{ name: string; avatarId?: string }> {
   if (creatorCache[creatorId]) return creatorCache[creatorId]
   try {
     const base = import.meta.env.VITE_API_URL ?? ''

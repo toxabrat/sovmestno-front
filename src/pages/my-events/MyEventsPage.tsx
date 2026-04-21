@@ -483,7 +483,7 @@ function SavedVenueCard({ venue, onRemove, onPropose }: {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    const logoId = venue.logo_id ?? (venue.logo as { id?: number } | undefined)?.id
+    const logoId = venue.logo_id ?? (venue.logo as { id?: string } | undefined)?.id
     if (logoId) fetchImageUrl(logoId).then(setLogoUrl).catch(() => {})
   }, [venue])
 
@@ -571,7 +571,7 @@ function SavedEventCard({ ev, token, isInvited, onRemove, onInvite }: {
   )
 }
 
-function ProposeEventThumb({ imageId }: { imageId?: number }) {
+function ProposeEventThumb({ imageId }: { imageId?: string }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!imageId) return

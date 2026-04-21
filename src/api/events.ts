@@ -13,7 +13,7 @@ export interface Event {
   creator_id: number
   title: string
   description: string
-  cover_photo_id?: number
+  cover_photo_id?: string
   category_ids?: number[]
   is_active: boolean
   is_completed: boolean
@@ -24,14 +24,14 @@ export interface Event {
 export interface CreateEventRequest {
   title: string
   description?: string
-  cover_photo_id?: number
+  cover_photo_id?: string
   category_ids?: number[]
 }
 
 export interface UpdateEventRequest {
   title?: string
   description?: string
-  cover_photo_id?: number
+  cover_photo_id?: string
   category_ids?: number[]
 }
 

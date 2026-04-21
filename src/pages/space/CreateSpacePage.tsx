@@ -35,8 +35,8 @@ export function CreateSpacePage() {
   const [coverFile, setCoverFile] = useState<File | null>(data.coverFile || null)
   const [coverPreview, setCoverPreview] = useState<string | null>(data.coverPreview || null)
 
-  const [existingLogoId, setExistingLogoId] = useState<number | null>(data.logoId)
-  const [existingCoverId, setExistingCoverId] = useState<number | null>(data.coverId)
+  const [existingLogoId, setExistingLogoId] = useState<string | null>(data.logoId)
+  const [existingCoverId, setExistingCoverId] = useState<string | null>(data.coverId)
 
   const [existingTgChannel, setExistingTgChannel] = useState('')
   const [existingVk, setExistingVk] = useState('')
@@ -153,8 +153,8 @@ export function CreateSpacePage() {
     try {
       const address = [city, street].filter(Boolean).join(', ')
 
-      let logoId: number | null = existingLogoId
-      let coverId: number | null = existingCoverId
+      let logoId: string | null = existingLogoId
+      let coverId: string | null = existingCoverId
 
       if (logoFile) {
         const res = await uploadImage(logoFile, 'venue-logo', authToken)
@@ -229,8 +229,8 @@ export function CreateSpacePage() {
         venueId = response.user.venue?.id ?? null
       }
 
-      let logoId: number | null = existingLogoId
-      let coverId: number | null = existingCoverId
+      let logoId: string | null = existingLogoId
+      let coverId: string | null = existingCoverId
 
       if (logoFile) {
         const res = await uploadImage(logoFile, 'venue-logo', token!)

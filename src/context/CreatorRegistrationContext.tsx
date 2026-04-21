@@ -14,7 +14,7 @@ interface CreatorRegistrationData {
   telegramPersonal: string
   photoFile: File | null
   photoPreview: string | null
-  photoId: number | null
+  photoId: string | null
   telegramChannel: string
   vkLink: string
   tiktokLink: string

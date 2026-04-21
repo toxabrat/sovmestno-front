@@ -128,7 +128,7 @@ function ProposeModal({
   )
 }
 
-function EventThumb({ eventId }: { eventId?: number }) {
+function EventThumb({ eventId }: { eventId?: string }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     if (!eventId) return
@@ -179,8 +179,8 @@ function VenueCard({
 
   useEffect(() => {
     let cancelled = false
-    const coverId = venue.cover_photo_id ?? (venue.cover_photo as { id?: number } | undefined)?.id
-    const logoId = venue.logo_id ?? (venue.logo as { id?: number } | undefined)?.id
+    const coverId = venue.cover_photo_id ?? (venue.cover_photo as { id?: string } | undefined)?.id
+    const logoId = venue.logo_id ?? (venue.logo as { id?: string } | undefined)?.id
     if (coverId) fetchImageUrl(coverId).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
     if (logoId) fetchImageUrl(logoId).then(u => { if (!cancelled) setLogoUrl(u) }).catch(() => {})
     return () => { cancelled = true }
@@ -277,7 +277,7 @@ function HeroBanner({ featuredVenue, onNavigate }: { featuredVenue: VenueListIte
   useEffect(() => {
     if (!featuredVenue) return
     let cancelled = false
-    const coverId = featuredVenue.cover_photo_id ?? (featuredVenue.cover_photo as { id?: number } | undefined)?.id
+    const coverId = featuredVenue.cover_photo_id ?? (featuredVenue.cover_photo as { id?: string } | undefined)?.id
     if (coverId) fetchImageUrl(coverId).then(u => { if (!cancelled) setCoverUrl(u) }).catch(() => {})
     return () => { cancelled = true }
   }, [featuredVenue])

@@ -48,8 +48,8 @@ export function SpaceFinalPage() {
   const [storedPhone, setStoredPhone] = useState(data.phone || '')
   const [storedWorkEmail, setStoredWorkEmail] = useState(data.workEmail || '')
   const [storedTgPersonal, setStoredTgPersonal] = useState(data.telegramPersonal || '')
-  const [storedLogoId, setStoredLogoId] = useState<number | null>(data.logoId)
-  const [storedCoverId, setStoredCoverId] = useState<number | null>(data.coverId)
+  const [storedLogoId, setStoredLogoId] = useState<string | null>(data.logoId)
+  const [storedCoverId, setStoredCoverId] = useState<string | null>(data.coverId)
 
   useEffect(() => {
     fetchCategories(activeToken).then(setCategories).catch(() => {})
