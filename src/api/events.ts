@@ -166,6 +166,14 @@ export async function fetchPublicEvents(params?: FetchEventsParams): Promise<Eve
   return (raw as { events?: Event[]; data?: Event[] }).events ?? (raw as { data?: Event[] }).data ?? []
 }
 
+export async function fetchEventsBatch(ids: number[], token?: string | null): Promise<Event[]> {
+  if (ids.length === 0) return []
+  const url = `${EVENT_API_BASE}/events/batch?ids=${ids.join(',')}`
+  const raw = await request<Event[] | { events?: Event[]; data?: Event[] }>(url, { method: 'GET' }, token)
+  if (Array.isArray(raw)) return raw
+  return (raw as { events?: Event[]; data?: Event[] }).events ?? (raw as { data?: Event[] }).data ?? []
+}
+
 export async function fetchFavoriteEvents(token: string): Promise<Event[]> {
   return request<Event[]>(`${EVENT_API_BASE}/events/favorites`, {}, token).catch(() => [])
 }

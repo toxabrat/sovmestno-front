@@ -192,3 +192,16 @@ export async function fetchCollaborationPartners(
   if (Array.isArray(raw)) return raw
   return (raw as { data?: number[] }).data ?? []
 }
+
+export async function fetchCompletedEventIds(
+  userId: number,
+  token: string,
+): Promise<number[]> {
+  const raw = await request<Record<string, number[]>>(
+    `${APP_API_BASE}/collaborations/completed-events?user_id=${userId}`,
+    { method: 'GET' },
+    token,
+  )
+  const values = Object.values(raw)
+  return values.length > 0 ? (values[0] ?? []) : []
+}

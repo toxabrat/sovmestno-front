@@ -1,7 +1,7 @@
 .ccPage {
   width: 100%;
   background: #f7f7f9;
-  min-height: 100vh;
+  flex: 1;
   font-family: 'Golos Text', system-ui, -apple-system, sans-serif;
 }
 

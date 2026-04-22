@@ -421,3 +421,41 @@
   display: flex; align-items: flex-start; gap: 4px;
 }
 .cp__venueAddrPin { font-size: 11px; flex-shrink: 0; }
+
+.cp__lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: cp__lbFadeIn 150ms ease;
+}
+@keyframes cp__lbFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.cp__lightboxImg {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+
+.cp__photoThumb--clickable,
+.cp__avatarWrap--clickable,
+.cp__eventCover--clickable {
+  cursor: zoom-in;
+}
+.cp__photoThumb--clickable .cp__photoImg,
+.cp__eventCover--clickable .cp__eventCoverImg {
+  transition: opacity 120ms;
+}
+.cp__photoThumb--clickable:hover .cp__photoImg,
+.cp__eventCover--clickable:hover .cp__eventCoverImg {
+  opacity: 0.85;
+}

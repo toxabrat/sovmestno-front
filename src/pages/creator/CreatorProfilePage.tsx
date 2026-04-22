@@ -9,8 +9,8 @@ import {
   addCreatorPhoto,
   deleteCreatorPhoto,
 } from '../../api/auth'
-import { fetchEvents, fetchCategories, deleteEvent, fetchFavoriteEvents, addFavoriteEvent, removeFavoriteEvent } from '../../api/events'
-import { createApplication, fetchApplications } from '../../api/applications'
+import { fetchEvents, fetchEventsBatch, fetchCategories, deleteEvent, fetchFavoriteEvents, addFavoriteEvent, removeFavoriteEvent } from '../../api/events'
+import { createApplication, fetchApplications, fetchCompletedEventIds } from '../../api/applications'
 import type { Application } from '../../api/applications'
 import type { CreatorProfile, CreatorPhotoItem } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
@@ -43,12 +43,26 @@ function SocialBadge({ href, label, type }: { href: string; label: string; type:
   )
 }
 
+function Lightbox({ url, onClose }: { url: string; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+  return (
+    <div className="cp__lightbox" onClick={onClose}>
+      <img src={url} alt="" className="cp__lightboxImg" />
+    </div>
+  )
+}
+
 function PhotoItem({
-  item, isOwner, onDelete,
+  item, isOwner, onDelete, onImageClick,
 }: {
   item: CreatorPhotoItem
   isOwner: boolean
   onDelete: (id: number) => void
+  onImageClick: (url: string) => void
 }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
@@ -56,12 +70,15 @@ function PhotoItem({
   }, [item.image.id])
 
   return (
-    <div className="cp__photoThumb">
+    <div
+      className={`cp__photoThumb${url ? ' cp__photoThumb--clickable' : ''}`}
+      onClick={() => url && onImageClick(url)}
+    >
       {url
         ? <img src={url} alt="" className="cp__photoImg" />
         : <div className="cp__photoPlaceholder" />}
       {isOwner && (
-        <button type="button" className="cp__photoDelete" onClick={() => onDelete(item.id)}>
+        <button type="button" className="cp__photoDelete" onClick={e => { e.stopPropagation(); onDelete(item.id) }}>
           ×
         </button>
       )}
@@ -72,7 +89,7 @@ function PhotoItem({
 function EventCard({
   event, token, categories, isOwner, isVenueVisitor, creatorUserId,
   initialInviteSent, initialSaved,
-  onDelete, onPublish, onEdit,
+  onDelete, onPublish, onEdit, onImageClick,
 }: {
   event: Event
   token: string | null
@@ -85,6 +102,7 @@ function EventCard({
   onDelete?: (id: number) => void
   onPublish?: (id: number) => void
   onEdit?: (id: number) => void
+  onImageClick?: (url: string) => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [saved, setSaved] = useState(initialSaved ?? false)
@@ -123,7 +141,10 @@ function EventCard({
 
   return (
     <div className="cp__eventCard">
-      <div className="cp__eventCover">
+      <div
+        className={`cp__eventCover${coverUrl ? ' cp__eventCover--clickable' : ''}`}
+        onClick={() => coverUrl && onImageClick?.(coverUrl)}
+      >
         {coverUrl
           ? <img src={coverUrl} alt="" className="cp__eventCoverImg" />
           : <div className="cp__eventCoverPlaceholder" />}
@@ -258,6 +279,7 @@ export function CreatorProfilePage() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
   const [categories, setCategories] = useState<Category[]>([])
   const [activeEvents, setActiveEvents] = useState<Event[]>([])
@@ -307,8 +329,10 @@ export function CreatorProfilePage() {
     if (!targetUserId || !token) return
     fetchEvents({ creator_id: targetUserId, is_active: true }, token)
       .then(setActiveEvents).catch(() => {})
-    fetchEvents({ creator_id: targetUserId, is_completed: true }, token)
-      .then(setCompletedEvents).catch(() => {})
+    fetchCompletedEventIds(targetUserId, token)
+      .then(ids => fetchEventsBatch(ids, token))
+      .then(setCompletedEvents)
+      .catch(() => {})
   }, [targetUserId, token])
 
   useEffect(() => {
@@ -343,7 +367,7 @@ export function CreatorProfilePage() {
     if (!file || !token) return
     setUploadingPhoto(true)
     try {
-      const uploaded = await uploadImage(file, 'venue-photo', token)
+      const uploaded = await uploadImage(file, 'creator-photo', token)
       await addCreatorPhoto(uploaded.id, token)
       loadProfile()
     } catch {
@@ -396,7 +420,10 @@ export function CreatorProfilePage() {
 
         <div className="cp__layout">
           <div className="cp__card">
-            <div className="cp__avatarWrap">
+            <div
+              className={`cp__avatarWrap${photoUrl ? ' cp__avatarWrap--clickable' : ''}`}
+              onClick={() => photoUrl && setLightboxUrl(photoUrl)}
+            >
               <div className="cp__avatar">
                 {photoUrl
                   ? <img src={photoUrl} alt="" className="cp__avatarImg" />
@@ -453,7 +480,7 @@ export function CreatorProfilePage() {
                   isOwner={isOwner} isVenueVisitor={isVenueVisitor} creatorUserId={targetUserId}
                   initialSaved={savedEventIds.includes(ev.id)}
                   initialInviteSent={sentApplications.some(a => a.event_id === ev.id && a.receiver_id === targetUserId && a.receiver_type === 'creator')}
-                  onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
+                  onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} onImageClick={setLightboxUrl} />
               ))}
             </div>
           </div>
@@ -488,7 +515,7 @@ export function CreatorProfilePage() {
               <p className="cp__emptyMsg">Фотографий пока нет</p>
             )}
             {photos.map(item => (
-              <PhotoItem key={item.id} item={item} isOwner={isOwner} onDelete={handleDeletePhoto} />
+              <PhotoItem key={item.id} item={item} isOwner={isOwner} onDelete={handleDeletePhoto} onImageClick={setLightboxUrl} />
             ))}
           </div>
         </section>
@@ -507,7 +534,7 @@ export function CreatorProfilePage() {
                 {completedEvents.map(ev => (
                   <EventCard key={ev.id} event={ev} token={token} categories={categories}
                     isOwner={isOwner} isVenueVisitor={false} creatorUserId={targetUserId}
-                    onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} />
+                    onDelete={handleDeleteEvent} onPublish={handlePublishEvent} onEdit={handleEditEvent} onImageClick={setLightboxUrl} />
                 ))}
               </div>
             ) : (
@@ -532,6 +559,8 @@ export function CreatorProfilePage() {
       )}
 
       <Footer />
+
+      {lightboxUrl && <Lightbox url={lightboxUrl} onClose={() => setLightboxUrl(null)} />}
     </div>
   )
 }

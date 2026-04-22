@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { fetchVenueProfile, fetchPublicVenueProfile, fetchImageUrl, fetchVenues, fetchPublicVenues, uploadImage, fetchFavoriteVenues, addFavoriteVenue, removeFavoriteVenue } from '../../api/auth'
-import { fetchEvents, fetchCategories, deleteEvent } from '../../api/events'
+import { fetchEvents, fetchEventsBatch, fetchCategories } from '../../api/events'
 import type { VenueProfile, VenueListItem, VenuePhoto } from '../../api/auth'
 import type { Event, Category } from '../../api/events'
-import { createApplication, fetchApplications } from '../../api/applications'
+import { createApplication, fetchApplications, fetchCompletedEventIds } from '../../api/applications'
 import type { Application } from '../../api/applications'
 import { Footer } from '../../components/layout/Footer'
 import '../spaces/SpacesCatalogPage.css'
@@ -20,11 +20,25 @@ import iconYoutube  from '../../assets/icons/space_sign_up4/Vector(4).png'
 import iconDzen     from '../../assets/icons/space_sign_up4/Vector(5).png'
 
 
-function PhotoThumb({ imageId, isOwner, photoRecordId, onDelete }: {
+function VenueLightbox({ url, onClose }: { url: string; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+  return (
+    <div className="venueProfile__lightbox" onClick={onClose}>
+      <img src={url} alt="" className="venueProfile__lightboxImg" />
+    </div>
+  )
+}
+
+function PhotoThumb({ imageId, isOwner, photoRecordId, onDelete, onImageClick }: {
   imageId: string
   isOwner?: boolean
   photoRecordId?: number
   onDelete?: (id: number) => void
+  onImageClick?: (url: string) => void
 }) {
   const [url, setUrl] = useState<string | null>(null)
 
@@ -37,22 +51,26 @@ function PhotoThumb({ imageId, isOwner, photoRecordId, onDelete }: {
   }, [imageId])
 
   return (
-    <div className="venueProfile__photoThumb">
+    <div
+      className={`venueProfile__photoThumb${url ? ' venueProfile__photoThumb--clickable' : ''}`}
+      onClick={() => url && onImageClick?.(url)}
+    >
       {url
         ? <img src={url} alt="" className="venueProfile__photoImg" />
         : <div className="venueProfile__photoPlaceholder" />}
-      {isOwner && photoRecordId && (
-        <button type="button" className="venueProfile__photoDeleteBtn" onClick={() => onDelete?.(photoRecordId)}>×</button>
+      {isOwner && photoRecordId != null && (
+        <button type="button" className="venueProfile__photoDeleteBtn" onClick={e => { e.stopPropagation(); onDelete?.(photoRecordId) }}>×</button>
       )}
     </div>
   )
 }
 
-function CompletedEventCard({ event, categories, isOwner, onDelete }: {
+function CompletedEventCard({ event, categories, isOwner, onDelete, onImageClick }: {
   event: Event
   categories: Category[]
   isOwner: boolean
   onDelete?: (id: number) => void
+  onImageClick?: (url: string) => void
 }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const catName = categories.find(c => event.category_ids?.includes(c.id))?.name ?? ''
@@ -64,7 +82,10 @@ function CompletedEventCard({ event, categories, isOwner, onDelete }: {
 
   return (
     <div className="venueProfile__completedCard">
-      <div className="venueProfile__completedCover">
+      <div
+        className={`venueProfile__completedCover${coverUrl ? ' venueProfile__completedCover--clickable' : ''}`}
+        onClick={() => coverUrl && onImageClick?.(coverUrl)}
+      >
         {coverUrl
           ? <img src={coverUrl} alt="" className="venueProfile__completedCoverImg" />
           : <div className="venueProfile__completedCoverPlaceholder" />}
@@ -294,6 +315,7 @@ export function VenueProfilePage() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
   const [recommended, setRecommended] = useState<VenueListItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -350,8 +372,10 @@ export function VenueProfilePage() {
 
   useEffect(() => {
     if (!targetUserId || !token) return
-    fetchEvents({ creator_id: targetUserId, is_completed: true }, token)
-      .then(setCompletedEvents).catch(() => setCompletedEvents([]))
+    fetchCompletedEventIds(targetUserId, token)
+      .then(ids => fetchEventsBatch(ids, token))
+      .then(setCompletedEvents)
+      .catch(() => setCompletedEvents([]))
   }, [targetUserId, token])
 
   const handleAddPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -394,14 +418,6 @@ export function VenueProfilePage() {
     } catch {
       setIsSaved(!nowSaved)
     }
-  }
-
-  const handleDeleteEvent = async (id: number) => {
-    if (!token) return
-    try {
-      await deleteEvent(id, token)
-      setCompletedEvents(prev => prev.filter(e => e.id !== id))
-    } catch { /* */ }
   }
 
   const scrollLeft  = () => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })
@@ -447,7 +463,10 @@ export function VenueProfilePage() {
           <div className="venueProfile__main">
             <div className="venueProfile__card">
 
-              <div className="venueProfile__cover">
+              <div
+                className={`venueProfile__cover${coverUrl ? ' venueProfile__cover--clickable' : ''}`}
+                onClick={() => coverUrl && setLightboxUrl(coverUrl)}
+              >
                 {coverUrl
                   ? <img src={coverUrl} alt="" className="venueProfile__coverImg" />
                   : <div className="venueProfile__coverPlaceholder" />}
@@ -455,7 +474,10 @@ export function VenueProfilePage() {
 
               <div className="venueProfile__cardBody">
                 <div className="venueProfile__identity">
-                  <div className="venueProfile__logo">
+                  <div
+                    className={`venueProfile__logo${logoUrl ? ' venueProfile__logo--clickable' : ''}`}
+                    onClick={() => logoUrl && setLightboxUrl(logoUrl)}
+                  >
                     {logoUrl
                       ? <img src={logoUrl} alt="" className="venueProfile__logoImg" />
                       : <div className="venueProfile__logoPlaceholder" />}
@@ -558,7 +580,7 @@ export function VenueProfilePage() {
               </>
             )}
             {photoItems.map(p => (
-              <PhotoThumb key={p.id} imageId={p.image.id} isOwner={isOwner} photoRecordId={p.id} onDelete={handleDeletePhoto} />
+              <PhotoThumb key={p.id} imageId={p.image.id} isOwner={isOwner} photoRecordId={p.id} onDelete={handleDeletePhoto} onImageClick={setLightboxUrl} />
             ))}
             {photoItems.length === 0 && !isOwner && (
               <p className="venueProfile__emptyMsg">Фотографий пока нет</p>
@@ -580,7 +602,7 @@ export function VenueProfilePage() {
             {completedEvents.length > 0 ? (
               <div className="venueProfile__photosScroll" ref={completedScrollRef}>
                 {completedEvents.map(ev => (
-                  <CompletedEventCard key={ev.id} event={ev} categories={categories} isOwner={isOwner} onDelete={handleDeleteEvent} />
+                  <CompletedEventCard key={ev.id} event={ev} categories={categories} isOwner={false} onImageClick={setLightboxUrl} />
                 ))}
               </div>
             ) : (
@@ -616,6 +638,8 @@ export function VenueProfilePage() {
       )}
 
       <Footer />
+
+      {lightboxUrl && <VenueLightbox url={lightboxUrl} onClose={() => setLightboxUrl(null)} />}
     </div>
   )
 }

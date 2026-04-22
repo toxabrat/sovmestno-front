@@ -229,6 +229,18 @@ function VenueExpanded({ app, onAccept, onReject }: {
           </p>
         </div>
         <div className="me__contactRight">
+          {app.phone && (
+            <div className="me__contactRow">
+              <span className="me__contactLabel">Контактный телефон</span>
+              <a href={`tel:${app.phone}`} className="me__contactValue">{app.phone}</a>
+            </div>
+          )}
+          {app.email && (
+            <div className="me__contactRow">
+              <span className="me__contactLabel">Рабочая почта</span>
+              <a href={`mailto:${app.email}`} className="me__contactValue">{app.email}</a>
+            </div>
+          )}
           {app.telegram && (
             <div className="me__contactRow">
               <span className="me__contactLabel">Аккаунт в telegram</span>
@@ -441,35 +453,32 @@ function CreatorCollabCard({ item, onComplete, onCancel, onShare, onEdit, onRemo
   )
 }
 
-function VenueCollabCard({ item, onComplete, onCancel }: {
+function VenueCollabCard({ item }: {
   item: DisplayCollab
-  onComplete: (id: number) => void
-  onCancel: (id: number) => void
 }) {
   return (
     <div className="me__currentCard">
       <CollabHeader item={item} />
 
       <div className="me__currentContacts">
+        {item.phone ? (
+          <div className="me__currentContactItem">
+            <span className="me__contactLabel">Контактный телефон</span>
+            <a href={`tel:${item.phone}`} className="me__contactValue">{item.phone}</a>
+          </div>
+        ) : <div className="me__currentContactItem" />}
+        {item.email ? (
+          <div className="me__currentContactItem">
+            <span className="me__contactLabel">Рабочая почта</span>
+            <a href={`mailto:${item.email}`} className="me__contactValue">{item.email}</a>
+          </div>
+        ) : <div className="me__currentContactItem" />}
         {item.telegram ? (
           <div className="me__currentContactItem">
             <span className="me__contactLabel">Аккаунт в telegram</span>
             <a href={`https://t.me/${item.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="me__contactValue">{item.telegram}</a>
           </div>
-        ) : null}
-      </div>
-
-      <div className="me__currentFooter">
-        <div className="me__currentFooterLeft">
-          <h3 className="me__currentFooterTitle">Удалось провести мероприятие?</h3>
-          <p className="me__currentFooterDesc">
-            Отвечая «Мероприятие было проведено», вы подтверждаете завершение сотрудничества
-          </p>
-        </div>
-        <div className="me__currentFooterActions">
-          <button type="button" className="me__currentBtnOutline" onClick={() => onCancel(item.collaborationId)}>Не удалось</button>
-          <button type="button" className="me__currentBtnFilled" onClick={() => onComplete(item.collaborationId)}>Мероприятие было проведено</button>
-        </div>
+        ) : <div className="me__currentContactItem" />}
       </div>
     </div>
   )
@@ -1021,8 +1030,6 @@ export function MyEventsPage() {
                       <VenueCollabCard
                         key={c.id}
                         item={c}
-                        onComplete={handleComplete}
-                        onCancel={handleCancel}
                       />
                     ) : (
                       <CreatorCollabCard
