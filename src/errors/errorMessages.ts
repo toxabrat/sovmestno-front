@@ -1,11 +1,9 @@
 const ERROR_MESSAGES: Record<string, string> = {
-  // Глобальные
   UNAUTHORIZED: 'Необходима авторизация',
   INVALID_TOKEN: 'Токен недействителен или истёк',
   SERVICE_UNAVAILABLE: 'Сервис временно недоступен',
   INTERNAL_ERROR: 'Внутренняя ошибка сервера',
 
-  // Аутентификация
   FIELD_REQUIRED: 'Заполните все обязательные поля',
   INVALID_EMAIL: 'Некорректный формат email',
   PASSWORD_TOO_SHORT: 'Пароль должен быть не менее 8 символов',
@@ -19,7 +17,6 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_CREDENTIALS: 'Неверный email или пароль',
   INVALID_REFRESH_TOKEN: 'Сессия истекла, войдите заново',
 
-  // Профили
   PROFILE_NOT_FOUND: 'Профиль не найден',
   PROFILE_ALREADY_EXISTS: 'Профиль уже создан для этого аккаунта',
   CREATOR_NOT_FOUND: 'Креатор не найден',
@@ -27,19 +24,15 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_ID: 'Некорректный идентификатор',
   ACCESS_DENIED: 'Доступ запрещён',
 
-  // Загрузка файлов
   INVALID_FILE_TYPE: 'Недопустимый формат файла (разрешены: jpg, jpeg, png, gif, webp)',
   FILE_TOO_LARGE: 'Файл превышает допустимый размер 10 МБ',
   INVALID_IMAGE_TYPE: 'Недопустимый тип изображения',
   PHOTO_NOT_FOUND: 'Фото не найдено',
 
-  // Мероприятия
   EVENT_NOT_FOUND: 'Мероприятие не найдено',
 
-  // Категории
   CATEGORY_NOT_FOUND: 'Категория не найдена',
 
-  // Заявки
   INVALID_VALUE: 'Некорректное значение',
   CANNOT_APPLY_TO_SELF: 'Нельзя отправить заявку самому себе',
   DUPLICATE_APPLICATION: 'Заявка на это мероприятие уже отправлена',
@@ -47,7 +40,6 @@ const ERROR_MESSAGES: Record<string, string> = {
   APPLICATION_NOT_FOUND: 'Заявка не найдена',
   APPLICATION_ALREADY_PROCESSED: 'Заявка уже обработана',
 
-  // Коллаборации
   COLLABORATION_NOT_FOUND: 'Коллаборация не найдена',
   COLLABORATION_ALREADY_PROCESSED: 'Коллаборация уже завершена или отменена',
 }
