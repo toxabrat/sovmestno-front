@@ -40,9 +40,8 @@ async function getCreatorInfo(
 }
 
 
-function CreatorHighlight({ creator, categories }: {
+function CreatorHighlight({ creator }: {
   creator: CreatorListItem
-  categories: Category[]
 }) {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   useEffect(() => {
@@ -57,11 +56,6 @@ function CreatorHighlight({ creator, categories }: {
       </div>
       <div className="creatorHighlight__info">
         <span className="creatorHighlight__name">{creator.name}</span>
-        <div className="creatorHighlight__tags">
-          {categories.slice(0, 2).map(c => (
-            <span key={c.id} className="creatorHighlight__tag">◇ {c.name}</span>
-          ))}
-        </div>
       </div>
     </Link>
   )
@@ -135,65 +129,62 @@ function CatalogEventCard({ event, token, categories, isVenue, initialSaved, ini
   }
 
   return (
-    <div
-      className={`catalogCard ${!isVenue ? 'catalogCard--noPointer' : ''}`}
-      onClick={isVenue ? onClick : undefined}
-      role={isVenue ? 'button' : undefined}
-      tabIndex={isVenue ? 0 : undefined}
-    >
-      <div className="catalogCard__cover">
-        {coverUrl
-          ? <img src={coverUrl} alt={event.title} className="catalogCard__coverImg" />
-          : <div className="catalogCard__coverPlaceholder" />}
-      </div>
-      <div className="catalogCard__body">
-        <h3 className="catalogCard__title">{event.title}</h3>
-        {visibleCats.length > 0 && (
-          <div className="catalogCard__tags">
-            {visibleCats.map(c => (
-              <span key={c.id} className="catalogCard__tag">◇ {c.name}</span>
-            ))}
-            {hiddenCatCount > 0 && (
-              <span className="catalogCard__tagMore">и ещё {hiddenCatCount}</span>
-            )}
-          </div>
-        )}
-        {event.description && (
-          <p className="catalogCard__desc">{event.description}</p>
-        )}
-        {creatorName && (
-          <Link
-            to={`/creator/profile/${event.creator_id}`}
-            className="catalogCard__creator"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="catalogCard__creatorAvatar">
-              {creatorAvatarUrl
-                ? <img src={creatorAvatarUrl} alt="" className="catalogCard__creatorImg" />
-                : <div className="catalogCard__creatorPlaceholder" />}
+    <div className="catalogCardWrap" onClick={onClick} role="button" tabIndex={0}>
+      <div className="catalogCard">
+        <div className="catalogCard__cover">
+          {coverUrl
+            ? <img src={coverUrl} alt={event.title} className="catalogCard__coverImg" />
+            : <div className="catalogCard__coverPlaceholder" />}
+        </div>
+        <div className="catalogCard__body">
+          <h3 className="catalogCard__title">{event.title}</h3>
+          {visibleCats.length > 0 && (
+            <div className="catalogCard__tags">
+              {visibleCats.map(c => (
+                <span key={c.id} className="catalogCard__tag">{c.name}</span>
+              ))}
+              {hiddenCatCount > 0 && (
+                <span className="catalogCard__tagMore">и ещё {hiddenCatCount}</span>
+              )}
             </div>
-            <span className="catalogCard__creatorName">{creatorName}</span>
-          </Link>
-        )}
-        {isVenue && (
-          <div className="catalogCard__actions">
-            <button
-              type="button"
-              className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
-              onClick={handleSave}
+          )}
+          {event.description && (
+            <p className="catalogCard__desc">{event.description}</p>
+          )}
+          {creatorName && (
+            <Link
+              to={`/creator/profile/${event.creator_id}`}
+              className="catalogCard__creator"
+              onClick={e => e.stopPropagation()}
             >
-              {saved ? 'Отменить сохранение' : 'Сохранить'}
-            </button>
-            {inviteSent ? (
-              <span className="catalogCard__sentLabel">Заявка отправлена!</span>
-            ) : (
-              <button type="button" className="catalogCard__proposeBtn" disabled={sending} onClick={handleInvite}>
-                {sending ? 'Отправка...' : 'Пригласить провести'}
-              </button>
-            )}
-          </div>
-        )}
+              <div className="catalogCard__creatorAvatar">
+                {creatorAvatarUrl
+                  ? <img src={creatorAvatarUrl} alt="" className="catalogCard__creatorImg" />
+                  : <div className="catalogCard__creatorPlaceholder" />}
+              </div>
+              <span className="catalogCard__creatorName">{creatorName}</span>
+            </Link>
+          )}
+        </div>
       </div>
+      {isVenue && (
+        <div className="catalogCard__actions" onClick={e => e.stopPropagation()}>
+          <button
+            type="button"
+            className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
+            onClick={handleSave}
+          >
+            {saved ? 'Отменить сохранение' : 'Сохранить'}
+          </button>
+          {inviteSent ? (
+            <span className="catalogCard__sentLabel">Заявка отправлена!</span>
+          ) : (
+            <button type="button" className="catalogCard__proposeBtn" disabled={sending} onClick={handleInvite}>
+              {sending ? 'Отправка...' : 'Пригласить провести'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -236,7 +227,7 @@ function FeaturedEventCard({ event, token, categories }: {
       </div>
       <div className="featuredCard__body">
         <h3 className="featuredCard__title">{event.title}</h3>
-        {cat && <span className="featuredCard__tag">◇ {cat.name}</span>}
+        {cat && <span className="featuredCard__tag">{cat.name}</span>}
         {event.description && <p className="featuredCard__desc">{event.description}</p>}
         {creatorName && (
           <div className="featuredCard__creator">
@@ -278,10 +269,11 @@ function MidBannerRow({ event, token, categories, onScrollToCatalog }: {
   )
 }
 
-function EventModal({ event, token, categories, initialInviteSent, initialSaved, onClose }: {
+function EventModal({ event, token, categories, isVenue, initialInviteSent, initialSaved, onClose }: {
   event: Event
   token: string | null
   categories: Category[]
+  isVenue: boolean
   initialInviteSent?: boolean
   initialSaved?: boolean
   onClose: () => void
@@ -349,7 +341,7 @@ function EventModal({ event, token, categories, initialInviteSent, initialSaved,
             {modalCats.length > 0 && (
               <div className="catalogCard__tags">
                 {modalCats.slice(0, 3).map(c => (
-                  <span key={c.id} className="eventModal__tag">◇ {c.name}</span>
+                  <span key={c.id} className="eventModal__tag">{c.name}</span>
                 ))}
                 {modalCats.length > 3 && (
                   <span className="catalogCard__tagMore">и ещё {modalCats.length - 3}</span>
@@ -365,21 +357,23 @@ function EventModal({ event, token, categories, initialInviteSent, initialSaved,
                 <span>{creatorName}</span>
               </Link>
             )}
-            {sent ? (
-              <p className="eventModal__sent">Заявка отправлена!</p>
-            ) : (
-              <div className="eventModal__actions">
-                <button
-                  type="button"
-                  className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
-                  onClick={handleSave}
-                >
-                  {saved ? 'Отменить сохранение' : 'Сохранить'}
-                </button>
-                <button type="button" className="catalogCard__proposeBtn" disabled={sending} onClick={handleInvite}>
-                  {sending ? 'Отправка...' : 'Пригласить провести'}
-                </button>
-              </div>
+            {isVenue && (
+              sent ? (
+                <p className="eventModal__sent">Заявка отправлена!</p>
+              ) : (
+                <div className="eventModal__actions">
+                  <button
+                    type="button"
+                    className={`catalogCard__saveBtn ${saved ? 'catalogCard__saveBtn--saved' : ''}`}
+                    onClick={handleSave}
+                  >
+                    {saved ? 'Отменить сохранение' : 'Сохранить'}
+                  </button>
+                  <button type="button" className="catalogCard__proposeBtn" disabled={sending} onClick={handleInvite}>
+                    {sending ? 'Отправка...' : 'Пригласить провести'}
+                  </button>
+                </div>
+              )
             )}
           </div>
         </div>
@@ -492,7 +486,7 @@ export function EventsCatalogPage() {
             </div>
             <div className="eventsCatalog__creatorsRow">
               {creators.map(c => (
-                <CreatorHighlight key={c.id} creator={c} categories={categories} />
+                <CreatorHighlight key={c.id} creator={c} />
               ))}
             </div>
           </section>
@@ -561,11 +555,12 @@ export function EventsCatalogPage() {
         </section>
       </div>
 
-      {modalEvent && isVenue && (
+      {modalEvent && (
         <EventModal
           event={modalEvent}
           token={token}
           categories={categories}
+          isVenue={isVenue}
           initialSaved={savedEventIds.includes(modalEvent.id)}
           initialInviteSent={sentApplications.some(a => a.event_id === modalEvent.id && a.receiver_id === modalEvent.creator_id && a.receiver_type === 'creator')}
           onClose={() => setModalEvent(null)}

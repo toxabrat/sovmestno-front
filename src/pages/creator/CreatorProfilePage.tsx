@@ -249,10 +249,7 @@ function EventRecommendCard({ event, token, categories }: { event: Event; token:
         {creatorName && (
           <div
             className="cp__recEventCreator"
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate(`/creator/profile/${event.creator_id}`)}
-            onKeyDown={e => e.key === 'Enter' && navigate(`/creator/profile/${event.creator_id}`)}
+            onClick={e => { e.stopPropagation(); navigate(`/creator/profile/${event.creator_id}`) }}
           >
             <div className="cp__recEventCreatorAvatar">
               {creatorPhotoUrl

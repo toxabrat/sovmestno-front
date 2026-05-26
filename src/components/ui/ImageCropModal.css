@@ -1,0 +1,80 @@
+.cropOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.cropModal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cropModal__hint {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  text-align: center;
+}
+
+.cropModal__imgWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.cropModal__img {
+  max-width: 100%;
+  max-height: 55vh;
+  display: block;
+}
+
+.cropModal__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.cropModal__cancelBtn {
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 100px;
+  border: 1.5px solid #d0d0d0;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 120ms;
+}
+.cropModal__cancelBtn:hover { border-color: #888; }
+.cropModal__cancelBtn:disabled { opacity: 0.5; cursor: default; }
+
+.cropModal__confirmBtn {
+  height: 44px;
+  padding: 0 28px;
+  border-radius: 100px;
+  border: none;
+  background: #6c6ce5;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.cropModal__confirmBtn:hover { background: #5b5bd4; }
+.cropModal__confirmBtn:disabled { opacity: 0.5; cursor: default; }

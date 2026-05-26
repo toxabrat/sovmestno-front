@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { uploadImage, fetchImageUrl } from '../../api/auth'
 import { createEvent, updateEvent, publishEvent, fetchEventById, fetchCategories } from '../../api/events'
 import type { Category } from '../../api/events'
+import { ImageCropModal } from '../../components/ui/ImageCropModal'
+import backArrow from '../../assets/icons/Vector 2376.png'
 import './CreateEventPage.css'
 
 
@@ -22,6 +24,7 @@ export function CreateEventPage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [coverPhotoId, setCoverPhotoId] = useState<string | null>(null)
   const [uploadingCover, setUploadingCover] = useState(false)
+  const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [titleError, setTitleError] = useState<string | null>(null)
@@ -47,19 +50,27 @@ export function CreateEventPage() {
     }).catch(() => {})
   }, [editId, copyId, token])
 
-  const handleCoverSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !token) return
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => setCoverCropSrc(reader.result as string)
+    reader.readAsDataURL(file)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handleCoverCropConfirm = async (file: File, previewUrl: string) => {
+    setCoverCropSrc(null)
+    if (!token) return
+    setCoverPreview(previewUrl)
     setUploadingCover(true)
     try {
-      setCoverPreview(URL.createObjectURL(file))
       const img = await uploadImage(file, 'event-cover', token)
       setCoverPhotoId(img.id)
     } catch (err) {
       console.error('Cover upload failed:', err)
     } finally {
       setUploadingCover(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -115,7 +126,7 @@ export function CreateEventPage() {
       <div className="ce__inner">
         <header className="ce__header">
           <button type="button" className="ce__back" onClick={() => navigate(-1)} aria-label="Назад">
-            ←
+            <img src={backArrow} alt="Назад" />
           </button>
           <div>
             <h1 className="ce__title">
@@ -215,6 +226,15 @@ export function CreateEventPage() {
             {isPublishing ? 'Публикация...' : 'Опубликовать'}
           </button>
         </div>
+
+        {coverCropSrc && (
+          <ImageCropModal
+            src={coverCropSrc}
+            aspect={5 / 6}
+            onConfirm={handleCoverCropConfirm}
+            onCancel={() => setCoverCropSrc(null)}
+          />
+        )}
       </div>
     </div>
   )

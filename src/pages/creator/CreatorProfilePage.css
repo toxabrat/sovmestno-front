@@ -324,13 +324,13 @@
 
 .cp__recEventCard {
   background: #fff; border-radius: 18px; overflow: hidden;
-  display: flex; flex-direction: column;
-  transition: box-shadow 150ms;
+  display: flex; flex-direction: row;
+  height: 190px;
+  min-width: 0;
 }
-.cp__recEventCard:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
 
 .cp__recEventCover {
-  width: 100%; height: 180px; overflow: hidden; flex-shrink: 0;
+  width: 170px; min-width: 170px; overflow: hidden; flex-shrink: 0;
 }
 .cp__recEventCoverImg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cp__recEventCoverPlaceholder {
@@ -338,7 +338,7 @@
   background: linear-gradient(135deg, #e8e4f8 0%, #d5cef0 100%);
 }
 
-.cp__recEventBody { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.cp__recEventBody { padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 0; overflow: hidden; }
 .cp__recEventTitle { font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 0; }
 .cp__recEventTag {
   display: inline-flex; align-items: center; gap: 4px;
@@ -354,7 +354,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: auto;
+  padding-top: 8px;
   cursor: pointer;
   width: fit-content;
 }

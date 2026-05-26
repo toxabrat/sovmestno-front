@@ -214,7 +214,7 @@ export function Header() {
                   {appCount > 0 && (
                     <span className="header__myEventsBadge">+{appCount}</span>
                   )}
-                  Мои мероприятия
+                  Заявки
                 </button>
                 {user?.role === 'creator' && (
                   <button

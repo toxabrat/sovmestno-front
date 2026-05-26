@@ -76,16 +76,30 @@
   gap: 6px;
 }
 
-.heroBanner__venueIcon {
-  width: 28px;
-  height: 28px;
+.heroBanner__categoryTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 100px;
+  padding: 5px 14px 5px 7px;
   margin-bottom: 2px;
+  align-self: flex-start;
+  width: fit-content;
 }
 
-.heroBanner__tagIcon {
-  width: 28px;
-  height: 28px;
+.heroBanner__categoryTagIcon {
+  width: 24px;
+  height: 24px;
   object-fit: contain;
+  display: block;
+}
+
+.heroBanner__categoryTagLabel {
+  font-family: 'Golos Text', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #fff;
 }
 
 .heroBanner__bottom {
@@ -332,17 +346,136 @@
 }
 
 .spacesCatalog__categoryBanner {
-  border-radius: 20px;
-  overflow: hidden;
   min-height: 0;
 }
 
-.spacesCatalog__categoryBannerImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+/* ── Category banner ───────────────────────────────── */
+.categoryBanner {
   border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  min-height: 300px;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.categoryBanner__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 16px 16px 20px;
+  min-width: 0;
+}
+
+.categoryBanner__titleBox {
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  width: fit-content;
+}
+
+.categoryBanner__title {
+  font-family: 'Golos Text', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #93A1FF;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.categoryBanner__note {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+/* Pills column — fixed height so stack always overflows by half a pill top/bottom */
+/* stack = 4×60px + 80px + 4×10px = 360px; container = 300px → overflow = 30px = ½ of 60px */
+.categoryBanner__pillsOuter {
+  position: relative;
+  flex-shrink: 0;
+  align-self: center;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  margin-right: 92px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+}
+
+.categoryBanner__pills {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.categoryBanner__pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 100px;
+  color: #fff;
+  white-space: nowrap;
+  font-family: 'Golos Text', sans-serif;
+  font-weight: 400;
+}
+
+.categoryBanner__pill--sm {
+  padding: 12px 18px 12px 8px;
+  font-size: 30px;
+}
+
+.categoryBanner__pill--lg {
+  padding: 15px 22px 15px 10px;
+  font-size: 42px;
+}
+
+.categoryBanner__pillIcon--sm {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+.categoryBanner__pillIcon--lg {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 1100px) {
+  .categoryBanner__pillsOuter { margin-right: 24px; height: 240px; }
+  .categoryBanner__pill--sm { padding: 9px 14px 9px 6px; font-size: 22px; }
+  .categoryBanner__pill--lg { padding: 12px 18px 12px 8px; font-size: 32px; }
+  .categoryBanner__pillIcon--sm { width: 22px; height: 22px; }
+  .categoryBanner__pillIcon--lg { width: 28px; height: 28px; }
+}
+
+@media (max-width: 900px) {
+  .categoryBanner__pillsOuter { margin-right: 16px; height: 200px; }
+  .categoryBanner__pill--sm { padding: 7px 12px 7px 6px; font-size: 18px; }
+  .categoryBanner__pill--lg { padding: 10px 16px 10px 8px; font-size: 26px; }
+  .categoryBanner__pillIcon--sm { width: 18px; height: 18px; }
+  .categoryBanner__pillIcon--lg { width: 24px; height: 24px; }
 }
 
 .spacesCatalog__pagination {

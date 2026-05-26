@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import './Footer.css'
 
 import iconTelegram from '../../assets/icons/footer/Vector(9).png'
-import iconSocial from '../../assets/icons/footer/Vector(10).png'
 import iconStar from '../../assets/icons/footer/Vector(11).png'
 import logoText from '../../assets/icons/footer/СОВМЕСТНО(1).png'
 import { subscribeNewsletter } from '../../api/auth'
@@ -55,9 +54,6 @@ export function Footer() {
             <a href="https://t.me/+jkx2g8mkGB1iYzYy" target="_blank" rel="noopener noreferrer" className="footer__socialLink">
               <img src={iconTelegram} alt="Telegram" className="footer__socialIcon" />
             </a>
-            <a href="#" className="footer__socialLink">
-              <img src={iconSocial} alt="Социальные сети" className="footer__socialIcon" />
-            </a>
           </div>
           <p className="footer__email">Для вопросов и предложений: pochta@mail.com</p>
         </div>
@@ -66,7 +62,6 @@ export function Footer() {
           <Link to="/spaces" className="footer__navLink">Площадки</Link>
           <Link to="/events" className="footer__navLink">Мероприятия</Link>
           <Link to="/creators" className="footer__navLink">Креаторы</Link>
-          <Link to="/landing/space" className="footer__navLink">Кейсы</Link>
           <Link to="/landing/space" className="footer__navLink">О нас</Link>
         </div>
 

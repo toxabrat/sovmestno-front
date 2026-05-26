@@ -4,6 +4,7 @@ import { useSpaceRegistration } from '../../context/SpaceRegistrationContext'
 import { useAuth } from '../../context/AuthContext'
 import { uploadImage, registerVenue, updateVenueProfile, fetchVenueProfile, fetchImageUrl } from '../../api/auth'
 import { getBackendError } from '../../errors/errorMessages'
+import { ImageCropModal } from '../../components/ui/ImageCropModal'
 import './CreateSpacePage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -37,6 +38,8 @@ export function CreateSpacePage() {
 
   const [existingLogoId, setExistingLogoId] = useState<string | null>(data.logoId)
   const [existingCoverId, setExistingCoverId] = useState<string | null>(data.coverId)
+  const [logoCropSrc, setLogoCropSrc] = useState<string | null>(null)
+  const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null)
 
   const [existingTgChannel, setExistingTgChannel] = useState('')
   const [existingVk, setExistingVk] = useState('')
@@ -126,22 +129,32 @@ export function CreateSpacePage() {
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setLogoFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => setLogoPreview(reader.result as string)
-      reader.readAsDataURL(file)
-    }
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => setLogoCropSrc(reader.result as string)
+    reader.readAsDataURL(file)
+    if (logoInputRef.current) logoInputRef.current.value = ''
   }
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setCoverFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => setCoverPreview(reader.result as string)
-      reader.readAsDataURL(file)
-    }
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => setCoverCropSrc(reader.result as string)
+    reader.readAsDataURL(file)
+    if (coverInputRef.current) coverInputRef.current.value = ''
+  }
+
+  const handleLogoCropConfirm = (file: File, previewUrl: string) => {
+    setLogoFile(file)
+    setLogoPreview(previewUrl)
+    setLogoCropSrc(null)
+  }
+
+  const handleCoverCropConfirm = (file: File, previewUrl: string) => {
+    setCoverFile(file)
+    setCoverPreview(previewUrl)
+    setCoverCropSrc(null)
   }
 
   const handleSubmitEdit = async () => {
@@ -479,6 +492,24 @@ export function CreateSpacePage() {
           </div>
         </div>
       </div>
+
+      {logoCropSrc && (
+        <ImageCropModal
+          src={logoCropSrc}
+          aspect={1}
+          circularCrop
+          onConfirm={handleLogoCropConfirm}
+          onCancel={() => setLogoCropSrc(null)}
+        />
+      )}
+      {coverCropSrc && (
+        <ImageCropModal
+          src={coverCropSrc}
+          aspect={16 / 9}
+          onConfirm={handleCoverCropConfirm}
+          onCancel={() => setCoverCropSrc(null)}
+        />
+      )}
 
       {backendError && <p className="createSpace__backendError">{backendError}</p>}
 

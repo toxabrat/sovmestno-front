@@ -11,8 +11,12 @@ import { Footer } from '../../components/layout/Footer'
 import './SpacesCatalogPage.css'
 
 import heroBg from '../../assets/icons/space_catalog_new/Frame 2131328255.png'
-import categoryBanner from '../../assets/icons/space_catalog_new/Frame 2131328255(1).png'
-import iconVenueTag from '../../assets/icons/space_catalog_new/Frame 2131328054.png'
+import bannerBg from '../../assets/icons/space_catalog_new/Frame 2131328253.png'
+import iconUyutno from '../../assets/icons/space_catalog_new/Frame 2131328245.png'
+import icon454 from '../../assets/icons/space_catalog_new/Frame 21313282454.png'
+import icon453 from '../../assets/icons/space_catalog_new/Frame 21313282453.png'
+import icon451 from '../../assets/icons/space_catalog_new/Frame 21313282451.png'
+import icon452 from '../../assets/icons/space_catalog_new/Frame 21313282452.png'
 
 function PinIcon() {
   return (
@@ -246,6 +250,46 @@ function VenueCard({
   )
 }
 
+function CategoryBanner() {
+  return (
+    <div className="categoryBanner" style={{ backgroundImage: `url(${bannerBg})` }}>
+      <div className="categoryBanner__left">
+        <div className="categoryBanner__titleBox">
+          <h2 className="categoryBanner__title">
+            Отмечаем лучшие*<br />места в каждой категории
+          </h2>
+        </div>
+        <p className="categoryBanner__note">*по мнению редакции</p>
+      </div>
+
+      <div className="categoryBanner__pillsOuter">
+        <div className="categoryBanner__pills">
+          <div className="categoryBanner__pill categoryBanner__pill--sm">
+            <img src={icon454} alt="" className="categoryBanner__pillIcon--sm" />
+            <span>Весело</span>
+          </div>
+          <div className="categoryBanner__pill categoryBanner__pill--sm">
+            <img src={icon453} alt="" className="categoryBanner__pillIcon--sm" />
+            <span>Вкусно</span>
+          </div>
+          <div className="categoryBanner__pill categoryBanner__pill--lg">
+            <img src={iconUyutno} alt="" className="categoryBanner__pillIcon--lg" />
+            <span>Уютно</span>
+          </div>
+          <div className="categoryBanner__pill categoryBanner__pill--sm">
+            <img src={icon451} alt="" className="categoryBanner__pillIcon--sm" />
+            <span>Весело</span>
+          </div>
+          <div className="categoryBanner__pill categoryBanner__pill--sm">
+            <img src={icon452} alt="" className="categoryBanner__pillIcon--sm" />
+            <span>Вкусно</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CategoryBannerRow({
   venue,
   token,
@@ -262,7 +306,7 @@ function CategoryBannerRow({
   return (
     <div className="spacesCatalog__categoryRow">
       <div className="spacesCatalog__categoryBanner">
-        <img src={categoryBanner} alt="Отмечаем лучшие места в каждой категории" className="spacesCatalog__categoryBannerImg" />
+        <CategoryBanner />
       </div>
       {venue && (
         <VenueCard venue={venue} token={token} isCreator={isCreator} onPropose={onPropose} onNavigate={onNavigate} />
@@ -295,8 +339,9 @@ function HeroBanner({ featuredVenue, onNavigate }: { featuredVenue: VenueListIte
               ? <img src={coverUrl} alt={featuredVenue.name} className="heroBanner__coverImg" />
               : <div className="heroBanner__coverPlaceholder" />}
             <div className="heroBanner__overlay">
-              <div className="heroBanner__venueIcon">
-                <img src={iconVenueTag} alt="" className="heroBanner__tagIcon" />
+              <div className="heroBanner__categoryTag">
+                <img src={iconUyutno} alt="" className="heroBanner__categoryTagIcon" />
+                <span className="heroBanner__categoryTagLabel">Уютно</span>
               </div>
               <div className="heroBanner__bottom">
                 <div className="heroBanner__textBlock">

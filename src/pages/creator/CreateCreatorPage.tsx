@@ -4,6 +4,7 @@ import { useCreatorRegistration } from '../../context/CreatorRegistrationContext
 import { useAuth } from '../../context/AuthContext'
 import { uploadImage, updateCreatorProfile, fetchCreatorProfile, fetchImageUrl } from '../../api/auth'
 import { getBackendError } from '../../errors/errorMessages'
+import { ImageCropModal } from '../../components/ui/ImageCropModal'
 import './CreateCreatorPage.css'
 
 import plusIcon from '../../assets/icons/plus-icon.svg'
@@ -33,6 +34,7 @@ export function CreateCreatorPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(data.photoFile || null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(data.photoPreview || null)
   const [existingPhotoId, setExistingPhotoId] = useState<string | null>(data.photoId)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
 
   const [existingTgChannel, setExistingTgChannel] = useState('')
   const [existingVk, setExistingVk] = useState('')
@@ -98,16 +100,17 @@ export function CreateCreatorPage() {
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setPhotoFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => setCropSrc(reader.result as string)
+    reader.readAsDataURL(file)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
-      console.log('Selected photo:', file.name, file.type, file.size)
-    }
+  const handleCropConfirm = (file: File, previewUrl: string) => {
+    setPhotoFile(file)
+    setPhotoPreview(previewUrl)
+    setCropSrc(null)
   }
 
   const handleSubmit = async () => {
@@ -293,6 +296,16 @@ export function CreateCreatorPage() {
           </div>
         </div>
       </div>
+
+      {cropSrc && (
+        <ImageCropModal
+          src={cropSrc}
+          aspect={1}
+          circularCrop
+          onConfirm={handleCropConfirm}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
 
       {backendError && <p className="createCreator__backendError">{backendError}</p>}
 
