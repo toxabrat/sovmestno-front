@@ -462,7 +462,10 @@ export function EventsCatalogPage() {
           <img src={heroBannerBg} alt="" className="eventsCatalog__heroBannerImg" />
           <div className="eventsCatalog__heroBannerText">
             <h1 className="eventsCatalog__heroBannerTitle">Мероприятия под<br/>любой вайб и цели</h1>
-            <p className="eventsCatalog__heroBannerSub">Каталог готовых идей<br/>и желающих их реализовать</p>
+            <p className="eventsCatalog__heroBannerSub">
+              <span className="heroBannerSub__desktop">Каталог готовых идей<br/>и желающих их реализовать</span>
+              <span className="heroBannerSub__mobile">Каталог<br/>готовых идей<br/>и желающих их<br/>реализовать</span>
+            </p>
           </div>
         </div>
 

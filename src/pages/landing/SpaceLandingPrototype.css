@@ -555,3 +555,238 @@
   border-radius: 100px;
   display: block;
 }
+
+@media (max-width: 1100px) {
+  .slp__section--padded {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+
+  .slp__descGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .slp__urgentlyRow {
+    gap: 32px;
+  }
+
+  .slp__urgentlyImgWrap {
+    flex: 0 0 55%;
+  }
+
+  .slp__urgentlyImg {
+    width: 100%;
+    height: auto;
+  }
+
+  .slp__badge--count {
+    left: auto;
+    right: -20px;
+    bottom: 20px;
+  }
+
+  .slp__featuresGrid {
+    grid-template-columns: 360px 1fr;
+  }
+
+  .slp__featureImg--left {
+    height: 540px;
+  }
+
+  .slp__featureImg--top {
+    height: 260px;
+  }
+
+  .slp__featureImg--half {
+    height: 260px;
+  }
+
+  .slp__blogGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .slp__bigTitle {
+    font-size: 34px;
+  }
+
+  .slp__bodyText {
+    font-size: 20px;
+  }
+
+  .slp__medTitle {
+    font-size: 34px;
+  }
+
+  .slp__featuresTitle {
+    font-size: 44px;
+  }
+
+  .slp__arrow1Wrap {
+    margin-top: 60px;
+  }
+
+  .slp__arrow2Wrap {
+    margin: 8px 60px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .slp__section--padded {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .slp__heroWrap {
+    height: auto;
+    border-radius: 24px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .slp__heroCard {
+    padding: 64px 24px 40px;
+    gap: 20px;
+    border-radius: 24px;
+  }
+
+  .slp__heroBtn {
+    height: 48px;
+    font-size: 16px;
+    padding: 0 28px;
+  }
+
+  .slp__benefits {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .slp__benefitImg {
+    flex: 0 0 calc(50% - 5px);
+    width: calc(50% - 5px);
+  }
+
+  .slp__descSection {
+    padding-top: 32px;
+    padding-bottom: 40px;
+  }
+
+  .slp__descGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .slp__descRight {
+    gap: 20px;
+  }
+
+  .slp__bigTitle {
+    font-size: 26px;
+  }
+
+  .slp__bodyText {
+    font-size: 16px;
+  }
+
+  .slp__medTitle {
+    font-size: 24px;
+  }
+
+  .slp__mockupPill {
+    margin-left: 16px;
+  }
+
+  .slp__arrow1Wrap,
+  .slp__arrow2Wrap {
+    display: none;
+  }
+
+  .slp__urgentlySection {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+
+  .slp__urgentlyRow {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .slp__urgentlyImgWrap {
+    flex: none;
+    width: 100%;
+  }
+
+  .slp__urgentlyImg {
+    width: 100%;
+    height: auto;
+  }
+
+  .slp__badge {
+    display: none;
+  }
+
+  .slp__urgentlyRight {
+    padding-top: 0;
+  }
+
+  .slp__featuresSection {
+    padding-top: 32px;
+    padding-bottom: 40px;
+  }
+
+  .slp__featuresTitle {
+    font-size: 30px;
+    margin-bottom: 28px;
+  }
+
+  .slp__featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .slp__featureImg--left {
+    height: auto;
+  }
+
+  .slp__featureImg--top {
+    height: auto;
+  }
+
+  .slp__featureImg--half {
+    height: auto;
+  }
+
+  .slp__tag {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+
+  .slp__blogSection {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+
+  .slp__blogGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .slp__blogCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .slp__blogTags {
+    gap: 8px;
+  }
+
+  .slp__telegramOverlayBtn {
+    width: min(420px, 75%);
+    height: 52px;
+  }
+
+  .slp__ctaOverlayBtn {
+    width: min(300px, 75%);
+    height: 52px;
+  }
+}

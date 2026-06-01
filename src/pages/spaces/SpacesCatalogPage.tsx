@@ -330,6 +330,7 @@ function HeroBanner({ featuredVenue, onNavigate }: { featuredVenue: VenueListIte
     <div className="heroBanner">
       <div className="heroBanner__left">
         <img src={heroBg} alt="" className="heroBanner__bgImg" />
+        <span className="heroBanner__mobileCaption">Собираем лучшие места<br />для твоего ивента</span>
       </div>
 
       <div className="heroBanner__right">

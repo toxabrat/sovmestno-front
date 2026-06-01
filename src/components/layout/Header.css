@@ -317,28 +317,249 @@
   margin: 4px 0;
 }
 
-.header__mobile {
-  border-top: 1px solid #f1f5f9;
-  background: var(--card);
+/* ── Mobile drawer ── */
+
+.header__mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 299;
+  pointer-events: none;
+  transition: background 280ms ease;
 }
-.header__mobileInner {
-  margin: 0 auto;
-  max-width: 1440px;
-  padding: 12px 17px;
+.header__mobileBackdrop--visible {
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
 }
-.header__mobileNav {
+
+.header__mobileDrawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  max-width: 85vw;
+  height: 100dvh;
+  background: #fff;
+  z-index: 300;
+  transform: translateX(-100%);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.14);
+  pointer-events: none;
+  overflow-y: auto;
 }
-.header__mobileLink {
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 16px;
-  color: var(--text);
+.header__mobileDrawer--open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.header__mobileDrawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.header__mobileDrawerLogo {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand);
   text-decoration: none;
+  letter-spacing: 0.01em;
 }
-.header__mobileLink:hover {
-  background: #f8fafc;
+
+.header__mobileDrawerClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #f5f5f7;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 150ms ease;
+  flex-shrink: 0;
+}
+.header__mobileDrawerClose:hover {
+  background: #ebebed;
+}
+
+.header__mobileDrawerNav {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 6px;
+  flex-shrink: 0;
+}
+
+.header__mobileDrawerLink {
+  display: block;
+  padding: 12px 12px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #313235;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 100ms ease;
+}
+.header__mobileDrawerLink:hover {
+  background: #f5f5f7;
+}
+.header__mobileDrawerLink--active {
+  color: #6c7efe;
+  background: #f0f1ff;
+}
+
+.header__mobileDrawerDivider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 12px;
+  flex-shrink: 0;
+}
+
+.header__mobileDrawerSection {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.header__mobileDrawerAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #313235;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms ease;
+  font-family: "Golos Text", system-ui, sans-serif;
+}
+.header__mobileDrawerAction:hover {
+  background: #f5f5f7;
+}
+.header__mobileDrawerAction--lime {
+  background: #D8F772;
+  color: #1a1a1a;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+.header__mobileDrawerAction--lime:hover {
+  background: #cde968;
+}
+
+.header__mobileDrawerBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 100px;
+  background: #e0e2f8;
+  color: #4a4a8a;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.header__mobileDrawerFooter {
+  margin-top: auto;
+  padding: 8px 12px 32px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.header__mobileDrawerProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms ease;
+  font-family: "Golos Text", system-ui, sans-serif;
+}
+.header__mobileDrawerProfile:hover {
+  background: #f5f5f7;
+}
+
+.header__mobileDrawerAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #E8B06D;
+}
+.header__mobileDrawerAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.header__mobileDrawerAvatarPlaceholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #E8B06D 0%, #D4956A 100%);
+}
+
+.header__mobileDrawerProfileName {
+  font-size: 15px;
+  font-weight: 500;
+  color: #313235;
+}
+
+.header__mobileDrawerLogout {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #313235;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms ease, color 100ms ease;
+  font-family: "Golos Text", system-ui, sans-serif;
+}
+.header__mobileDrawerLogout:hover {
+  background: #fef2f2;
+  color: #e03030;
+}
+
+.header__mobileDrawerLogin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  background: #D8F772;
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: background 150ms ease;
+  font-family: "Golos Text", system-ui, sans-serif;
+}
+.header__mobileDrawerLogin:hover {
+  background: #cde968;
 }
 

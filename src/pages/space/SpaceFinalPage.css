@@ -5,6 +5,11 @@
   padding: 40px 80px 80px;
 }
 
+@media (max-width: 768px) {
+  .spaceFinal {
+    padding: 24px 20px 80px;
+  }
+}
 
 @media (max-width: 480px) {
   .spaceFinal {
@@ -18,6 +23,12 @@
   gap: 24px;
   margin-bottom: 40px;
   margin-left: -40px;
+}
+
+@media (max-width: 768px) {
+  .spaceFinal__header {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -109,12 +120,15 @@
   flex-wrap: nowrap;
   overflow-x: auto;
   padding-bottom: 4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .spaceFinal__photoBtn {
   width: 180px;
   height: 160px;
   min-width: 180px;
+  scroll-snap-align: start;
   background: var(--bg);
   border: 1.5px solid #E5E5E5;
   border-radius: 16px;
@@ -148,6 +162,7 @@
   width: 180px;
   height: 160px;
   min-width: 180px;
+  scroll-snap-align: start;
   border-radius: 16px;
   overflow: hidden;
   position: relative;
@@ -420,9 +435,16 @@
   gap: 12px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .spaceFinal__footer {
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .spaceFinal__skipBtn,
+  .spaceFinal__saveBtn {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -460,6 +482,15 @@
 
 .spaceFinal__saveBtn:hover {
   filter: brightness(0.95);
+}
+
+@media (max-width: 768px) {
+  .spaceFinal__photoBtn,
+  .spaceFinal__photoThumb {
+    width: calc(55vw - 20px);
+    min-width: calc(55vw - 20px);
+    height: 150px;
+  }
 }
 
 .spaceFinal__backendError {

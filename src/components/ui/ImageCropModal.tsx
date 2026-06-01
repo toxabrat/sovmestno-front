@@ -77,6 +77,14 @@ export function ImageCropModal({ src, aspect, circularCrop = false, onConfirm, o
       ? centerCrop(makeAspectCrop({ unit: '%', width: 80 }, aspect, width, height), width, height)
       : { unit: '%' as const, x: 10, y: 10, width: 80, height: 80 }
     setCrop(initial)
+    // Enable the confirm button immediately without requiring the user to drag the crop area
+    setCompletedCrop({
+      unit: 'px',
+      x: Math.round((initial.x / 100) * width),
+      y: Math.round((initial.y / 100) * height),
+      width: Math.round((initial.width / 100) * width),
+      height: Math.round((initial.height / 100) * height),
+    })
   }, [aspect])
 
   const handleConfirm = async () => {

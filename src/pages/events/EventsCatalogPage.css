@@ -230,6 +230,14 @@
   text-align: center;
 }
 
+/* hero banner subtitle – desktop/mobile variants */
+.heroBannerSub__desktop { display: inline; }
+.heroBannerSub__mobile  { display: none; }
+@media (max-width: 768px) {
+  .heroBannerSub__desktop { display: none; }
+  .heroBannerSub__mobile  { display: inline; }
+}
+
 .eventsCatalog__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -747,4 +755,37 @@
   color: #6c6ce5;
   padding-top: 8px;
   margin: 0;
+}
+
+/* ── Mobile overrides ── */
+@media (max-width: 768px) {
+  /* mid-banner: hide card on mobile, center text block */
+  .eventsMidBanner__right { display: none; }
+  .eventsMidBanner__icon  { display: none; }
+  .eventsMidBanner__left {
+    padding: 32px 24px 36px;
+    align-items: center;
+    text-align: center;
+  }
+  .eventsMidBanner__text {
+    font-size: 16px;
+    padding: 10px 16px;
+  }
+
+  /* catalog cards: vertical layout on mobile */
+  .catalogCard {
+    flex-direction: column;
+    height: auto;
+  }
+  .catalogCard__cover {
+    width: 100%;
+    height: 160px;
+    min-width: unset;
+  }
+  .catalogCard__body {
+    padding: 14px 16px 12px;
+  }
+  .catalogCard__desc {
+    -webkit-line-clamp: 2;
+  }
 }

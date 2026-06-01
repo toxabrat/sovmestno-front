@@ -51,9 +51,6 @@
   margin: 0;
   line-height: 1.1;
 }
-@media (max-width: 768px) {
-  .ccPage__bannerTitle { font-size: 26px; }
-}
 
 .ccPage__bannerDesc {
   font-size: 14px;
@@ -61,6 +58,19 @@
   line-height: 1.5;
   margin: 0;
   max-width: 400px;
+}
+
+@media (max-width: 768px) {
+  .ccPage__banner {
+    height: 200px;
+  }
+  .ccPage__bannerTitle { font-size: 24px; }
+  .ccPage__bannerOverlay { padding: 20px 22px; gap: 6px; }
+  .ccPage__bannerDesc {
+    font-size: 12px;
+    max-width: 260px;
+    line-height: 1.45;
+  }
 }
 
 .ccPage__search {

@@ -38,6 +38,7 @@ export function Header() {
 
   const handleLogout = async () => {
     setMenuOpen(false)
+    setIsOpen(false)
     if (refreshToken) await apiLogout(refreshToken)
     logout()
     navigate('/landing/space')
@@ -88,15 +89,8 @@ export function Header() {
   }, [token, isAuthenticated, avatarId])
 
   const handleAvatarClick = useCallback(() => {
-    if (avatarWrapRef.current) {
-      const rect = avatarWrapRef.current.getBoundingClientRect()
-      setDropdownPos({
-        top: rect.bottom - 52,
-        right: window.innerWidth - rect.right,
-      })
-    }
-    setMenuOpen(prev => !prev)
-  }, [])
+    navigate(profilePath)
+  }, [navigate, profilePath])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -109,6 +103,22 @@ export function Header() {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [menuOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const scrollY = window.scrollY
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      window.scrollTo(0, scrollY)
+    }
+  }, [isOpen])
 
   const nav = useMemo(
     () => [
@@ -167,6 +177,108 @@ export function Header() {
   return (
     <>
       {dropdown}
+
+      {/* Mobile drawer backdrop */}
+      <div
+        className={`header__mobileBackdrop ${isOpen ? 'header__mobileBackdrop--visible' : ''}`}
+        onClick={() => setIsOpen(false)}
+      />
+
+      {/* Mobile drawer */}
+      <div className={`header__mobileDrawer ${isOpen ? 'header__mobileDrawer--open' : ''}`}>
+        <div className="header__mobileDrawerHead">
+          <Link to="/" className="header__mobileDrawerLogo" onClick={() => setIsOpen(false)}>
+            СОВМЕСТНО
+          </Link>
+          <button
+            type="button"
+            className="header__mobileDrawerClose"
+            onClick={() => setIsOpen(false)}
+            aria-label="Закрыть меню"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 1L15 15M15 1L1 15" stroke="#313235" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <nav className="header__mobileDrawerNav">
+          {nav.map((i) => (
+            <NavLink
+              key={i.to}
+              to={i.to}
+              className={({ isActive }) =>
+                cx('header__mobileDrawerLink', isActive && 'header__mobileDrawerLink--active')
+              }
+              onClick={() => setIsOpen(false)}
+            >
+              {i.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        {isAuthenticated && (
+          <>
+            <div className="header__mobileDrawerDivider" />
+            <div className="header__mobileDrawerSection">
+              <button
+                type="button"
+                className="header__mobileDrawerAction"
+                onClick={() => { setIsOpen(false); navigate('/my-events') }}
+              >
+                <span>Заявки</span>
+                {appCount > 0 && (
+                  <span className="header__mobileDrawerBadge">+{appCount}</span>
+                )}
+              </button>
+              {user?.role === 'creator' && (
+                <button
+                  type="button"
+                  className="header__mobileDrawerAction header__mobileDrawerAction--lime"
+                  onClick={() => { setIsOpen(false); navigate('/events/create') }}
+                >
+                  Создать мероприятие
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="header__mobileDrawerFooter">
+          {isAuthenticated ? (
+            <>
+              <button
+                type="button"
+                className="header__mobileDrawerProfile"
+                onClick={() => { setIsOpen(false); navigate(profilePath) }}
+              >
+                <div className="header__mobileDrawerAvatar">
+                  {avatarUrl
+                    ? <img src={avatarUrl} alt="" className="header__mobileDrawerAvatarImg" />
+                    : <span className="header__mobileDrawerAvatarPlaceholder" />
+                  }
+                </div>
+                <span className="header__mobileDrawerProfileName">Моя страница</span>
+              </button>
+              <button
+                type="button"
+                className="header__mobileDrawerLogout"
+                onClick={handleLogout}
+              >
+                Выйти
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="header__mobileDrawerLogin"
+              onClick={() => setIsOpen(false)}
+            >
+              → ВОЙТИ
+            </Link>
+          )}
+        </div>
+      </div>
 
       <header className="header">
         <div className="header__inner">
@@ -247,27 +359,7 @@ export function Header() {
             )}
           </div>
         </div>
-
-        {isOpen && (
-          <div className="header__mobile">
-            <nav className="header__mobileInner">
-              <div className="header__mobileNav">
-                {nav.map((i) => (
-                  <NavLink
-                    key={i.to}
-                    to={i.to}
-                    className="header__mobileLink"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {i.label}
-                  </NavLink>
-                ))}
-              </div>
-            </nav>
-          </div>
-        )}
       </header>
     </>
   )
 }
-

@@ -13,7 +13,7 @@
 
 @media (max-width: 768px) {
   .createSpace {
-    padding: 24px 20px 40px;
+    padding: 24px 20px 80px;
   }
 }
 
@@ -29,6 +29,12 @@
   gap: 24px;
   margin-bottom: 32px;
   margin-left: -40px;
+}
+
+@media (max-width: 768px) {
+  .createSpace__header {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -155,12 +161,6 @@
   color: var(--text-muted);
 }
 
-@media (max-width: 480px) {
-  .createSpace__coverText {
-    font-size: 12px;
-    font-weight: 700;
-  }
-}
 
 .createSpace__profileBottom {
   display: flex;
@@ -278,12 +278,6 @@
   text-align: center;
 }
 
-@media (max-width: 480px) {
-  .createSpace__logoText {
-    font-size: 12px;
-    font-weight: 700;
-  }
-}
 
 .createSpace__info {
   flex: 1;
@@ -326,11 +320,6 @@
     padding: 22px 18px;
     border-radius: 15px;
   }
-  
-  .createSpace__about::placeholder {
-    font-size: 12px;
-    font-weight: 700;
-  }
 }
 
 .createSpace__aboutCounter {
@@ -349,6 +338,10 @@
 @media (max-width: 600px) {
   .createSpace__address {
     flex-direction: column;
+  }
+  .createSpace__streetInput {
+    flex: none;
+    width: 100%;
   }
 }
 
@@ -377,8 +370,7 @@
 
 @media (max-width: 480px) {
   .createSpace__citySelect {
-    height: 48px;
-    font-size: 12px;
+    height: 52px;
   }
 }
 
@@ -400,12 +392,7 @@
 
 @media (max-width: 480px) {
   .createSpace__streetInput {
-    height: 48px;
-  }
-  
-  .createSpace__streetInput::placeholder {
-    font-size: 12px;
-    font-weight: 700;
+    height: 52px;
   }
 }
 
@@ -504,19 +491,19 @@
   font-family: inherit;
   font-size: 16px;
   color: var(--text);
-  max-width: 368px;
 }
 
 @media (max-width: 768px) {
   .createSpace__contactInput {
     width: 100%;
     max-width: none;
+    flex: none;
   }
 }
 
 @media (max-width: 480px) {
   .createSpace__contactInput {
-    height: 48px;
+    height: 56px;
   }
 }
 

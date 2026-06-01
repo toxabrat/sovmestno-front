@@ -30,6 +30,7 @@ export function SpaceFinalPage() {
   const activeUserId = data.userId || authUser?.id || null
 
   const [photos, setPhotos] = useState<Array<{ preview: string; uploading: boolean }>>([])
+
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([])
   const [telegram, setTelegram] = useState(data.telegramChannel)
@@ -116,27 +117,22 @@ export function SpaceFinalPage() {
   }
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? [])
-    if (!files.length) return
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const previewUrl = URL.createObjectURL(file)
+    setPhotos(prev => [...prev, { preview: previewUrl, uploading: true }])
 
-    for (const file of files) {
-      const preview = URL.createObjectURL(file)
-      const idx = photos.length
-      setPhotos(prev => [...prev, { preview, uploading: true }])
-
-      if (activeToken) {
-        try {
-          const uploaded = await uploadImage(file, 'venue-photo', activeToken)
-          await addVenuePhoto(uploaded.id, activeToken)
-        } catch (err) {
-          console.error('Error uploading venue photo:', err)
-        }
+    if (activeToken) {
+      try {
+        const uploaded = await uploadImage(file, 'venue-photo', activeToken)
+        await addVenuePhoto(uploaded.id, activeToken)
+      } catch (err) {
+        console.error('Error uploading venue photo:', err)
       }
-
-      setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, uploading: false } : p))
     }
 
-    e.target.value = ''
+    setPhotos(prev => prev.map(p => p.preview === previewUrl ? { ...p, uploading: false } : p))
   }
 
   const handleSkip = () => {
@@ -221,7 +217,6 @@ export function SpaceFinalPage() {
         ref={photoInputRef}
         type="file"
         accept="image/jpeg,image/png,image/gif,image/webp"
-        multiple
         onChange={handlePhotoChange}
         style={{ display: 'none' }}
       />

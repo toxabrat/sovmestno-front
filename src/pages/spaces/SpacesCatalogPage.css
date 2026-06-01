@@ -30,6 +30,62 @@
     grid-template-columns: 1fr;
     height: auto;
   }
+  .heroBanner__left {
+    height: 130px;
+  }
+  .heroBanner__right {
+    height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroBanner {
+    height: auto;
+  }
+  .heroBanner__left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    background: #313235;
+  }
+  .heroBanner__bgImg {
+    display: none;
+  }
+  .heroBanner__right {
+    height: 220px;
+  }
+  .heroBanner__bottom {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .heroBanner__title {
+    font-size: 16px;
+  }
+  .heroBanner__btn {
+    padding: 0 12px;
+    font-size: 12px;
+    height: 36px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+.heroBanner__mobileCaption {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .heroBanner__mobileCaption {
+    display: block;
+    color: #D8F772;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.35;
+    padding: 0 20px;
+  }
 }
 
 .heroBanner__left {
@@ -128,9 +184,6 @@
   line-height: 1.2;
 }
 
-@media (max-width: 768px) {
-  .heroBanner__title { font-size: 18px; }
-}
 
 .heroBanner__desc {
   font-size: 13px;

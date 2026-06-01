@@ -576,3 +576,254 @@
   border-radius: 100px;
   display: block;
 }
+
+@media (max-width: 1100px) {
+  .clp__section--padded {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+
+  .clp__descGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .clp__descRight {
+    padding-top: 180px;
+  }
+
+  .clp__portfolioGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .clp__blogGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .clp__featureCardAcquaint {
+    width: 340px;
+  }
+
+  .clp__bigTitle {
+    font-size: 34px;
+  }
+
+  .clp__bodyText {
+    font-size: 20px;
+  }
+
+  .clp__centeredTitle {
+    font-size: 34px;
+  }
+
+  .clp__centeredBody {
+    font-size: 20px;
+  }
+
+  .clp__medTitle {
+    font-size: 34px;
+  }
+
+  .clp__faqTitle {
+    font-size: 34px;
+  }
+
+  .clp__faqTrigger {
+    font-size: 22px;
+  }
+
+  .clp__faqAnswer {
+    font-size: 20px;
+  }
+
+  .clp__portfolioCards {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .clp__section--padded {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .clp__heroWrap {
+    height: auto;
+    border-radius: 24px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .clp__heroCard {
+    padding: 64px 24px 40px;
+    gap: 20px;
+    border-radius: 24px;
+  }
+
+  .clp__heroBtn {
+    height: 48px;
+    font-size: 16px;
+    padding: 0 28px;
+  }
+
+  .clp__benefits {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .clp__benefitImg {
+    flex: 0 0 calc(50% - 5px);
+    width: calc(50% - 5px);
+  }
+
+  .clp__descSection {
+    padding-top: 32px;
+    padding-bottom: 40px;
+  }
+
+  .clp__descGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .clp__descRight {
+    padding-top: 0;
+  }
+
+  .clp__arrowWrap {
+    display: none;
+  }
+
+  .clp__bigTitle {
+    font-size: 26px;
+  }
+
+  .clp__bodyText {
+    font-size: 16px;
+  }
+
+  .clp__centeredSection {
+    padding-top: 36px;
+    padding-bottom: 36px;
+    gap: 14px;
+  }
+
+  .clp__centeredTitle {
+    font-size: 26px;
+  }
+
+  .clp__centeredBody {
+    font-size: 16px;
+  }
+
+  .clp__featureSection {
+    padding-bottom: 12px;
+  }
+
+  .clp__featureRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .clp__featureCardAcquaint {
+    width: 100%;
+  }
+
+  .clp__featureCardPrivacy {
+    flex: none;
+    width: 100%;
+  }
+
+  .clp__portfolioSection {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+
+  .clp__portfolioGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .clp__portfolioCards {
+    height: 280px;
+  }
+
+  .clp__portfolioBadge {
+    left: 20px;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .clp__faqSection {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+
+  .clp__faqTitle {
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .clp__faqTrigger {
+    font-size: 18px;
+    padding: 18px 0;
+  }
+
+  .clp__faqAnswer {
+    font-size: 15px;
+    padding-bottom: 18px;
+  }
+
+  .clp__medTitle {
+    font-size: 24px;
+  }
+
+  .clp__blogSection {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+
+  .clp__blogGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .clp__blogCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clp__blogTags {
+    gap: 8px;
+  }
+
+  .clp__tag {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+
+  .clp__telegramOverlayBtn {
+    width: min(420px, 75%);
+    height: 52px;
+  }
+
+  .clp__ctaOverlayBtn {
+    width: min(300px, 75%);
+    height: 52px;
+  }
+
+  .clp__roleCardText--space,
+  .clp__roleCardText--creator {
+    max-width: 42%;
+  }
+
+  .clp__roleCardTitle {
+    font-size: clamp(12px, 3.2vw, 20px);
+  }
+
+  .clp__roleCardDesc {
+    font-size: clamp(9px, 2.2vw, 16px);
+  }
+}

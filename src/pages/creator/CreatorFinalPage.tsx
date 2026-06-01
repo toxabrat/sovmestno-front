@@ -75,18 +75,19 @@ export function CreatorFinalPage() {
 
   const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !activeToken) return
+    if (!file) return
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    const previewUrl = URL.createObjectURL(file)
+    setPhotoPreviews(prev => [...prev, previewUrl])
+    if (!activeToken) return
     setUploadingPhoto(true)
     try {
-      const preview = URL.createObjectURL(file)
-      setPhotoPreviews(prev => [...prev, preview])
       const img = await uploadImage(file, 'venue-photo', activeToken)
       await addCreatorPhoto(img.id, activeToken)
     } catch (err) {
       console.error('Photo upload failed:', err)
     } finally {
       setUploadingPhoto(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
