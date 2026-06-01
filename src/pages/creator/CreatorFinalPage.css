@@ -276,14 +276,24 @@
 
 @media (max-width: 768px) {
   .creatorFinal__footer {
-    flex-direction: column;
-    align-items: stretch;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
     gap: 10px;
   }
   .creatorFinal__skipBtn,
   .creatorFinal__saveBtn {
-    width: 100%;
+    flex: 1;
     text-align: center;
+  }
+  .creatorFinal {
+    padding-bottom: 90px;
   }
 }
 
@@ -324,11 +334,17 @@
 }
 
 @media (max-width: 768px) {
+  .creatorFinal__photoGrid {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
   .creatorFinal__photoBtn,
   .creatorFinal__photoPreview {
-    width: calc(55vw - 20px);
-    min-width: calc(55vw - 20px);
-    height: 140px;
+    width: calc(50% - 6px);
+    min-width: 0;
+    height: 130px;
+    scroll-snap-align: none;
   }
 }
 
@@ -340,3 +356,4 @@
   line-height: 1.4;
   text-align: center;
 }
+

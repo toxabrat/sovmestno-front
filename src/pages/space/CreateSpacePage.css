@@ -19,7 +19,7 @@
 
 @media (max-width: 480px) {
   .createSpace {
-    padding: 24px 15px 40px;
+    padding: 24px 15px 80px;
   }
 }
 
@@ -339,10 +339,6 @@
   .createSpace__address {
     flex-direction: column;
   }
-  .createSpace__streetInput {
-    flex: none;
-    width: 100%;
-  }
 }
 
 .createSpace__citySelect {
@@ -390,11 +386,14 @@
   color: var(--text-muted);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .createSpace__streetInput {
-    height: 52px;
+    flex: none;
+    width: 100%;
+    height: 56px;
   }
 }
+
 
 .createSpace__contactsCard {
   background: var(--card);
@@ -560,18 +559,30 @@
     font-size: 18px;
     padding: 0 32px;
   }
+
+  .createSpace__footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+    justify-content: center;
+  }
+
+  .createSpace {
+    padding-bottom: 90px;
+  }
 }
 
 @media (max-width: 480px) {
   .createSpace__submitBtn {
     height: 50px;
     font-size: 16px;
-    padding: 15px 45px;
-    width: auto;
-  }
-  
-  .createSpace__footer {
-    justify-content: flex-end;
+    padding: 0 32px;
+    width: 100%;
   }
 }
 
@@ -649,3 +660,4 @@
   color: #e84040;
   line-height: 1.4;
 }
+

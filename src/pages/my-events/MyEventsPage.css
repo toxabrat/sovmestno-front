@@ -798,6 +798,17 @@
   justify-content: center;
   gap: 16px;
 }
+@media (max-width: 600px) {
+  .me__savedActions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .me__savedBtnOutline,
+  .me__savedBtnFilled {
+    width: 100%;
+    padding: 0 16px;
+  }
+}
 
 .me__savedBtnOutline {
   height: 42px;
@@ -959,5 +970,14 @@
   padding: 0 28px 24px;
 }
 @media (max-width: 600px) {
-  .me__eventCardActions { padding: 0 16px 16px; }
+  .me__eventCardActions {
+    padding: 0 16px 16px;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .me__eventCardActions .me__savedBtnOutline,
+  .me__eventCardActions .me__savedBtnFilled {
+    width: 100%;
+    padding: 0 16px;
+  }
 }
