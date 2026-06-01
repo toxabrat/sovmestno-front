@@ -20,7 +20,7 @@ export function Header() {
   const avatarUrlRef = useRef<string | null>(null)
   const avatarWrapRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 })
+  const [dropdownPos] = useState({ top: 0, right: 0 })
   const { isAuthenticated, user, token, refreshToken, logout } = useAuth()
   const [appCount, setAppCount] = useState(0)
 
