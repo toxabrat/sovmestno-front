@@ -55,7 +55,7 @@ export function Footer() {
               <img src={iconTelegram} alt="Telegram" className="footer__socialIcon" />
             </a>
           </div>
-          <p className="footer__email">Для вопросов и предложений: pochta@mail.com</p>
+          <p className="footer__email">Для вопросов и предложений: sovmestnoteam@mail.ru</p>
         </div>
 
         <div className="footer__nav">
