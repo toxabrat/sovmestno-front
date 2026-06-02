@@ -64,8 +64,9 @@ jobs:
             set -e
 
             echo "Creating backup..."
-            if [ -d "${DEPLOY_PATH}" ]; then
-              BACKUP_PATH="${DEPLOY_PATH}_backup_\$(date +%Y%m%d_%H%M%S)"
+            mkdir -p ~/frontend-backups
+            if [ -d "${DEPLOY_PATH}" ] && [ -n "\$(ls -A ${DEPLOY_PATH} 2>/dev/null)" ]; then
+              BACKUP_PATH=~/frontend-backups/frontend_backup_\$(date +%Y%m%d_%H%M%S)
               cp -r ${DEPLOY_PATH} \${BACKUP_PATH}
               echo "Backup created at \${BACKUP_PATH}"
             else
@@ -116,7 +117,7 @@ jobs:
         run: |
           echo "Deployment failed! Rolling back..."
           ssh ${PROD_USER}@${PROD_HOST} << ENDSSH
-            BACKUP_PATH=\$(ls -td ${DEPLOY_PATH}_backup_* 2>/dev/null | head -1)
+            BACKUP_PATH=\$(ls -td ~/frontend-backups/frontend_backup_* 2>/dev/null | head -1)
             if [ -n "\${BACKUP_PATH}" ]; then
               rm -rf ${DEPLOY_PATH}
               cp -r \${BACKUP_PATH} ${DEPLOY_PATH}
