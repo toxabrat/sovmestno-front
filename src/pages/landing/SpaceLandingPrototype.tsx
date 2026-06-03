@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
+import { useIsMobile } from '../../hooks/useIsMobile'
+import { SpaceLandingMobile } from './SpaceLandingMobile'
 import './SpaceLandingPrototype.css'
 
 import heroStar from '../../assets/icons/hero-star.svg'
@@ -30,8 +32,11 @@ import telegramSection from '../../assets/icons/landing_space/prototype/telegram
 import ctaBottom from '../../assets/icons/landing_space/prototype/cta_bottom.png'
 
 export function SpaceLandingPrototype() {
+  const isMobile = useIsMobile()
   const [tab, setTab] = useState<'space' | 'creator'>('space')
   const navigate = useNavigate()
+
+  if (isMobile) return <SpaceLandingMobile />
 
   const handleTab = (t: 'space' | 'creator') => {
     setTab(t)

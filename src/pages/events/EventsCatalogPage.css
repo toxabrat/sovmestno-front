@@ -28,6 +28,10 @@
   border-radius: 20px;
 }
 
+.eventsCatalog__heroBannerImg--mobile {
+  display: none;
+}
+
 .eventsCatalog__heroBannerText {
   position: absolute;
   top: 5%;
@@ -230,12 +234,31 @@
   text-align: center;
 }
 
-/* hero banner subtitle – desktop/mobile variants */
 .heroBannerSub__desktop { display: inline; }
 .heroBannerSub__mobile  { display: none; }
 @media (max-width: 768px) {
   .heroBannerSub__desktop { display: none; }
   .heroBannerSub__mobile  { display: inline; }
+
+  .eventsCatalog__heroBannerImg--desktop { display: none; }
+  .eventsCatalog__heroBannerImg--mobile  { display: block; }
+
+  .eventsCatalog__heroBannerText {
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 85%;
+  }
+
+  .eventsCatalog__heroBannerTitle {
+    font-size: 26px;
+    margin: 0 0 12px;
+  }
+
+  .eventsCatalog__heroBannerSub {
+    font-size: 15px;
+  }
 }
 
 .eventsCatalog__grid {
@@ -381,7 +404,6 @@
   text-overflow: ellipsis;
 }
 
-/* Actions sit below the white card, not inside it */
 .catalogCard__actions {
   display: flex;
   gap: 8px;
@@ -757,9 +779,7 @@
   margin: 0;
 }
 
-/* ── Mobile overrides ── */
 @media (max-width: 768px) {
-  /* mid-banner: hide card on mobile, center text block */
   .eventsMidBanner__right { display: none; }
   .eventsMidBanner__icon  { display: none; }
   .eventsMidBanner__left {
@@ -772,7 +792,6 @@
     padding: 10px 16px;
   }
 
-  /* catalog cards: vertical layout on mobile */
   .catalogCard {
     flex-direction: column;
     height: auto;

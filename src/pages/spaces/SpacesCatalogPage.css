@@ -448,8 +448,6 @@
   margin: 0;
 }
 
-/* Pills column — fixed height so stack always overflows by half a pill top/bottom */
-/* stack = 4×60px + 80px + 4×10px = 360px; container = 300px → overflow = 30px = ½ of 60px */
 .categoryBanner__pillsOuter {
   position: relative;
   flex-shrink: 0;

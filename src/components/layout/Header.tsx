@@ -178,13 +178,11 @@ export function Header() {
     <>
       {dropdown}
 
-      {/* Mobile drawer backdrop */}
       <div
         className={`header__mobileBackdrop ${isOpen ? 'header__mobileBackdrop--visible' : ''}`}
         onClick={() => setIsOpen(false)}
       />
 
-      {/* Mobile drawer */}
       <div className={`header__mobileDrawer ${isOpen ? 'header__mobileDrawer--open' : ''}`}>
         <div className="header__mobileDrawerHead">
           <Link to="/" className="header__mobileDrawerLogo" onClick={() => setIsOpen(false)}>

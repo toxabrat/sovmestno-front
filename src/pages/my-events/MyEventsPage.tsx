@@ -1075,7 +1075,7 @@ export function MyEventsPage() {
                           try {
                             await createApplication({ receiver_id: evt.creator_id, receiver_type: 'creator', event_id: evt.id }, token)
                             setInvitedEventIds(prev => new Set([...prev, evt.id]))
-                          } catch { /* ignore */ }
+                          } catch { /* */ }
                         }}
                       />
                     ))}

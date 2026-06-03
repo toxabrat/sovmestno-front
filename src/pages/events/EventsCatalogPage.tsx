@@ -11,6 +11,7 @@ import { Footer } from '../../components/layout/Footer'
 import './EventsCatalogPage.css'
 
 import heroBannerBg from '../../assets/icons/event_catalog/Frame 2131328071.png'
+import heroBannerMobile from '../../assets/icons/event_catalog/mobile/Frame 2131328053(2).png'
 import midBannerBg from '../../assets/icons/event_catalog/Frame 2131328266.png'
 import iconFire from '../../assets/icons/event_catalog/A_Button(small).png'
 
@@ -459,7 +460,8 @@ export function EventsCatalogPage() {
       <div className="eventsCatalog__content">
 
         <div className="eventsCatalog__heroBannerWrap">
-          <img src={heroBannerBg} alt="" className="eventsCatalog__heroBannerImg" />
+          <img src={heroBannerBg} alt="" className="eventsCatalog__heroBannerImg eventsCatalog__heroBannerImg--desktop" />
+          <img src={heroBannerMobile} alt="" className="eventsCatalog__heroBannerImg eventsCatalog__heroBannerImg--mobile" />
           <div className="eventsCatalog__heroBannerText">
             <h1 className="eventsCatalog__heroBannerTitle">Мероприятия под<br/>любой вайб и цели</h1>
             <p className="eventsCatalog__heroBannerSub">

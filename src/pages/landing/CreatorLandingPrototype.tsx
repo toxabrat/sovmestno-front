@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Footer } from '../../components/layout/Footer'
 import { Header } from '../../components/layout/Header'
+import { useIsMobile } from '../../hooks/useIsMobile'
+import { CreatorLandingMobile } from './CreatorLandingMobile'
 import './CreatorLandingPrototype.css'
 
 import arrowImg from '../../assets/icons/landing_creator/prototype/arrow.png'
@@ -41,9 +43,12 @@ const FAQS = [
 ]
 
 export function CreatorLandingPrototype() {
+  const isMobile = useIsMobile()
   const [tab, setTab] = useState<'space' | 'creator'>('creator')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const navigate = useNavigate()
+
+  if (isMobile) return <CreatorLandingMobile />
 
   const handleTab = (t: 'space' | 'creator') => {
     setTab(t)

@@ -1,0 +1,586 @@
+
+.clpm {
+  background: #f5f5f7;
+  font-family: "Golos Text", system-ui, sans-serif;
+  color: #1a1a1a;
+  min-height: 100dvh;
+}
+
+.clpm__section {
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 40px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.clpm__hl {
+  background: #d8f772;
+  border-radius: 6px;
+  padding: 0 4px;
+  display: inline;
+}
+
+.clpm__bigTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.clpm__bodyText {
+  font-size: 15px;
+  font-weight: 400;
+  color: #555;
+  margin: 0 0 20px;
+  line-height: 1.55;
+}
+
+.clpm__tag {
+  display: inline-block;
+  align-self: flex-start;
+  background: transparent;
+  border: 1.5px solid #313235;
+  border-radius: 100px;
+  padding: 5px 15px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #313235;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.clpm__hero {
+  padding-top: 24px;
+  margin-bottom: 40px;
+}
+
+.clpm__heroCard {
+  background: #6c7efe;
+  border-radius: 28px;
+  padding: 60px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.clpm__heroToggle {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: #fff;
+  border-radius: 100px;
+  padding: 3px;
+  z-index: 10;
+}
+
+.clpm__heroToggleBtn {
+  height: 32px;
+  padding: 0 18px;
+  border: none;
+  background: transparent;
+  border-radius: 100px;
+  font-family: "Golos Text", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+
+.clpm__heroToggleBtn--active {
+  background: #6c7efe;
+  color: #fff;
+}
+
+.clpm__heroStar {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.clpm__heroTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.clpm__heroTitleLast {
+  position: relative;
+  display: inline-block;
+}
+
+.clpm__heroLine {
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.clpm__heroSubtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.clpm__heroBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  background: #d8f772;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 100px;
+  font-family: "Golos Text", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 150ms ease;
+  flex-shrink: 0;
+}
+
+.clpm__heroBtn:hover {
+  filter: brightness(0.95);
+}
+
+.clpm__benefitsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.clpm__benefitImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+}
+
+.clpm__desc {
+  display: flex;
+  flex-direction: column;
+}
+
+.clpm__arrowWrap {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.clpm__arrow {
+  width: 180px;
+  height: auto;
+  display: block;
+}
+
+.clpm__roleCardWrap {
+  position: relative;
+  width: 100%;
+}
+
+.clpm__roleCardImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+}
+
+.clpm__roleCardLabel {
+  position: absolute;
+  left: 16px;
+  right: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clpm__roleCardLabel--space {
+  top: 18px;
+}
+
+.clpm__roleCardLabel--creator {
+  top: 52%;
+}
+
+.clpm__roleCardTitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: #313235;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.clpm__roleCardDesc {
+  font-size: 10px;
+  font-weight: 400;
+  color: #98989a;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.clpm__centered {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
+.clpm__centeredTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.clpm__centeredBody {
+  font-size: 15px;
+  font-weight: 400;
+  color: #555;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.clpm__features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.clpm__featureCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.clpm__featureImgWrap {
+  position: relative;
+}
+
+.clpm__featureImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+}
+
+.clpm__featureTag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: transparent;
+  border: 1.5px solid #313235;
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #313235;
+  line-height: 1;
+}
+
+.clpm__featureText {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  font-weight: 400;
+  color: #313235;
+  margin: 0;
+  line-height: 1.4;
+  padding: 0 16px;
+  text-align: left;
+}
+
+.clpm__quoteCard {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.clpm__quoteImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.clpm__quoteOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px 92px;
+  text-align: center;
+}
+
+.clpm__quoteTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.clpm__quoteLime {
+  text-decoration: underline;
+  text-decoration-color: #d8f772;
+  text-underline-offset: 4px;
+}
+
+.clpm__portfolioStack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.clpm__portfolioCards {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.clpm__portfolioBadge {
+  position: absolute;
+  top: 30px;
+  left: 20px;
+  background: #d4d8f3;
+  border-radius: 100px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #313235;
+  white-space: nowrap;
+  z-index: 5;
+  transform: rotate(6deg);
+}
+
+.clpm__portfolioCardBack {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.clpm__portfolioCardFront {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  z-index: 2;
+}
+
+.clpm__faq {
+  display: flex;
+  flex-direction: column;
+}
+
+.clpm__faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.clpm__faqItem {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.clpm__faqTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0;
+  background: transparent;
+  border: none;
+  font-family: "Golos Text", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #313235;
+  cursor: pointer;
+  text-align: left;
+}
+
+.clpm__faqArrow {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.clpm__faqAnswer {
+  font-size: 15px;
+  font-weight: 400;
+  color: #313235;
+  line-height: 1.55;
+  margin: 0 0 18px;
+}
+
+.clpm__goal {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.clpm__blogRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.clpm__blogCard {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.clpm__community {
+  display: flex;
+  flex-direction: column;
+}
+
+.clpm__telegramBlock {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.clpm__telegramImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.clpm__telegramOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 16px;
+  gap: 14px;
+}
+
+.clpm__communityTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.clpm__communityTags .clpm__tag {
+  margin-bottom: 0;
+  background: #fff;
+  border-color: transparent;
+  font-size: 10px;
+  padding: 4px 10px;
+}
+
+.clpm__telegramLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: #6c7efe;
+  color: #fff;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  margin-top: 80px;
+  transition: opacity 150ms ease;
+}
+
+.clpm__telegramLink:hover {
+  opacity: 0.85;
+}
+
+.clpm__cta {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.clpm__ctaCard {
+  background: #6c7efe;
+  border-radius: 40px 40px 0 0;
+  padding: 48px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  min-height: 480px;
+}
+
+.clpm__ctaTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.clpm__ctaOutlined {
+  display: inline-block;
+  border: 2px solid #d8f772;
+  border-radius: 100px;
+  padding: 0 10px;
+  line-height: 1.3;
+}
+
+.clpm__ctaUnderline {
+  position: relative;
+  display: inline-block;
+}
+
+.clpm__ctaUnderline::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #d8f772;
+  border-radius: 2px;
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+
+.clpm__ctaSubtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+}
