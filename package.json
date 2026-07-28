@@ -10,15 +10,23 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "android:sync": "cap sync android",
+    "android:build": "cd android && ./gradlew assembleDebug",
+    "android:open": "cap open android",
+    "android:icons": "capacitor-assets generate --android --assetPath src/assets/app-icon"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-image-crop": "^11.0.10",
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.6.8",
     "@eslint/js": "^9.39.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
